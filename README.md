@@ -1,0 +1,33 @@
+# fit-tooling
+
+## Running the application
+
+```shell script
+./mvn quarkus:dev
+```
+
+```shell
+# Request all data
+$ curl http://localhost:8080/fit/data 
+
+# Request aggregated statistics
+$ curl http://localhost:8080/fit/stats
+
+# Call website
+$ curl http://localhost:8080/fit/index -H 'accept: text/html' 
+```
+
+## Open TODOs
+
+- [ ] add altitude difference, elapsed time, max speed
+- [ ] show overall statistics -> dedicated endpoint?
+  - [x] aggregated kilometers
+  - [ ] histogram tour length
+  - [ ] driven kilometers over time (histogram?) 
+  - [ ] enable filtering (for year)
+  - [ ] any possibility to add additional tags for filtering (such as by bike, by route, ...)?
+- [ ] speed over time -> graph
+  - [ ] add grade over time in different color?
+- [ ] optimization: cache parsed results   
+- [ ] upload files via API?
+- [ ] persist files?
