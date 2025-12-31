@@ -23,8 +23,11 @@ public class FitService {
   FitData fetchDataBy(String fileName) {
     Decode decode = new Decode();
     MesgBroadcaster broadcaster = new MesgBroadcaster(decode);
-    StatsListener stats = new StatsListener();
-    broadcaster.addListener(stats);
+    RecordListener rec = new RecordListener();
+    SessionListener ses = new SessionListener();
+
+    broadcaster.addListener(rec);
+    broadcaster.addListener(ses);
     String fullPath = sourcePath + "/" + fileName;
 
     try (InputStream is =
@@ -38,10 +41,13 @@ public class FitService {
 
       return new FitData(
           fileName,
-          stats.getDate(),
-          stats.getTotalDistance(),
-          stats.getAverageSpeed(),
-          stats.getPositions());
+          rec.getDate(),
+          ses.getDistance(),
+          ses.getTimeWithoutBreaks(),
+          ses.getAverageSpeed(),
+          rec.getMaxSpeed(),
+          ses.getTotalAscent(),
+          rec.getPositions());
 
     } catch (IOException e) {
       throw new IllegalStateException("Resource not found: " + fullPath);

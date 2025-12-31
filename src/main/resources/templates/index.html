@@ -34,7 +34,10 @@
                             <th class="sortable">Name <span class="arrow">↑↓</span></th>
                             <th class="sortable has-text-centered">Date <span class="arrow">↑↓</span></th>
                             <th class="sortable has-text-centered">Distance <span class="arrow">↑↓</span></th>
+                            <th class="sortable has-text-centered">Duration <span class="arrow">↑↓</span></th>
+                            <th class="sortable has-text-centered">Total ascent <span class="arrow">↑↓</span></th>
                             <th class="sortable has-text-centered">Average Speed <span class="arrow">↑↓</span></th>
+                            <th class="sortable has-text-centered">Max Speed <span class="arrow">↑↓</span></th>
                         </tr>
                     </thead>
 
@@ -44,7 +47,10 @@
                             <td>{entry.displayName}</td>
                             <td class="has-text-centered">{entry.date}</td>
                             <td class="has-text-centered">{entry.distance}</td>
+                            <td class="has-text-centered">{entry.duration}</td>
+                            <td class="has-text-centered">{entry.totalAscent}</td>
                             <td class="has-text-centered">{entry.avgSpeed}</td>
+                            <td class="has-text-centered">{entry.maxSpeed}</td>
                         </tr>
                         {/for}
                     </tbody>

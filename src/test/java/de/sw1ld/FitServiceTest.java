@@ -27,7 +27,7 @@ class FitServiceTest {
     assertThat(result.name()).isEqualTo(TEST_FIT_FILE);
     assertThat(result.date()).isEqualTo(LocalDate.of(2021, 4, 27));
     assertThat(result.distance()).isCloseTo(34.68, within(0.005));
-    assertThat(result.avgSpeed()).isCloseTo(20.35, within(0.005));
+    assertThat(result.avgSpeed()).isCloseTo(21.93, within(0.005));
     assertThat(result.positions()).isNotEmpty();
   }
 

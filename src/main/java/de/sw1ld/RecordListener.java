@@ -6,23 +6,16 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StatsListener implements RecordMesgListener {
-  private double lastDistance = 0;
-  private double speedSum = 0;
-  private int count = 0;
+public class RecordListener implements RecordMesgListener {
+  private double maxSpeed = 0.0;
   private List<Position> positions = new ArrayList<>();
 
   @Override
   public void onMesg(RecordMesg m) {
-    if (m.getDistance() != null) {
-      lastDistance = m.getDistance();
-    }
-    if (m.getSpeed() != null) {
-      speedSum += m.getSpeed();
-      count++;
+    if (m.getSpeed() != null && m.getSpeed() < 25) { // avoid weird peeks (25 m/s -> ca 90km/h)
+      maxSpeed = Math.max(maxSpeed, m.getSpeed());
     }
     if (m.getPositionLat() != null && m.getPositionLat() != null) {
-
       positions.add(new Position(m.getPositionLat(), m.getPositionLong(), m.getTimestamp()));
     }
   }
@@ -40,13 +33,8 @@ public class StatsListener implements RecordMesgListener {
     }
   }
 
-  /* km */
-  double getTotalDistance() {
-    return lastDistance / 1000.0;
-  }
-
   /* kilometer per hour */
-  double getAverageSpeed() {
-    return count > 0 ? (speedSum / count * 3.6) : 0;
+  double getMaxSpeed() {
+    return maxSpeed * 3.6;
   }
 }

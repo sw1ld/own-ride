@@ -8,7 +8,10 @@ public record FitResponse(
     String name, // used as ID right now
     LocalDate date,
     String distance,
+    String duration,
     String avgSpeed,
+    String maxSpeed,
+    String totalAscent,
     List<Position> positions) {
 
   public FitResponse(FitData fd) {
@@ -16,8 +19,11 @@ public record FitResponse(
         toDisplayName(fd.name()),
         fd.name(),
         fd.date(),
-        ResponseHelper.formattedDistanceWithUnit(fd.distance()),
-        ResponseHelper.formattedSpeedWithUnit(fd.avgSpeed()),
+        Prettyfier.distanceWithUnit(fd.distance()),
+        Prettyfier.duration(fd.duration()),
+        Prettyfier.speedWithUnit(fd.avgSpeed()),
+        Prettyfier.speedWithUnit(fd.maxSpeed()),
+        Prettyfier.withMeter(fd.totalAscent()),
         fd.positions());
   }
 

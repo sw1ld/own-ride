@@ -19,9 +19,8 @@ $ curl http://localhost:8080/fit/index -H 'accept: text/html'
 
 ## Open TODOs
 
-- [ ] add altitude difference, elapsed time, max speed
+- [x] subtract pauses from elapsed time (and avg speed)
 - [ ] show overall statistics -> dedicated endpoint?
-  - [x] aggregated kilometers
   - [ ] histogram tour length
   - [ ] driven kilometers over time (histogram?) 
   - [ ] enable filtering (for year)
