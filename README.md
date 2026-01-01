@@ -8,13 +8,13 @@
 
 ```shell
 # Request all data
-$ curl http://localhost:8080/fit/data 
+$ curl http://localhost:8080/fit/details 
 
 # Request aggregated statistics
 $ curl http://localhost:8080/fit/stats
 
 # Call website
-$ curl http://localhost:8080/fit/index -H 'accept: text/html' 
+$ curl http://localhost:8080/fit/stats -H 'accept: text/html' 
 ```
 
 ## Open TODOs

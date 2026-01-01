@@ -21,8 +21,8 @@ class FitServiceTest {
   }
 
   @Test
-  void fetchDataBy() {
-    FitData result = cut.fetchDataBy(TEST_FIT_FILE);
+  void fetchDetailsBy() {
+    FitData result = cut.fetchDetailsBy(TEST_FIT_FILE);
 
     assertThat(result.name()).isEqualTo(TEST_FIT_FILE);
     assertThat(result.date()).isEqualTo(LocalDate.of(2021, 4, 27));
@@ -32,15 +32,15 @@ class FitServiceTest {
   }
 
   @Test
-  void fetchDataByUnknown() {
-    FitData result = cut.fetchDataBy(UNKNOWN_FIT_FILE);
+  void fetchDetailsByUnknown() {
+    FitData result = cut.fetchDetailsBy(UNKNOWN_FIT_FILE);
 
     assertThat(result).isNull();
   }
 
   @Test
-  void fetchData() {
-    List<FitData> result = cut.fetchData();
+  void fetchDetails() {
+    List<FitData> result = cut.fetchDetails();
 
     assertThat(result).hasSize(2);
   }

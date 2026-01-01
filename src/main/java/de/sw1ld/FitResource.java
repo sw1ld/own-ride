@@ -20,41 +20,47 @@ public class FitResource {
   }
 
   @GET
-  @Path("/index")
+  @Path("/stats")
   @Produces(MediaType.TEXT_HTML)
   public Response index() {
-    List<FitData> fitData = fitService.fetchData();
+    List<FitData> fitData = fitService.fetchDetails();
 
-    return Response.ok(
-            Templates.index(
-                fitData.stream().map(FitResponse::new).toList(), StatsService.getStats(fitData)))
-        .build();
-  }
-
-  @GET
-  @Path("/data")
-  @Produces(MediaType.APPLICATION_JSON)
-  public Response allData() {
-    List<FitData> fitData = fitService.fetchData();
-
-    return Response.ok().entity(fitData.stream().map(FitResponse::new).toList()).build();
-  }
-
-  @GET
-  @Path("data/name/{name}")
-  @Produces(MediaType.APPLICATION_JSON)
-  public Response dataByName(@PathParam("name") String name) {
-    FitData fitData = fitService.fetchDataBy(name);
-
-    return Response.ok().entity(new FitResponse(fitData)).build();
+    return Response.ok(Templates.index(StatsService.getStats(fitData))).build();
   }
 
   @GET
   @Path("/stats")
   @Produces(MediaType.APPLICATION_JSON)
   public Response statistics() {
-    List<FitData> fitData = fitService.fetchData();
+    List<FitData> fitData = fitService.fetchDetails();
 
     return Response.ok().entity(StatsService.getStats(fitData)).build();
+  }
+
+  @GET
+  @Path("/details")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response allData() {
+    List<FitData> fitData = fitService.fetchDetails();
+
+    return Response.ok().entity(fitData.stream().map(FitResponse::new).toList()).build();
+  }
+
+  @GET
+  @Path("/details")
+  @Produces(MediaType.TEXT_HTML)
+  public Response details() {
+    List<FitData> fitData = fitService.fetchDetails();
+
+    return Response.ok(Templates.details(fitData.stream().map(FitResponse::new).toList())).build();
+  }
+
+  @GET
+  @Path("details/name/{name}")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response dataByName(@PathParam("name") String name) {
+    FitData fitData = fitService.fetchDetailsBy(name);
+
+    return Response.ok().entity(new FitResponse(fitData)).build();
   }
 }

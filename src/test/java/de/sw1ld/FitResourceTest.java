@@ -21,8 +21,8 @@ class FitResourceTest {
   @InjectMock FitService fitService;
 
   @Test
-  void fetchData() {
-    when(fitService.fetchData())
+  void fetchDetails() {
+    when(fitService.fetchDetails())
         .thenReturn(
             List.of(
                 new FitData(
@@ -38,7 +38,7 @@ class FitResourceTest {
     RestAssured.given()
         .when()
         .accept(ContentType.JSON)
-        .get(BASE_PATH + "/data")
+        .get(BASE_PATH + "/details")
         .then()
         .statusCode(200)
         .contentType(ContentType.JSON)
@@ -54,7 +54,7 @@ class FitResourceTest {
 
   @Test
   void fetchDistinct() {
-    when(fitService.fetchDataBy("foobar.fit"))
+    when(fitService.fetchDetailsBy("foobar.fit"))
         .thenReturn(
             new FitData(
                 FILENAME,
@@ -69,7 +69,7 @@ class FitResourceTest {
     RestAssured.given()
         .when()
         .accept(ContentType.JSON)
-        .get(BASE_PATH + "/data/name/foobar.fit")
+        .get(BASE_PATH + "/details/name/foobar.fit")
         .then()
         .statusCode(200)
         .contentType(ContentType.JSON)
@@ -94,7 +94,7 @@ class FitResourceTest {
             38,
             170,
             List.of());
-    when(fitService.fetchData()).thenReturn(List.of(fitData, fitData, fitData));
+    when(fitService.fetchDetails()).thenReturn(List.of(fitData, fitData, fitData));
 
     RestAssured.given()
         .when()

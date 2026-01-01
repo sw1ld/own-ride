@@ -9,7 +9,7 @@ let endMarker = null;
 
 async function loadRoute(filename) {
   try {
-    const response = await fetch(`/fit/data/name/${encodeURIComponent(filename)}`);
+    const response = await fetch(`/fit/details/name/${encodeURIComponent(filename)}`);
     if (!response.ok) throw new Error("HTTP " + response.status);
 
     const data = await response.json();

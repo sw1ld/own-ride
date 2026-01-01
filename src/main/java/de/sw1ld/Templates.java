@@ -9,5 +9,7 @@ public class Templates {
 
   private Templates() {}
 
-  public static native TemplateInstance index(List<FitResponse> data, StatisticResponse stats);
+  public static native TemplateInstance index(StatisticResponse stats);
+
+  public static native TemplateInstance details(List<FitResponse> data);
 }

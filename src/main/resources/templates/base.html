@@ -38,14 +38,19 @@
     </head>
 
     <body>
+        <nav class="navbar" role="navigation" aria-label="main navigation">
+            <div id="mainNavbar" class="navbar-menu">
+                <div class="navbar-start">
+                    <a class="navbar-item" href="/fit/stats">Dashboard</a>
+                    <a class="navbar-item" href="/fit/details">Details</a>
+                </div>
+            </div>
+        </nav>
+
         <section class="section">
             <div class="container">
                 {#insert}Missing body! 😿{/}
             </div>
         </section>
-
-        <div id="loader" class="loader__overlay">
-            <div class="loader__content"></div>
-        </div>
     </body>
 </html>

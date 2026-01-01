@@ -1,0 +1,51 @@
+{#include base}
+    <h1 class="title">Activities</h1>
+
+    <section class="f-switch">
+        <div class="box">
+            <h2 class="title is-4">Details</h2>
+
+            <div id="fitResponses">
+                <table class="table is-striped is-hoverable is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th class="sortable">Name <span class="arrow">↑↓</span></th>
+                            <th class="sortable has-text-centered">Date <span class="arrow">↑↓</span></th>
+                            <th class="sortable has-text-centered">Distance <span class="arrow">↑↓</span></th>
+                            <th class="sortable has-text-centered">Duration <span class="arrow">↑↓</span></th>
+                            <th class="sortable has-text-centered">Total ascent <span class="arrow">↑↓</span></th>
+                            <th class="sortable has-text-centered">Average Speed <span class="arrow">↑↓</span></th>
+                            <th class="sortable has-text-centered">Max Speed <span class="arrow">↑↓</span></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {#for entry in data}
+                        <tr class="clickable-row" data-filename="{entry.name}">
+                            <td>{entry.displayName}</td>
+                            <td class="has-text-centered">{entry.date}</td>
+                            <td class="has-text-centered">{entry.distance}</td>
+                            <td class="has-text-centered">{entry.duration}</td>
+                            <td class="has-text-centered">{entry.totalAscent}</td>
+                            <td class="has-text-centered">{entry.avgSpeed}</td>
+                            <td class="has-text-centered">{entry.maxSpeed}</td>
+                        </tr>
+                        {/for}
+                    </tbody>
+                </table>
+            </div>
+            <script src="/arrow-toggler.js" defer></script>
+
+            <section class="section">
+                <h2 class="title is-4">Route</h2>
+
+                <div class="box">
+                    <div id="map"></div>
+
+                    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                    <script src="/map.js" defer></script>
+                </div>
+            </section>
+        </div>
+    </section>
+{/include}

@@ -20,7 +20,7 @@ public class FitService {
     this.sourcePath = sourcePath;
   }
 
-  FitData fetchDataBy(String fileName) {
+  FitData fetchDetailsBy(String fileName) {
     Decode decode = new Decode();
     MesgBroadcaster broadcaster = new MesgBroadcaster(decode);
     RecordListener rec = new RecordListener();
@@ -56,7 +56,7 @@ public class FitService {
     }
   }
 
-  List<FitData> fetchData() {
+  List<FitData> fetchDetails() {
     List<FitData> fitResponses = new ArrayList<>();
 
     try {
@@ -69,7 +69,7 @@ public class FitService {
                   .forEach(
                       file -> {
                         String filename = file.getFileName().toString();
-                        fitResponses.add(fetchDataBy(filename));
+                        fitResponses.add(fetchDetailsBy(filename));
                       });
             } catch (IOException e) {
               throw new RuntimeException(e);
