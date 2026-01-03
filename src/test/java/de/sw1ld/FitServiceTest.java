@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 class FitServiceTest {
 
   private static final String TEST_FIT_FILE = "2021-04-27_Route1.fit";
-  private static final String UNKNOWN_FIT_FILE = "unknown.fit";
+  private static final String UNKNOWN_FIT_FILE = "2021-03-12_unknown.fit";
 
   FitService cut;
 
@@ -40,8 +40,17 @@ class FitServiceTest {
 
   @Test
   void fetchDetails() {
-    List<FitData> result = cut.fetchDetails();
+    List<FitData> result = cut.fetchDetails(null);
 
     assertThat(result).hasSize(2);
+  }
+
+  @Test
+  void fetchDetailsFilteredByYear() {
+    List<FitData> result = cut.fetchDetails(2021);
+    assertThat(result).hasSize(2);
+
+    result = cut.fetchDetails(2024);
+    assertThat(result).isEmpty();
   }
 }

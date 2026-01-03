@@ -22,7 +22,7 @@ class FitResourceTest {
 
   @Test
   void fetchDetails() {
-    when(fitService.fetchDetails())
+    when(fitService.fetchDetails(2025))
         .thenReturn(
             List.of(
                 new FitData(
@@ -38,7 +38,7 @@ class FitResourceTest {
     RestAssured.given()
         .when()
         .accept(ContentType.JSON)
-        .get(BASE_PATH + "/details")
+        .get(BASE_PATH + "/details?year=2025")
         .then()
         .statusCode(200)
         .contentType(ContentType.JSON)
@@ -94,16 +94,31 @@ class FitResourceTest {
             38,
             170,
             List.of());
-    when(fitService.fetchDetails()).thenReturn(List.of(fitData, fitData, fitData));
+    when(fitService.fetchDetails(2025)).thenReturn(List.of(fitData, fitData, fitData));
 
     RestAssured.given()
         .when()
         .accept(ContentType.JSON)
-        .get(BASE_PATH + "/stats")
+        .get(BASE_PATH + "/stats?year=2025")
         .then()
         .statusCode(200)
         .contentType(ContentType.JSON)
         .body("rides", Matchers.equalTo(3))
         .body("distance", Matchers.equalTo("150.00 km"));
+  }
+
+  @Test
+  void fetchEmptyStatistics() {
+    when(fitService.fetchDetails(2024)).thenReturn(List.of());
+
+    RestAssured.given()
+        .when()
+        .accept(ContentType.JSON)
+        .get(BASE_PATH + "/stats?year=2024")
+        .then()
+        .statusCode(200)
+        .contentType(ContentType.JSON)
+        .body("rides", Matchers.equalTo(0))
+        .body("distance", Matchers.equalTo("0.00 km"));
   }
 }

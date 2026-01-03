@@ -1,8 +1,11 @@
 package de.sw1ld;
 
-public record StatisticResponse(int rides, String distance) {
+import java.time.LocalDate;
+import java.util.Map;
 
-  public StatisticResponse(int rides, double distance) {
-    this(rides, Prettyfier.distanceWithUnit(distance));
+public record StatisticResponse(int rides, String distance, Map<LocalDate, Double> tourDates) {
+
+  public StatisticResponse(int rides, double distance, Map<LocalDate, Double> tourDates) {
+    this(rides, Prettyfier.distanceWithUnit(distance), tourDates);
   }
 }

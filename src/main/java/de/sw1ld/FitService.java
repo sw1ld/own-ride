@@ -3,6 +3,7 @@ package de.sw1ld;
 import com.garmin.fit.Decode;
 import com.garmin.fit.MesgBroadcaster;
 import io.quarkus.runtime.util.ClassPathUtils;
+import jakarta.annotation.Nullable;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +57,7 @@ public class FitService {
     }
   }
 
-  List<FitData> fetchDetails() {
+  List<FitData> fetchDetails(@Nullable Integer year) {
     List<FitData> fitResponses = new ArrayList<>();
 
     try {
@@ -69,7 +70,15 @@ public class FitService {
                   .forEach(
                       file -> {
                         String filename = file.getFileName().toString();
-                        fitResponses.add(fetchDetailsBy(filename));
+                        if (year == null) {
+                          fitResponses.add(fetchDetailsBy(filename));
+                        } else {
+                          if (filename.startsWith(year.toString())) {
+                            fitResponses.add(fetchDetailsBy(filename));
+                          } else {
+                            // ignore other files
+                          }
+                        }
                       });
             } catch (IOException e) {
               throw new RuntimeException(e);

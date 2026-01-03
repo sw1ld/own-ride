@@ -11,7 +11,7 @@
 $ curl http://localhost:8080/fit/details 
 
 # Request aggregated statistics
-$ curl http://localhost:8080/fit/stats
+$ curl http://localhost:8080/fit/stats?year=2025
 
 # Call website
 $ curl http://localhost:8080/fit/stats -H 'accept: text/html' 
@@ -19,12 +19,12 @@ $ curl http://localhost:8080/fit/stats -H 'accept: text/html'
 
 ## Open TODOs
 
-- [x] subtract pauses from elapsed time (and avg speed)
-- [ ] show overall statistics -> dedicated endpoint?
-  - [ ] histogram tour length
-  - [ ] driven kilometers over time (histogram?) 
-  - [ ] enable filtering (for year)
-  - [ ] any possibility to add additional tags for filtering (such as by bike, by route, ...)?
+- [ ] any possibility to add additional tags for filtering (such as by bike, by route, ...)?
+- [ ] init drop down for year-filter by "minimal year" of uploaded files
+- [ ] bug: small browser window does not scale up charts properly
+- [ ] move code to dedicated js files
+  - [ ] routeLengthChart 
+  - [ ] insert JSON to js files
 - [ ] speed over time -> graph
   - [ ] add grade over time in different color?
 - [ ] optimization: cache parsed results   
