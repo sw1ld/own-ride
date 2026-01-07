@@ -1,0 +1,58 @@
+{#include base}
+    <h1 class="title">Upload</h1>
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-5">
+                    <div class="card">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                File upload
+                            </p>
+                        </header>
+
+                        <div class="card-content">
+                            <form id="uploadForm" action="/fit/upload" method="post" enctype="multipart/form-data">
+                                <div id="errorMessage" class="notification is-danger is-hidden"></div>
+                                <div id="successMessage" class="notification is-success is-hidden"></div>
+
+                                <div class="field">
+                                    <div class="control">
+                                        <div class="file is-fullwidth has-name is-boxed">
+                                            <label class="file-label">
+                                                <input
+                                                    id="fileInput"
+                                                    class="file-input"
+                                                    type="file"
+                                                    name="file"
+                                                    accept=".fit"
+                                                    required
+                                                >
+                                                <span class="file-cta">
+                                                    <span class="file-icon">📁</span>
+                                                    <span class="file-label">Select file…</span>
+                                                </span>
+                                                <span id="fileName" class="file-name">
+                                                    No file selected
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <p class="help">Supported format: <strong>.fit</strong></p>
+                                </div>
+
+                                <div class="field is-grouped is-grouped-right">
+                                    <div class="control">
+                                        <button type="submit" class="button is-primary">
+                                            Upload
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{/include}

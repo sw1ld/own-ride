@@ -1,7 +1,10 @@
 package de.sw1ld;
 
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -11,27 +14,60 @@ import jakarta.ws.rs.core.Response;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 @Path("/fit")
 @RequestScoped
 public class FitResource {
 
   private final FitService fitService;
+  private final UploadService uploadService;
 
-  public FitResource(FitService fitService) {
+  public FitResource(FitService fitService, UploadService uploadService) {
     this.fitService = fitService;
+    this.uploadService = uploadService;
+  }
+
+  @GET
+  @Path("/upload")
+  @Produces(MediaType.TEXT_HTML)
+  public Response uploadPage() {
+    return Response.ok(Templates.upload("foobar")).build();
+  }
+
+  @Transactional
+  @POST
+  @Path("/upload")
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @Produces(MediaType.TEXT_HTML)
+  public Response upload(MultipartFormDataInput fitfile) {
+    // TODO verify/cut length of filename!
+    var parts = fitfile.getFormDataMap().get("file");
+    if (parts == null || parts.size() != 1 || parts.getFirst().getFileName().isEmpty()) {
+      return Response.status(400).entity("Uploaded file must not be empty!").build();
+    }
+    var part = parts.getFirst();
+    try {
+      UUID id = uploadService.persistActivity(part.getFileName(), part.getBody(byte[].class, null));
+
+      return Response.ok(Templates.upload("Upload was successful. Id [%s]".formatted(id))).build();
+    } catch (Exception e) {
+      // TODO error page!
+      return Response.ok(Templates.upload("something failed")).build();
+    }
   }
 
   @GET
   @Path("/stats")
   @Produces(MediaType.TEXT_HTML)
-  public Response index(@QueryParam("year") Integer year) {
+  public Response allStats(@QueryParam("year") Integer year) {
     if (year == null) {
       year = LocalDate.now().getYear();
     }
     List<FitData> fitData = fitService.fetchDetails(year);
 
-    return Response.ok(Templates.index(StatsService.getStats(fitData, year))).build();
+    return Response.ok(Templates.statistics(StatsService.getStats(fitData, year))).build();
   }
 
   @GET
@@ -77,10 +113,10 @@ public class FitResource {
   }
 
   @GET
-  @Path("details/name/{name}")
+  @Path("details/id/{id}")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response dataByName(@PathParam("name") String name) {
-    FitData fitData = fitService.fetchDetailsBy(name);
+  public Response dataById(@PathParam("id") UUID id) {
+    FitData fitData = fitService.fetchDetailsBy(id);
 
     return Response.ok().entity(new FitResponse(fitData)).build();
   }

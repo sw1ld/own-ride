@@ -14,7 +14,18 @@ public class Prettyfier {
     return "%.2f km/h".formatted(speed);
   }
 
+  static String temperatureWithUnit(Integer temp) {
+    if (temp == null) {
+      return "/";
+    } else {
+      return "%d °C".formatted(temp);
+    }
+  }
+
   public static String duration(Duration duration) {
+    if (duration == null) {
+      return "not defined";
+    }
     return "%d:%02d:%02d"
         .formatted(duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
   }

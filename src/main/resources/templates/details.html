@@ -1,4 +1,24 @@
 {#include base}
+    <h1 class="title">Details</h1>
+    <div class="columns">
+        <div class="column is-3">
+            <div class="field">
+                <div class="control">
+                    <div class="select is-fullwidth">
+                        <select id="yearFilter">
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <section class="f-switch">
         <div class="box">
             <h2 class="title is-4">Details</h2>
@@ -13,20 +33,20 @@
                             <th class="sortable has-text-centered">Duration <span class="arrow">↑↓</span></th>
                             <th class="sortable has-text-centered">Total ascent <span class="arrow">↑↓</span></th>
                             <th class="sortable has-text-centered">Average Speed <span class="arrow">↑↓</span></th>
-                            <th class="sortable has-text-centered">Max Speed <span class="arrow">↑↓</span></th>
+                            <th class="sortable has-text-centered">Temperature <span class="arrow">↑↓</span></th>
                         </tr>
                     </thead>
 
                     <tbody>
                         {#for entry in data}
-                        <tr class="clickable-row" data-filename="{entry.name}">
+                        <tr class="clickable-row" data-id="{entry.id}">
                             <td>{entry.displayName}</td>
                             <td class="has-text-centered">{entry.date}</td>
                             <td class="has-text-centered">{entry.distance}</td>
                             <td class="has-text-centered">{entry.duration}</td>
                             <td class="has-text-centered">{entry.totalAscent}</td>
                             <td class="has-text-centered">{entry.avgSpeed}</td>
-                            <td class="has-text-centered">{entry.maxSpeed}</td>
+                            <td class="has-text-centered">{entry.temperature}</td>
                         </tr>
                         {/for}
                     </tbody>

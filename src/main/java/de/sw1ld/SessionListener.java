@@ -11,6 +11,7 @@ public class SessionListener implements SessionMesgListener {
   private Duration timeWithoutBreaks;
   private Integer totalAscent;
   private double averageSpeed = 0.0;
+  private Integer temperature;
 
   @Override
   public void onMesg(SessionMesg mesg) {
@@ -35,6 +36,10 @@ public class SessionListener implements SessionMesgListener {
     }
 
     this.totalAscent = mesg.getTotalAscent();
+
+    if (mesg.getAvgTemperature() != null) {
+      temperature = Integer.valueOf(mesg.getAvgTemperature().toString());
+    }
   }
 
   double getDistance() {
@@ -55,5 +60,9 @@ public class SessionListener implements SessionMesgListener {
 
   Integer getTotalAscent() {
     return totalAscent;
+  }
+
+  Integer getTemperature() {
+    return temperature;
   }
 }

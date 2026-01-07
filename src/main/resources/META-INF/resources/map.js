@@ -7,9 +7,9 @@ let currentPolyline = null;
 let startMarker = null;
 let endMarker = null;
 
-async function loadRoute(filename) {
+async function loadRoute(id) {
   try {
-    const response = await fetch(`/fit/details/name/${encodeURIComponent(filename)}`);
+    const response = await fetch(`/fit/details/id/${encodeURIComponent(id)}`);
     if (!response.ok) throw new Error("HTTP " + response.status);
 
     const data = await response.json();
@@ -38,7 +38,7 @@ async function loadRoute(filename) {
 
 document.querySelectorAll('.clickable-row').forEach(row => {
   row.addEventListener('click', () => {
-    const filename = row.dataset.filename; // assuming each <tr> has data-filename
-    loadRoute(filename);
+    const id = row.dataset.id;
+    loadRoute(id);
   });
 });
