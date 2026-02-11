@@ -5,6 +5,7 @@ import com.garmin.fit.MesgBroadcaster;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ public class UploadService {
 
   @PersistenceContext EntityManager em;
 
+  @Transactional
   UUID persistActivity(String fileName, byte[] content) {
     UUID activityId = UUID.randomUUID();
 

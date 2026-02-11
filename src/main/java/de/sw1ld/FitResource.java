@@ -1,7 +1,6 @@
 package de.sw1ld;
 
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -12,6 +11,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -33,33 +33,42 @@ public class FitResource {
   @Path("/upload")
   @Produces(MediaType.TEXT_HTML)
   public Response uploadPage() {
-    return Response.ok(Templates.upload(null, true)).build();
+    return Response.ok(Templates.upload(null)).build();
   }
 
-  @Transactional
   @POST
   @Path("/upload")
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Produces(MediaType.TEXT_HTML)
   public Response upload(MultipartFormDataInput fitfile) {
-    // TODO verify/cut length of filename!
     var parts = fitfile.getFormDataMap().get("file");
-    if (parts == null || parts.size() != 1 || parts.getFirst().getFileName().isEmpty()) {
+    if (parts == null || parts.isEmpty()) {
       return Response.status(400)
-          .entity(Templates.upload("Uploaded file must not be empty!", false))
-          .build();
-    }
-    var part = parts.getFirst();
-    try {
-      UUID id = uploadService.persistActivity(part.getFileName(), part.getBody(byte[].class, null));
-
-      return Response.ok(
+          .entity(
               Templates.upload(
-                  "Upload of [%s] was successful. Id [%s]".formatted(part.getFileName(), id), true))
+                  List.of(UploadResult.error("N/A", "Uploaded file must not be empty!"))))
           .build();
-    } catch (Exception e) {
-      return Response.ok(Templates.upload("Upload failed: " + e.getMessage(), false)).build();
     }
+
+    List<UploadResult> results = new ArrayList<>();
+    for (var part : parts) {
+      String fileName = part.getFileName();
+      if (fileName != null && !fileName.isEmpty()) {
+        try {
+          byte[] bytes = part.getBody(byte[].class, null);
+          if (bytes == null || bytes.length == 0) {
+            results.add(UploadResult.error(fileName, "File is empty"));
+          } else {
+            UUID id = uploadService.persistActivity(fileName, bytes);
+            results.add(UploadResult.success(fileName, id));
+          }
+        } catch (Exception e) {
+          results.add(UploadResult.error(fileName, e.getMessage()));
+        }
+      }
+    }
+
+    return Response.ok(Templates.upload(results)).build();
   }
 
   @GET

@@ -30,6 +30,8 @@ $ curl http://localhost:8080/fit/stats -H 'accept: text/html'
 
 ## Open TODOs
 
+- [x] allow possibility to upload all files in a folder
+- [ ] make sure to not upload the same file twice (id field in fit file?)
 - [ ] any possibility to add additional tags for filtering (such as by bike, by route, ...)?
   - [ ] add simple database to persist "meta data"
 - [ ] more details: 

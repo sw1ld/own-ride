@@ -41,8 +41,8 @@ async function loadStatistics() {
         }
         const stats = await response.json();
 
-        // stats.tourDates ist ein Objekt mit ISO-Datum als Key und Distanz als Value
-        // Da wir eine TreeMap im Backend verwenden, kommen die Keys sortiert an.
+        // stats.tourDates is an object with ISO date as key and distance as value
+        // Since we use a TreeMap in the backend, the keys arrive sorted.
         const dailyDates = Object.keys(stats.tourDates);
         const dailyDistance = Object.values(stats.tourDates);
 
@@ -55,7 +55,7 @@ async function loadStatistics() {
         if (totalDistance) totalDistance.textContent = stats.distance;
 
     } catch (e) {
-        console.error("Fehler beim Laden der Statistik-Daten", e);
+        console.error("Error loading statistics data", e);
     }
 }
 
@@ -64,7 +64,7 @@ function initStatistics(dailyDates, dailyDistance) {
         "routesInYearChart",
         dailyDates,
         dailyDistance,
-        'Kilometer',
+        'Kilometers',
         'Distribution over time',
         'rgba(54, 162, 235, 0.6)',
         5

@@ -37,7 +37,7 @@ public class FitService {
     int currentYear = LocalDate.now().getYear();
     int minYear = activityDataRepository.findMinYear().orElse(currentYear);
 
-    // Wir wollen eine absteigende Liste (aktuellstes Jahr zuerst)
+    // We want a descending list (most recent year first)
     return IntStream.rangeClosed(minYear, currentYear).boxed().sorted((a, b) -> b - a).toList();
   }
 }

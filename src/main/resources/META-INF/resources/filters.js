@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const currentYear = new Date().getFullYear();
 
-  // Kein year-Param -> redirect mit aktuellem Jahr
+  // No year-Param -> redirect with current year
   if (!urlYear && document.getElementById("yearFilter")) {
     urlYear = String(currentYear);
     params.set("year", urlYear);
@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const yearFilter = document.getElementById("yearFilter");
   if (yearFilter) {
-    // Falls das Jahr in der URL nicht in den Optionen ist, nimm das erste verfügbare oder aktuelle
+    // If the year in the URL is not in the options, take the first available or current one
     const options = [...yearFilter.options].map(opt => opt.value);
     if (!options.includes(urlYear)) {
         urlYear = options[0] || String(currentYear);

@@ -3,7 +3,7 @@
     <section class="section">
         <div class="container">
             <div class="columns is-centered">
-                <div class="column is-5">
+                <div class="column {results ? 'is-10' : 'is-6'}">
                     <div class="card">
                         <header class="card-header">
                             <p class="card-header-title">
@@ -12,38 +12,73 @@
                         </header>
 
                         <div class="card-content">
-                            {#if message}
-                                {#if success}
-                                    <div class="notification is-success">
-                                        {message}
+                            {#if results}
+                                <div class="content">
+                                    <h3 class="subtitle">Upload Results</h3>
+                                    <div class="table-container">
+                                        <table class="table is-striped is-fullwidth is-narrow">
+                                            <thead>
+                                                <tr>
+                                                    <th>File</th>
+                                                    <th>Status</th>
+                                                    <th>Details / ID</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {#for res in results}
+                                                    <tr class="{res.success ? 'has-text-success' : 'has-text-danger'}">
+                                                        <td style="word-break: break-all;">{res.fileName}</td>
+                                                        <td style="white-space: nowrap;">{res.success ? '✅ OK' : '❌ Error'}</td>
+                                                        <td style="word-break: break-all;">
+                                                            {#if res.success}
+                                                                <small class="has-text-grey">{res.id}</small>
+                                                            {#else}
+                                                                {res.message}
+                                                            {/if}
+                                                        </td>
+                                                    </tr>
+                                                {/for}
+                                            </tbody>
+                                        </table>
                                     </div>
-                                {#else}
-                                    <div class="notification is-danger">
-                                        {message}
-                                    </div>
-                                {/if}
+                                </div>
                             {/if}
 
                             <form id="uploadForm" action="/fit/upload" method="post" enctype="multipart/form-data">
 
                                 <div class="field">
+                                    <label class="label">Upload files or folders</label>
                                     <div class="control">
-                                        <div class="file is-fullwidth has-name is-boxed">
+                                        <div class="buttons">
+                                            <button type="button" class="button is-info is-outlined" id="selectFilesBtn">
+                                                <span>📄 Select files</span>
+                                            </button>
+                                            <button type="button" class="button is-info is-outlined" id="selectFolderBtn">
+                                                <span>📁 Select folder</span>
+                                            </button>
+                                        </div>
+                                        
+                                        <input
+                                            id="fileInput"
+                                            class="is-hidden"
+                                            type="file"
+                                            name="file"
+                                            accept=".fit"
+                                            multiple
+                                        >
+                                        <input
+                                            id="folderInput"
+                                            class="is-hidden"
+                                            type="file"
+                                            name="file"
+                                            accept=".fit"
+                                            webkitdirectory
+                                        >
+                                        
+                                        <div class="file has-name is-fullwidth is-boxed mt-2">
                                             <label class="file-label">
-                                                <input
-                                                    id="fileInput"
-                                                    class="file-input"
-                                                    type="file"
-                                                    name="file"
-                                                    accept=".fit"
-                                                    required
-                                                >
-                                                <span class="file-cta">
-                                                    <span class="file-icon">📁</span>
-                                                    <span class="file-label">Select file…</span>
-                                                </span>
-                                                <span id="fileName" class="file-name">
-                                                    No file selected
+                                                <span id="fileName" class="file-name has-text-centered">
+                                                    No files selected
                                                 </span>
                                             </label>
                                         </div>
@@ -68,17 +103,42 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const fileInput = document.getElementById('fileInput');
+            const folderInput = document.getElementById('folderInput');
             const fileName = document.getElementById('fileName');
+            const selectFilesBtn = document.getElementById('selectFilesBtn');
+            const selectFolderBtn = document.getElementById('selectFolderBtn');
+            const uploadForm = document.getElementById('uploadForm');
 
-            if (fileInput && fileName) {
-                fileInput.onchange = () => {
-                    if (fileInput.files.length > 0) {
-                        fileName.textContent = fileInput.files[0].name;
-                    } else {
-                        fileName.textContent = 'No file selected';
-                    }
-                };
-            }
+            const updateLabel = (input) => {
+                const count = input.files.length;
+                if (count === 1) {
+                    fileName.textContent = input.files[0].name;
+                } else if (count > 1) {
+                    fileName.textContent = count + ' files selected';
+                } else {
+                    fileName.textContent = 'No files selected';
+                }
+            };
+
+            selectFilesBtn.onclick = () => {
+                folderInput.value = ''; // Reset folder input
+                fileInput.click();
+            };
+
+            selectFolderBtn.onclick = () => {
+                fileInput.value = ''; // Reset file input
+                folderInput.click();
+            };
+
+            fileInput.onchange = () => updateLabel(fileInput);
+            folderInput.onchange = () => updateLabel(folderInput);
+
+            uploadForm.onsubmit = (e) => {
+                if (fileInput.files.length === 0 && folderInput.files.length === 0) {
+                    e.preventDefault();
+                    alert('Please select at least one file or folder.');
+                }
+            };
         });
     </script>
 {/include}
