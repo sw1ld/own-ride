@@ -33,7 +33,7 @@ public class FitResource {
   @Path("/upload")
   @Produces(MediaType.TEXT_HTML)
   public Response uploadPage() {
-    return Response.ok(Templates.upload("foobar")).build();
+    return Response.ok(Templates.upload(null, true)).build();
   }
 
   @Transactional
@@ -45,16 +45,20 @@ public class FitResource {
     // TODO verify/cut length of filename!
     var parts = fitfile.getFormDataMap().get("file");
     if (parts == null || parts.size() != 1 || parts.getFirst().getFileName().isEmpty()) {
-      return Response.status(400).entity("Uploaded file must not be empty!").build();
+      return Response.status(400)
+          .entity(Templates.upload("Uploaded file must not be empty!", false))
+          .build();
     }
     var part = parts.getFirst();
     try {
       UUID id = uploadService.persistActivity(part.getFileName(), part.getBody(byte[].class, null));
 
-      return Response.ok(Templates.upload("Upload was successful. Id [%s]".formatted(id))).build();
+      return Response.ok(
+              Templates.upload(
+                  "Upload of [%s] was successful. Id [%s]".formatted(part.getFileName(), id), true))
+          .build();
     } catch (Exception e) {
-      // TODO error page!
-      return Response.ok(Templates.upload("something failed")).build();
+      return Response.ok(Templates.upload("Upload failed: " + e.getMessage(), false)).build();
     }
   }
 

@@ -15,5 +15,5 @@ public class Templates {
   public static native TemplateInstance details(
       List<FitResponse> data, List<Integer> availableYears);
 
-  public static native TemplateInstance upload(String message);
+  public static native TemplateInstance upload(String message, boolean success);
 }

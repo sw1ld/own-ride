@@ -47,6 +47,6 @@ $ curl http://localhost:8080/fit/stats -H 'accept: text/html'
 - [x] persist files?
   - [x] write stateful test
   - [x] upload via FE
-  - [ ] show proper result after upload - success message / reason of failure
+  - [x] show proper result after upload - success message / reason of failure
   - [x] make FE look nicer
   - [x] do not show Activity per year for upload page!

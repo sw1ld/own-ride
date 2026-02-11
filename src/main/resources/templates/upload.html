@@ -12,9 +12,19 @@
                         </header>
 
                         <div class="card-content">
+                            {#if message}
+                                {#if success}
+                                    <div class="notification is-success">
+                                        {message}
+                                    </div>
+                                {#else}
+                                    <div class="notification is-danger">
+                                        {message}
+                                    </div>
+                                {/if}
+                            {/if}
+
                             <form id="uploadForm" action="/fit/upload" method="post" enctype="multipart/form-data">
-                                <div id="errorMessage" class="notification is-danger is-hidden"></div>
-                                <div id="successMessage" class="notification is-success is-hidden"></div>
 
                                 <div class="field">
                                     <div class="control">
@@ -40,7 +50,6 @@
                                     </div>
                                     <p class="help">Supported format: <strong>.fit</strong></p>
                                 </div>
-
                                 <div class="field is-grouped is-grouped-right">
                                     <div class="control">
                                         <button type="submit" class="button is-primary">
@@ -55,4 +64,21 @@
             </div>
         </div>
     </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('fileInput');
+            const fileName = document.getElementById('fileName');
+
+            if (fileInput && fileName) {
+                fileInput.onchange = () => {
+                    if (fileInput.files.length > 0) {
+                        fileName.textContent = fileInput.files[0].name;
+                    } else {
+                        fileName.textContent = 'No file selected';
+                    }
+                };
+            }
+        });
+    </script>
 {/include}
