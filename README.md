@@ -40,9 +40,6 @@ $ curl http://localhost:8080/fit/stats -H 'accept: text/html'
 
 - [ ] init drop down for year-filter by "minimal year" of uploaded files
 - [ ] bug: small browser window does not scale up charts properly
-- [ ] move code to dedicated js files
-  - [ ] routeLengthChart 
-  - [ ] insert JSON to js files
 - [ ] optimization 
   - [ ] cache parsed results?
   - [ ] parse relevant data only once and persist in database?

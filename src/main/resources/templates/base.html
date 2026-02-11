@@ -19,7 +19,7 @@
             rel="stylesheet"
             href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         />
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 
         <style>
             #map {
@@ -64,10 +64,30 @@
 
         <section class="section">
             <div class="container">
+                <div class="columns">
+                    {#if showYearFilter}
+                    <div class="column is-3">
+                        <div class="field">
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select id="yearFilter">
+                                        <option value="2026">2026</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2023">2023</option>
+                                        <option value="2022">2022</option>
+                                        <option value="2021">2021</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
+                </div>
                 {#insert}Missing body! 😿{/}
             </div>
         </section>
 
-        <script src="/filters.js"></script>
+        <script src="/filters.js" defer></script>
     </body>
 </html>

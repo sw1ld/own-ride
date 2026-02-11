@@ -1,146 +1,50 @@
-{#include base}
-    <script>
-        const dailyDates = [
-            {#for entry in stats.tourDates}
-                "{entry.key}",
-            {/for}
-        ];
-
-        const dailyDistance = [
-            {#for entry in stats.tourDates}
-                {entry.value},
-            {/for}
-        ];
-
-        function createBarChart(canvasId, labels, data, label, title, color, barThickness) {
-            new Chart(document.getElementById(canvasId), {
-                type: 'bar',
-                data: {
-                    labels,
-                    datasets: [{
-                        label,
-                        data,
-                        backgroundColor: color,
-                        barThickness: barThickness
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: title
-                        }
-                    }
-                }
-            });
-        }
-    </script>
+{#include base showYearFilter=true}
     <h1 class="title">Statistics</h1>
-    <div class="columns">
-        <div class="column is-3">
-            <div class="field">
-                <div class="control">
-                    <div class="select is-fullwidth">
-                        <select id="yearFilter">
-                            <option value="2026">2026</option>
-                            <option value="2025">2025</option>
-                            <option value="2024">2024</option>
-                            <option value="2023">2023</option>
-                            <option value="2022">2022</option>
-                            <option value="2021">2021</option>
-                        </select>
-                    </div>
+    <div class="box">
+        <h2 class="title is-4">Summary</h2>
+
+        <div id="summary">
+            <table class="table is-fullwidth">
+                <thead>
+                    <tr>
+                        <th class="has-text-centered">Total number of rides</th>
+                        <th class="has-text-centered">Total distance</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td id="ridesCount" class="has-text-centered">{stats.rides}</td>
+                        <td id="totalDistance" class="has-text-centered">{stats.distance}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="box">
+        <h2 class="title is-4">Analysis</h2>
+        <div class="charts">
+            <div class="chart">
+                <div id="routesInYear">
+                    <canvas id="routesInYearChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart">
+                <div id="routeLength">
+                    <canvas id="routeLengthChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
 
-        <div class="box">
-            <h2 class="title is-4">Summary</h2>
-
-            <div id="summary">
-                <table class="table is-fullwidth">
-                    <thead>
-                        <tr>
-                            <th class="has-text-centered">Total number of rides</th>
-                            <th class="has-text-centered">Total distance</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr>
-                            <td class="has-text-centered">{stats.rides}</td>
-                            <td class="has-text-centered">{stats.distance}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="box">
-            <h2 class="title is-4">Analysis</h2>
-            <div class="charts">
-                <div class="chart">
-                    <div id="routesInYear">
-                        <canvas id="routesInYearChart"></canvas>
-                        <script>
-                            createBarChart(
-                                "routesInYearChart",
-                                dailyDates,
-                                dailyDistance,
-                                'Kilometer',
-                                'Distribution over time',
-                                'rgba(54, 162, 235, 0.6)',
-                                5
-                            )
-                        </script>
-                    </div>
-                </div>
-
-                <div class="chart">
-                    <div id="routeLength">
-                        <canvas id="routeLengthChart"></canvas>
-                        <script>
-                            const distances = dailyDistance.filter(v => v > 0);
-
-                            const binCount = 10;
-                            const min = 0;
-                            const max = 100;
-                            const binSize = (max - min) / binCount;
-
-                            const bins = new Array(binCount).fill(0).map((_, i) => ({
-                                start: min + i * binSize,
-                                end: min + (i + 1) * binSize,
-                                count: 0
-                            }));
-
-                            distances.forEach(value => {
-                                const index = Math.min(
-                                    Math.floor((value - min) / binSize),
-                                    binCount - 1
-                                );
-                                bins[index].count++;
-                            });
-
-                            const labelPerBin = bins.map(b =>
-                                b.end.toFixed(1)
-                            );
-                            const dataPerBin = bins.map(b => b.count);
-
-                            createBarChart(
-                                "routeLengthChart",
-                                labelPerBin,
-                                dataPerBin,
-                                '#routes',
-                                'Routes per kilometer',
-                                'rgba(75, 192, 192, 0.6)',
-                                50
-                            )
-                        </script>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <script src="/stats.js" defer></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            if (typeof loadStatistics === 'function') {
+                loadStatistics();
+            }
+        });
+    </script>
 {/include}
