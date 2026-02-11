@@ -9,9 +9,11 @@ public class Templates {
 
   private Templates() {}
 
-  public static native TemplateInstance statistics(StatisticResponse stats);
+  public static native TemplateInstance statistics(
+      StatisticResponse stats, List<Integer> availableYears);
 
-  public static native TemplateInstance details(List<FitResponse> data);
+  public static native TemplateInstance details(
+      List<FitResponse> data, List<Integer> availableYears);
 
   public static native TemplateInstance upload(String message);
 }

@@ -66,8 +66,10 @@ public class FitResource {
       year = LocalDate.now().getYear();
     }
     List<FitData> fitData = fitService.fetchDetails(year);
+    var stats = StatsService.getStats(fitData, year);
+    var years = fitService.getAvailableYears();
 
-    return Response.ok(Templates.statistics(StatsService.getStats(fitData, year))).build();
+    return Response.ok(Templates.statistics(stats, years)).build();
   }
 
   @GET
@@ -102,13 +104,15 @@ public class FitResource {
   @Produces(MediaType.TEXT_HTML)
   public Response details(@QueryParam("year") Integer year) {
     List<FitData> fitData = fitService.fetchDetails(year);
+    var years = fitService.getAvailableYears();
 
     return Response.ok(
             Templates.details(
                 fitData.stream()
                     .map(FitResponse::new)
                     .sorted(Comparator.comparing(FitResponse::date).reversed())
-                    .toList()))
+                    .toList(),
+                years))
         .build();
   }
 

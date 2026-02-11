@@ -10,4 +10,6 @@ public interface ActivityDataRepository {
   List<ActivityData> findByYear(int year);
 
   List<ActivityData> findAll();
+
+  Optional<Integer> findMinYear();
 }

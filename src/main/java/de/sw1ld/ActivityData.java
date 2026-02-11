@@ -19,11 +19,15 @@ import org.hibernate.type.SqlTypes;
         "SELECT ed FROM ActivityData ed WHERE ed.date >= :startOfYear AND ed.date <"
             + " :startOfNextYear")
 @NamedQuery(name = ActivityData.QUERY_FIND_ALL, query = "SELECT ed FROM ActivityData ed")
+@NamedQuery(
+    name = ActivityData.QUERY_FIND_MIN_DATE,
+    query = "SELECT MIN(ed.date) FROM ActivityData ed")
 public class ActivityData {
 
   public static final String QUERY_FIND_BY_ID = "ExtractedData.findById";
   public static final String QUERY_FIND_BY_YEAR = "ExtractedData.findByYear";
   public static final String QUERY_FIND_ALL = "ExtractedData.findAll";
+  public static final String QUERY_FIND_MIN_DATE = "ExtractedData.findMinDate";
 
   @Id @Column private UUID id;
 

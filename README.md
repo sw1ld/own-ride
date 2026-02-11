@@ -38,7 +38,7 @@ $ curl http://localhost:8080/fit/stats -H 'accept: text/html'
     - [ ] add grade (Anstieg) over time in different color?
   - [ ] allow to recalculate entries in ActivityData (FE-click?)
 
-- [ ] init drop down for year-filter by "minimal year" of uploaded files
+- [x] init drop down for year-filter by "minimal year" of uploaded files
 - [ ] bug: small browser window does not scale up charts properly
 - [ ] optimization 
   - [ ] cache parsed results?

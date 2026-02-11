@@ -46,4 +46,13 @@ public class ActivityDataRepositoryJpa implements ActivityDataRepository {
         .createNamedQuery(ActivityData.QUERY_FIND_ALL, ActivityData.class)
         .getResultList();
   }
+
+  @Override
+  public Optional<Integer> findMinYear() {
+    LocalDate minDate =
+        entityManager
+            .createNamedQuery(ActivityData.QUERY_FIND_MIN_DATE, LocalDate.class)
+            .getSingleResult();
+    return Optional.ofNullable(minDate).map(LocalDate::getYear);
+  }
 }
