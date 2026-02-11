@@ -15,6 +15,7 @@ function createBarChart(canvasId, labels, data, label, title, color, barThicknes
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 title: {
                     display: true,

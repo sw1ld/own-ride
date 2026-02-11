@@ -39,7 +39,7 @@ $ curl http://localhost:8080/fit/stats -H 'accept: text/html'
   - [ ] allow to recalculate entries in ActivityData (FE-click?)
 
 - [x] init drop down for year-filter by "minimal year" of uploaded files
-- [ ] bug: small browser window does not scale up charts properly
+- [x] bug: small browser window does not scale up charts properly
 - [ ] optimization 
   - [ ] cache parsed results?
   - [ ] parse relevant data only once and persist in database?

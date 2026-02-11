@@ -45,14 +45,26 @@
                 border-radius: 8px;
             }
             .canvas {
-                width: 100% !important;
-                height: auto !important;
+                width: 100%;
+                height: 100%;
             }
         </style>
     </head>
 
     <body>
         <nav class="navbar" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand">
+                <a class="navbar-item" href="/fit/stats">
+                    <strong>Fit App</strong>
+                </a>
+
+                <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="mainNavbar">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+
             <div id="mainNavbar" class="navbar-menu">
                 <div class="navbar-start">
                     <a class="navbar-item year-link" href="/fit/upload">Upload</a>
@@ -66,7 +78,7 @@
             <div class="container">
                 <div class="columns">
                     {#if showYearFilter}
-                    <div class="column is-3">
+                    <div class="column is-3-tablet is-12-mobile">
                         <div class="field">
                             <div class="control">
                                 <div class="select is-fullwidth">
@@ -86,5 +98,20 @@
         </section>
 
         <script src="/filters.js" defer></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+                if ($navbarBurgers.length > 0) {
+                    $navbarBurgers.forEach( el => {
+                        el.addEventListener('click', () => {
+                            const target = el.dataset.target;
+                            const $target = document.getElementById(target);
+                            el.classList.toggle('is-active');
+                            $target.classList.toggle('is-active');
+                        });
+                    });
+                }
+            });
+        </script>
     </body>
 </html>
