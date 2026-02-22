@@ -8,6 +8,6 @@ public record UploadResult(String fileName, boolean success, String message, UUI
   }
 
   public static UploadResult success(String fileName, UUID id) {
-    return new UploadResult(fileName, true, "Erfolgreich hochgeladen", id);
+    return new UploadResult(fileName, true, "Successfully uploaded", id);
   }
 }

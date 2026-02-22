@@ -1,6 +1,7 @@
 package de.sw1ld;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -87,5 +88,33 @@ class FitResourceTest {
         .body("[0].avgSpeed", equalTo("21.93 km/h"))
         .body("[0].temperature", equalTo("/"))
         .body("[0].totalAscent", equalTo("/"));
+  }
+
+  @Test
+  @Order(3)
+  void uploadDuplicateFile_ShouldFail() {
+    File fitFile = new File("src/test/resources/testdata/2021-04-27_Route1.fit");
+
+    given()
+        .accept(MediaType.TEXT_HTML)
+        .contentType(ContentType.MULTIPART)
+        .multiPart("file", fitFile)
+        .when()
+        .post("/fit/upload")
+        .then()
+        .log()
+        .body()
+        .statusCode(200)
+        .body(containsString("duplicate-error"))
+        .body(containsString("Activity already uploaded"));
+
+    given()
+        .accept(MediaType.APPLICATION_JSON)
+        .queryParam("year", YEAR)
+        .when()
+        .get("/fit/stats")
+        .then()
+        .statusCode(200)
+        .body("rides", equalTo(1));
   }
 }

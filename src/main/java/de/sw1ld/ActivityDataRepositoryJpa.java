@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -54,5 +55,18 @@ public class ActivityDataRepositoryJpa implements ActivityDataRepository {
             .createNamedQuery(ActivityData.QUERY_FIND_MIN_DATE, LocalDate.class)
             .getSingleResult();
     return Optional.ofNullable(minDate).map(LocalDate::getYear);
+  }
+
+  @Override
+  public Optional<ActivityData> findByTimeCreated(LocalDateTime timeCreated) {
+    try {
+      return Optional.of(
+          entityManager
+              .createNamedQuery(ActivityData.QUERY_FIND_BY_TIME_CREATED, ActivityData.class)
+              .setParameter("timeCreated", timeCreated)
+              .getSingleResult());
+    } catch (NoResultException e) {
+      return Optional.empty();
+    }
   }
 }

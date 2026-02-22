@@ -92,8 +92,6 @@ Run `./mvn spotless:apply` to format the code.
 - [ ] Add swagger docs
 - [ ] Add pipeline for github
 - [ ] Disable /q/dev endpoints for "prod usage"!
-- [x] add junie file for "how to write code using AI" (see [.junie/CONTRIBUTING_AI.md](.junie/CONTRIBUTING_AI.md))
-- [ ] Duplicate check during upload (ID field in FIT file?)
 - [ ] Additional tags for filtering (Bike, Route, etc.)
 - [ ] Expand database for metadata persistence
 - [ ] Altitude profile calculation via GPS positions

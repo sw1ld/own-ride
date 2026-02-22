@@ -33,7 +33,7 @@
                                                             {#if res.success}
                                                                 <small class="has-text-grey">{res.id}</small>
                                                             {#else}
-                                                                {res.message}
+                                                                <span class="duplicate-error">{res.message}</span>
                                                             {/if}
                                                         </td>
                                                     </tr>

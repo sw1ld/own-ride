@@ -9,12 +9,18 @@ import jakarta.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
 public class UploadService {
 
   @PersistenceContext EntityManager em;
+  private final ActivityDataRepository activityDataRepository;
+
+  public UploadService(ActivityDataRepository activityDataRepository) {
+    this.activityDataRepository = activityDataRepository;
+  }
 
   @Transactional
   UUID persistActivity(String fileName, byte[] content) {
@@ -31,9 +37,11 @@ public class UploadService {
     MesgBroadcaster broadcaster = new MesgBroadcaster(decode);
     RecordListener rec = new RecordListener();
     SessionListener ses = new SessionListener();
+    FileIdListener fileId = new FileIdListener();
 
     broadcaster.addListener(rec);
     broadcaster.addListener(ses);
+    broadcaster.addListener(fileId);
 
     try (InputStream is = new ByteArrayInputStream(content)) {
       if (is == null) {
@@ -41,6 +49,15 @@ public class UploadService {
       }
 
       decode.read(is, broadcaster);
+
+      if (fileId.getTimeCreated() != null) {
+        Optional<ActivityData> existingActivity =
+            activityDataRepository.findByTimeCreated(fileId.getTimeCreated());
+
+        if (existingActivity.isPresent()) {
+          throw new IllegalArgumentException("Activity already uploaded");
+        }
+      }
 
       ActivityData data = new ActivityData();
       UUID id = UUID.randomUUID();
@@ -53,6 +70,7 @@ public class UploadService {
       data.setAvgSpeed(ses.getAverageSpeed());
       data.setTemperature(ses.getTemperature());
       data.setTotalAscent(ses.getTotalAscent());
+      data.setTimeCreated(fileId.getTimeCreated());
       data.setPositions(rec.getPositions());
 
       em.persist(activityRaw);

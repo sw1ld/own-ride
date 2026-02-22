@@ -1,8 +1,16 @@
 package de.sw1ld;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -22,12 +30,16 @@ import org.hibernate.type.SqlTypes;
 @NamedQuery(
     name = ActivityData.QUERY_FIND_MIN_DATE,
     query = "SELECT MIN(ed.date) FROM ActivityData ed")
+@NamedQuery(
+    name = ActivityData.QUERY_FIND_BY_TIME_CREATED,
+    query = "SELECT ed FROM ActivityData ed WHERE ed.timeCreated = :timeCreated")
 public class ActivityData {
 
   public static final String QUERY_FIND_BY_ID = "ExtractedData.findById";
   public static final String QUERY_FIND_BY_YEAR = "ExtractedData.findByYear";
   public static final String QUERY_FIND_ALL = "ExtractedData.findAll";
   public static final String QUERY_FIND_MIN_DATE = "ExtractedData.findMinDate";
+  public static final String QUERY_FIND_BY_TIME_CREATED = "ExtractedData.findByTimeCreated";
 
   @Id @Column private UUID id;
 
@@ -53,6 +65,9 @@ public class ActivityData {
 
   @Column(name = "total_ascent")
   private Integer totalAscent;
+
+  @Column(name = "time_created")
+  private LocalDateTime timeCreated;
 
   @Column private Integer temperature;
 
@@ -131,6 +146,14 @@ public class ActivityData {
 
   public void setTotalAscent(Integer totalAscent) {
     this.totalAscent = totalAscent;
+  }
+
+  public LocalDateTime getTimeCreated() {
+    return timeCreated;
+  }
+
+  public void setTimeCreated(LocalDateTime timeCreated) {
+    this.timeCreated = timeCreated;
   }
 
   public Integer getTemperature() {
