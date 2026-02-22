@@ -100,8 +100,8 @@ function initStatistics(dailyDates, dailyDistance) {
         labelPerBin,
         dataPerBin,
         '#routes',
-        'Routes per kilometer',
+        'Activity days per kilometer',
         'rgba(75, 192, 192, 0.6)',
-        50
+        40
     );
 }

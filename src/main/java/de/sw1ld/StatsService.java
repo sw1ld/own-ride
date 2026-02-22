@@ -21,8 +21,8 @@ public class StatsService {
       basicTourStatistics.put(d, 0.0);
     }
 
-    // set/overwrite with concrete values
-    fitData.forEach(f -> basicTourStatistics.put(f.date(), f.distance()));
+    // set/merge with concrete values
+    fitData.forEach(f -> basicTourStatistics.merge(f.date(), f.distance(), Double::sum));
 
     return new StatisticResponse(fitData.size(), total, basicTourStatistics);
   }
