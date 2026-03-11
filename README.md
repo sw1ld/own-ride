@@ -1,5 +1,7 @@
 # OwnRide
 
+[![Java CI with Maven](https://github.com/sw1ld/own-ride/actions/workflows/maven.yml/badge.svg)](https://github.com/sw1ld/own-ride/actions/workflows/maven.yml)
+
 `OwnRide` is a lightweight Quarkus application for analyzing and managing Garmin FIT files.
 I believe that your fitness data should belong to you, and only you.
 
@@ -71,14 +73,8 @@ The application provides both an HTML interface and a JSON API:
 
 ## 🤝 Contribution
 
-Contributions are welcome!
-If you want to improve the project:
-
-1. **Fork** the repository.
-2. Create a **Feature Branch** (`git checkout -b feature/AmazingFeature`).
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-4. Push the branch (`git push origin feature/AmazingFeature`).
-5. Open a **Pull Request**.
+Contributions are welcome! 
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on our development workflow and commit message guidelines.
 
 ### Development & Testing
 
@@ -90,7 +86,6 @@ Run `./mvn spotless:apply` to format the code.
 ## 🗺️ Roadmap / Open TODOs
 
 - [ ] Add swagger docs
-- [ ] Add pipeline for github
 - [ ] Disable /q/dev endpoints for "prod usage"!
 - [ ] Additional tags for filtering (Bike, Route, etc.)
 - [ ] Expand database for metadata persistence
