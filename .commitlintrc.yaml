@@ -1,0 +1,13 @@
+rules:
+  # check length of commit header
+  header-max-length: [2, "always", 50]
+
+  # no trailing dot in commit header
+  header-full-stop: [ 2, "never", "." ]
+
+  # check length of commit body
+  body-max-line-length: [2, "always", 72]
+
+  type-empty: [0]
+  subject-empty: [0]
+  scope-empty: [0]
