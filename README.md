@@ -13,11 +13,11 @@ I believe that your fitness data should belong to you, and only you.
 - **Data Persistence:** Metadata storage in a PostgreSQL database
 - **HTTP API:** Access detailed activity data and statistics in JSON format
 
-![Upload Screenshot](src/main/resources/screenshots/upload.png)
-
-![Dashboard Screenshot](src/main/resources/screenshots/dashboard.png)
-
-![Details Screenshot](src/main/resources/screenshots/details.png)
+<table>
+    <tr><td><img src="src/main/resources/screenshots/dashboard.png" alt="Dashboard Screenshot" width="800"></td></tr>
+    <tr><td><img src="src/main/resources/screenshots/details.png" alt="Overview Screenshot" width="800"></td></tr>
+    <tr><td><img src="src/main/resources/screenshots/upload.png" alt="Upload Screenshot" width="800"></td></tr>
+</table>
 
 
 ## 🚲 Why .FIT?
