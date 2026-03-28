@@ -38,7 +38,7 @@
     <dependency>
       <groupId>com.garmin</groupId>
       <artifactId>fit</artifactId>
-      <version>21.176.0</version>
+      <version>21.195.0</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
