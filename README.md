@@ -1,6 +1,6 @@
 # OwnRide
 
-[![Java CI with Maven](https://github.com/sw1ld/own-ride/actions/workflows/maven.yml/badge.svg)](https://github.com/sw1ld/own-ride/actions/workflows/maven.yml)
+[![Java CI with Maven](https://github.com/sw1ld/own-ride/actions/workflows/maven.yml/badge.svg)](https://github.com/sw1ld/own-ride/actions/workflows/maven.yml) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 `OwnRide` is a lightweight Quarkus application for analyzing and managing Garmin FIT files.
 I believe that your fitness data should belong to you, and only you.
@@ -92,6 +92,11 @@ Run `./mvn spotless:apply` to format the code.
 - [ ] Altitude profile calculation via GPS positions
 - [ ] Speed graphs & slope display
 - [ ] Performance optimization (caching, persistent pre-calculation)
+
+## ⚖️ License
+
+This project is licensed under the **GNU General Public License v3.0**.  
+See the [LICENSE](LICENSE) file for details.
 
 ---
 *Developed with ❤️*
