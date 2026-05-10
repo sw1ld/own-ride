@@ -4,10 +4,14 @@ import com.garmin.fit.DateTime;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
-public record Position(double lat, double lon, LocalDate timestamp) {
+public record Position(double lat, double lon, float altitude, LocalDate timestamp) {
 
-  public Position(double latSemicircle, double lonSemicircle, DateTime timestamp) {
-    this(toDegree(latSemicircle), toDegree(lonSemicircle), convertDate(timestamp));
+  public Position(double latSemicircle, double lonSemicircle, Float altitude, DateTime timestamp) {
+    this(
+        toDegree(latSemicircle),
+        toDegree(lonSemicircle),
+        altitude != null ? altitude : 0.0f,
+        convertDate(timestamp));
   }
 
   private static double toDegree(double semicircle) {

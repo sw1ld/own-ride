@@ -87,7 +87,8 @@ class FitResourceTest {
         .body("[0].duration", equalTo("1:34:54"))
         .body("[0].avgSpeed", equalTo("21.93 km/h"))
         .body("[0].temperature", equalTo("/"))
-        .body("[0].totalAscent", equalTo("/"));
+        .body("[0].totalAscent", equalTo("/"))
+        .body("[0].positions[0]", org.hamcrest.Matchers.hasKey("altitude"));
   }
 
   @Test

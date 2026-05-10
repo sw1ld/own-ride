@@ -89,7 +89,6 @@ Run `./mvn spotless:apply` to format the code.
 - [ ] Disable /q/dev endpoints for "prod usage"!
 - [ ] Additional tags for filtering (Bike, Route, etc.)
 - [ ] Expand database for metadata persistence
-- [ ] Altitude profile calculation via GPS positions
 - [ ] Speed graphs & slope display
 - [ ] Performance optimization (caching, persistent pre-calculation)
 
