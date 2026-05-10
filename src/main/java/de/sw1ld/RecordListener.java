@@ -15,8 +15,10 @@ public class RecordListener implements RecordMesgListener {
     if (m.getSpeed() != null && m.getSpeed() < 25) { // avoid weird peeks (25 m/s -> ca 90km/h)
       maxSpeed = Math.max(maxSpeed, m.getSpeed());
     }
-    if (m.getPositionLat() != null && m.getPositionLat() != null) {
-      positions.add(new Position(m.getPositionLat(), m.getPositionLong(), m.getTimestamp()));
+    if (m.getPositionLat() != null && m.getPositionLong() != null) {
+      positions.add(
+          new Position(
+              m.getPositionLat(), m.getPositionLong(), m.getEnhancedAltitude(), m.getTimestamp()));
     }
   }
 
