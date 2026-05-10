@@ -1,5 +1,6 @@
 package de.sw1ld;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -33,6 +34,9 @@ import org.hibernate.type.SqlTypes;
 @NamedQuery(
     name = ActivityData.QUERY_FIND_BY_TIME_CREATED,
     query = "SELECT ed FROM ActivityData ed WHERE ed.timeCreated = :timeCreated")
+@NamedQuery(
+    name = ActivityData.QUERY_DELETE_BY_ID,
+    query = "DELETE FROM ActivityData ed WHERE id = :id")
 public class ActivityData {
 
   public static final String QUERY_FIND_BY_ID = "ExtractedData.findById";
@@ -40,10 +44,11 @@ public class ActivityData {
   public static final String QUERY_FIND_ALL = "ExtractedData.findAll";
   public static final String QUERY_FIND_MIN_DATE = "ExtractedData.findMinDate";
   public static final String QUERY_FIND_BY_TIME_CREATED = "ExtractedData.findByTimeCreated";
+  public static final String QUERY_DELETE_BY_ID = "ExtractedData.deleteById";
 
   @Id @Column private UUID id;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.REMOVE)
   @JoinColumn(name = "activity_raw_id")
   private ActivityRaw activityRaw;
 
@@ -68,6 +73,9 @@ public class ActivityData {
 
   @Column(name = "time_created")
   private LocalDateTime timeCreated;
+
+  @Column(name = "last_modified")
+  private LocalDateTime lastModified;
 
   @Column private Integer temperature;
 
@@ -154,6 +162,14 @@ public class ActivityData {
 
   public void setTimeCreated(LocalDateTime timeCreated) {
     this.timeCreated = timeCreated;
+  }
+
+  public LocalDateTime getLastModified() {
+    return lastModified;
+  }
+
+  public void setLastModified(LocalDateTime lastModified) {
+    this.lastModified = lastModified;
   }
 
   public Integer getTemperature() {

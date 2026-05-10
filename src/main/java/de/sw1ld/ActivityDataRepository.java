@@ -15,4 +15,6 @@ public interface ActivityDataRepository {
   Optional<Integer> findMinYear();
 
   Optional<ActivityData> findByTimeCreated(LocalDateTime timeCreated);
+
+  boolean delete(UUID id);
 }

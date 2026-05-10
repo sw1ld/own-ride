@@ -2,8 +2,10 @@ package de.sw1ld;
 
 import jakarta.annotation.Nullable;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
@@ -16,13 +18,8 @@ public class FitService {
     this.activityDataRepository = activityDataRepository;
   }
 
-  FitData fetchDetailsBy(UUID id) {
-    ActivityData data =
-        activityDataRepository
-            .findById(id)
-            .orElseThrow(() -> new IllegalStateException("Resource not found for Id: " + id));
-
-    return new FitData(data);
+  Optional<FitData> fetchDetailsBy(UUID id) {
+    return activityDataRepository.findById(id).map(FitData::new);
   }
 
   List<FitData> fetchDetails(@Nullable Integer year) {
@@ -39,5 +36,10 @@ public class FitService {
 
     // We want a descending list (most recent year first)
     return IntStream.rangeClosed(minYear, currentYear).boxed().sorted((a, b) -> b - a).toList();
+  }
+
+  @Transactional
+  boolean deleteActivity(UUID id) {
+    return activityDataRepository.delete(id);
   }
 }

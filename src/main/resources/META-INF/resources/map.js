@@ -104,7 +104,8 @@ async function loadRoute(id) {
 }
 
 document.querySelectorAll('.clickable-row').forEach(row => {
-  row.addEventListener('click', () => {
+  row.addEventListener('click', (e) => {
+    if (e.target.closest('.button')) return; // Ignore clicks on action buttons
     const id = row.dataset.id;
     loadRoute(id);
   });

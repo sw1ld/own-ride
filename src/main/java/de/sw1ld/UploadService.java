@@ -30,8 +30,6 @@ public class UploadService {
     activityRaw.setId(activityId);
     activityRaw.setName(fileName);
     activityRaw.setFitFile(content);
-    // check if created date was set properly!
-    activityRaw.setLastModified(LocalDateTime.now());
 
     Decode decode = new Decode();
     MesgBroadcaster broadcaster = new MesgBroadcaster(decode);
@@ -71,12 +69,57 @@ public class UploadService {
       data.setTemperature(ses.getTemperature());
       data.setTotalAscent(ses.getTotalAscent());
       data.setTimeCreated(fileId.getTimeCreated());
+      data.setLastModified(LocalDateTime.now());
       data.setPositions(rec.getPositions());
 
       em.persist(activityRaw);
       em.persist(data);
 
       return id;
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  @Transactional
+  FitData recalculateActivity(UUID id) {
+    ActivityData activityData =
+        activityDataRepository
+            .findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Activity data not found"));
+
+    ActivityRaw activityRaw = activityData.getActivity();
+    if (activityRaw == null) {
+      throw new IllegalStateException("Raw activity data not found for activity: " + id);
+    }
+
+    byte[] content = activityRaw.getFitFile();
+
+    Decode decode = new Decode();
+    MesgBroadcaster broadcaster = new MesgBroadcaster(decode);
+    RecordListener rec = new RecordListener();
+    SessionListener ses = new SessionListener();
+    FileIdListener fileId = new FileIdListener();
+
+    broadcaster.addListener(rec);
+    broadcaster.addListener(ses);
+    broadcaster.addListener(fileId);
+
+    try (InputStream is = new ByteArrayInputStream(content)) {
+      decode.read(is, broadcaster);
+
+      activityData.setDate(rec.getDate());
+      activityData.setDistance(ses.getDistance());
+      activityData.setDuration(ses.getTimeWithoutBreaks());
+      activityData.setAvgSpeed(ses.getAverageSpeed());
+      activityData.setTemperature(ses.getTemperature());
+      activityData.setTotalAscent(ses.getTotalAscent());
+      activityData.setTimeCreated(fileId.getTimeCreated());
+      activityData.setLastModified(LocalDateTime.now());
+      activityData.setPositions(rec.getPositions());
+
+      em.merge(activityData);
+      return new FitData(activityData);
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }

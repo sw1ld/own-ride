@@ -69,4 +69,15 @@ public class ActivityDataRepositoryJpa implements ActivityDataRepository {
       return Optional.empty();
     }
   }
+
+  @Override
+  public boolean delete(UUID id) {
+    Optional<ActivityData> activityToDelete = findById(id);
+
+    if (activityToDelete.isPresent()) {
+      entityManager.remove(activityToDelete.get());
+      return true;
+    }
+    return false;
+  }
 }

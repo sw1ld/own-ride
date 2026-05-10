@@ -15,6 +15,7 @@
                             <th class="sortable has-text-centered">Total ascent <span class="arrow">↑↓</span></th>
                             <th class="sortable has-text-centered">Average Speed <span class="arrow">↑↓</span></th>
                             <th class="sortable has-text-centered">Temperature <span class="arrow">↑↓</span></th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
 
@@ -28,6 +29,18 @@
                             <td class="has-text-centered">{entry.totalAscent}</td>
                             <td class="has-text-centered">{entry.avgSpeed}</td>
                             <td class="has-text-centered">{entry.temperature}</td>
+                            <td class="has-text-centered">
+                                <button class="button is-small is-danger is-outlined delete-route" title="Delete Route" data-id="{entry.id}">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-trash"></i>
+                                    </span>
+                                </button>
+                                <button class="button is-small is-info is-outlined recalculate-route" title="Recalculate Route" data-id="{entry.id}">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-sync"></i>
+                                    </span>
+                                </button>
+                            </td>
                         </tr>
                         {/for}
                     </tbody>
@@ -45,6 +58,7 @@
                     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                     <script src="/altitude.js" defer></script>
                     <script src="/map.js" defer></script>
+                    <script src="/modal.js" defer></script>
                 </div>
 
                 <h2 class="title is-4">Altitude Profile</h2>
@@ -54,4 +68,21 @@
             </section>
         </div>
     </section>
+
+    <div id="confirmModal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title" id="confirmModalTitle">Confirm Action</p>
+                <button class="delete" aria-label="close" id="closeModal"></button>
+            </header>
+            <section class="modal-card-body">
+                <p id="confirmModalMessage">Are you sure you want to proceed?</p>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-success" id="confirmModalAction">Confirm</button>
+                <button class="button" id="cancelModal">Cancel</button>
+            </footer>
+        </div>
+    </div>
 {/include}

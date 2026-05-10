@@ -32,9 +32,6 @@ public class ActivityRaw {
   @Column(name = "uploaded_at", nullable = false)
   private LocalDateTime uploadedAt;
 
-  @Column(name = "last_modified", nullable = false)
-  private LocalDateTime lastModified;
-
   public UUID getId() {
     return id;
   }
@@ -65,13 +62,5 @@ public class ActivityRaw {
 
   public void setUploadedAt(LocalDateTime uploadedAt) {
     this.uploadedAt = uploadedAt;
-  }
-
-  public LocalDateTime getLastModified() {
-    return lastModified;
-  }
-
-  public void setLastModified(LocalDateTime lastModified) {
-    this.lastModified = lastModified;
   }
 }

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ class StatsServiceTest {
   void sumStatsForSameDate() {
     int year = 2025;
     LocalDate date = LocalDate.of(year, 6, 7);
+    LocalDateTime now = LocalDateTime.now();
     FitData ride1 =
         new FitData(
             UUID.randomUUID(),
@@ -24,6 +26,7 @@ class StatsServiceTest {
             10.5,
             20,
             100,
+            now,
             List.of());
     FitData ride2 =
         new FitData(
@@ -35,6 +38,7 @@ class StatsServiceTest {
             15.0,
             22,
             150,
+            now,
             List.of());
 
     List<FitData> fitData = List.of(ride1, ride2);
