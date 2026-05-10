@@ -1,6 +1,7 @@
 package de.sw1ld;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ public record FitResponse(
     String avgSpeed,
     String temperature,
     String totalAscent,
+    LocalDateTime lastModified,
     List<Position> positions) {
 
   public FitResponse(FitData fd) {
@@ -27,6 +29,7 @@ public record FitResponse(
         Prettyfier.speedWithUnit(fd.avgSpeed()),
         Prettyfier.temperatureWithUnit(fd.temperature()),
         Prettyfier.withMeter(fd.totalAscent()),
+        fd.lastModified(),
         fd.positions());
   }
 

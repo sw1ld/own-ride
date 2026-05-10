@@ -2,8 +2,10 @@ package de.sw1ld;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -14,6 +16,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
@@ -133,8 +136,28 @@ public class FitResource {
   @Path("details/id/{id}")
   @Produces(MediaType.APPLICATION_JSON)
   public Response dataById(@PathParam("id") UUID id) {
-    FitData fitData = fitService.fetchDetailsBy(id);
+    Optional<FitData> fitData = fitService.fetchDetailsBy(id);
+    if (fitData.isEmpty()) {
+      return Response.status(404).build();
+    }
+    return Response.ok().entity(new FitResponse(fitData.get())).build();
+  }
 
-    return Response.ok().entity(new FitResponse(fitData)).build();
+  @DELETE
+  @Path("details/id/{id}")
+  public Response delete(@PathParam("id") UUID id) {
+    return fitService.deleteActivity(id)
+        ? Response.noContent().build()
+        : Response.status(404).build();
+  }
+
+  @PUT
+  @Path("details/id/{id}")
+  public Response recalculate(@PathParam("id") UUID id) {
+    Optional<FitData> fitData = fitService.fetchDetailsBy(id);
+    if (fitData.isEmpty()) {
+      return Response.status(404).build();
+    }
+    return Response.ok().entity(new FitResponse(uploadService.recalculateActivity(id))).build();
   }
 }
