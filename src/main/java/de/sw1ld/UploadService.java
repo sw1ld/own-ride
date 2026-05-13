@@ -66,6 +66,7 @@ public class UploadService {
       data.setDistance(ses.getDistance());
       data.setDuration(ses.getTimeWithoutBreaks());
       data.setAvgSpeed(ses.getAverageSpeed());
+      data.setMaxSpeed(rec.getMaxSpeed());
       data.setTemperature(ses.getTemperature());
       data.setTotalAscent(ses.getTotalAscent());
       data.setTimeCreated(fileId.getTimeCreated());
@@ -112,6 +113,7 @@ public class UploadService {
       activityData.setDistance(ses.getDistance());
       activityData.setDuration(ses.getTimeWithoutBreaks());
       activityData.setAvgSpeed(ses.getAverageSpeed());
+      activityData.setMaxSpeed(rec.getMaxSpeed());
       activityData.setTemperature(ses.getTemperature());
       activityData.setTotalAscent(ses.getTotalAscent());
       activityData.setTimeCreated(fileId.getTimeCreated());
