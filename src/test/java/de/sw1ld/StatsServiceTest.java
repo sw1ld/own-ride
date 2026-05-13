@@ -27,6 +27,7 @@ class StatsServiceTest {
             20,
             100,
             now,
+            0,
             List.of());
     FitData ride2 =
         new FitData(
@@ -39,6 +40,7 @@ class StatsServiceTest {
             22,
             150,
             now,
+            0,
             List.of());
 
     List<FitData> fitData = List.of(ride1, ride2);

@@ -71,6 +71,7 @@ public class UploadService {
       data.setTotalAscent(ses.getTotalAscent());
       data.setTimeCreated(fileId.getTimeCreated());
       data.setLastModified(LocalDateTime.now());
+      data.setRate(0);
       data.setPositions(rec.getPositions());
 
       em.persist(activityRaw);
@@ -83,18 +84,31 @@ public class UploadService {
   }
 
   @Transactional
-  FitData recalculateActivity(UUID id) {
-    ActivityData activityData =
+  FitData setUserRating(UUID id, Rate rate) {
+    ActivityData data =
         activityDataRepository
             .findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Activity data not found"));
 
-    ActivityRaw activityRaw = activityData.getActivity();
-    if (activityRaw == null) {
-      throw new IllegalStateException("Raw activity data not found for activity: " + id);
+    Integer existingRate = data.getRate();
+
+    if (existingRate != null && existingRate.equals(rate.value())) {
+      data.setRate(0);
+    } else {
+      data.setRate(rate.value());
     }
 
-    byte[] content = activityRaw.getFitFile();
+    em.merge(data);
+
+    return new FitData(data);
+  }
+
+  @Transactional
+  FitData recalculateActivity(UUID id) {
+    ActivityData data =
+        activityDataRepository
+            .findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Activity data not found"));
 
     Decode decode = new Decode();
     MesgBroadcaster broadcaster = new MesgBroadcaster(decode);
@@ -106,22 +120,23 @@ public class UploadService {
     broadcaster.addListener(ses);
     broadcaster.addListener(fileId);
 
+    byte[] content = data.getActivity().getFitFile();
     try (InputStream is = new ByteArrayInputStream(content)) {
       decode.read(is, broadcaster);
 
-      activityData.setDate(rec.getDate());
-      activityData.setDistance(ses.getDistance());
-      activityData.setDuration(ses.getTimeWithoutBreaks());
-      activityData.setAvgSpeed(ses.getAverageSpeed());
-      activityData.setMaxSpeed(rec.getMaxSpeed());
-      activityData.setTemperature(ses.getTemperature());
-      activityData.setTotalAscent(ses.getTotalAscent());
-      activityData.setTimeCreated(fileId.getTimeCreated());
-      activityData.setLastModified(LocalDateTime.now());
-      activityData.setPositions(rec.getPositions());
+      data.setDate(rec.getDate());
+      data.setDistance(ses.getDistance());
+      data.setDuration(ses.getTimeWithoutBreaks());
+      data.setAvgSpeed(ses.getAverageSpeed());
+      data.setMaxSpeed(rec.getMaxSpeed());
+      data.setTemperature(ses.getTemperature());
+      data.setTotalAscent(ses.getTotalAscent());
+      data.setTimeCreated(fileId.getTimeCreated());
+      data.setLastModified(LocalDateTime.now());
+      data.setPositions(rec.getPositions());
 
-      em.merge(activityData);
-      return new FitData(activityData);
+      em.merge(data);
+      return new FitData(data);
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }

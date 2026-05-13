@@ -56,6 +56,22 @@
                 width: 100%;
                 height: 100%;
             }
+            .rating {
+                display: inline-flex;
+                flex-direction: row-reverse;
+                gap: 2px;
+            }
+            .rating i {
+                cursor: pointer;
+                color: #ccc;
+                transition: color 0.2s;
+            }
+            .rating i:hover,
+            .rating i:hover ~ i,
+            .rating i.active,
+            .rating i.active ~ i {
+                color: #ffd700;
+            }
         </style>
     </head>
 

@@ -35,8 +35,21 @@ document.addEventListener('DOMContentLoaded', () => {
       if (ascending === null) return;
 
       rows.sort((a, b) => {
-        const cellA = a.children[colIndex].textContent.trim();
-        const cellB = b.children[colIndex].textContent.trim();
+        const cellAElement = a.children[colIndex];
+        const cellBElement = b.children[colIndex];
+
+        const ratingA = cellAElement.querySelector('.rating');
+        const ratingB = cellBElement.querySelector('.rating');
+
+        let cellA, cellB;
+
+        if (ratingA && ratingB) {
+            cellA = ratingA.getAttribute('data-rate') || "0";
+            cellB = ratingB.getAttribute('data-rate') || "0";
+        } else {
+            cellA = cellAElement.textContent.trim();
+            cellB = cellBElement.textContent.trim();
+        }
 
         const numA = parseFloat(cellA.replace(/[^0-9.-]/g, ''));
         const numB = parseFloat(cellB.replace(/[^0-9.-]/g, ''));

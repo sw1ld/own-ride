@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.not;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import io.restassured.response.ValidatableResponse;
 import jakarta.ws.rs.core.MediaType;
 import java.io.File;
 import java.util.UUID;
@@ -142,6 +143,39 @@ class FitResourceTest {
 
   @Test
   @Order(5)
+  void rateActivity() {
+    FitResponse activity = firstActivity(YEAR);
+
+    // rate activity
+    assertThat(activity.rate()).isZero(); // default rating
+
+    // set rating to 3
+    setRating(activity.id(), 3).body("rate", equalTo(3));
+
+    // fetch activity and assert for persisted value 3
+    given()
+        .accept(MediaType.APPLICATION_JSON)
+        .when()
+        .get("/fit/details/id/" + activity.id())
+        .then()
+        .statusCode(200)
+        .body("rate", equalTo(3));
+
+    // set rating to 3 again (toggle off)
+    setRating(activity.id(), 3).body("rate", equalTo(0));
+
+    // assert rating to be 0 (persisted)
+    given()
+        .accept(MediaType.APPLICATION_JSON)
+        .when()
+        .get("/fit/details/id/" + activity.id())
+        .then()
+        .statusCode(200)
+        .body("rate", equalTo(0));
+  }
+
+  @Test
+  @Order(6)
   void deleteActivity() {
     UUID id = firstActivity(YEAR).id();
 
@@ -176,5 +210,15 @@ class FitResourceTest {
         .body("", hasSize(1))
         .extract()
         .as(FitResponse[].class)[0];
+  }
+
+  private static ValidatableResponse setRating(UUID activityId, int rate) {
+    return given()
+        .contentType(ContentType.JSON)
+        .body(rate)
+        .when()
+        .put("/fit/details/id/%s/rate".formatted(activityId))
+        .then()
+        .statusCode(200);
   }
 }
