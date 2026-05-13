@@ -15,6 +15,7 @@ public record FitResponse(
     String avgSpeed,
     String temperature,
     String totalAscent,
+    Integer rate,
     LocalDateTime lastModified,
     List<Position> positions) {
 
@@ -29,6 +30,7 @@ public record FitResponse(
         Prettyfier.speedWithUnit(fd.avgSpeed()),
         Prettyfier.temperatureWithUnit(fd.temperature()),
         Prettyfier.withMeter(fd.totalAscent()),
+        fd.rate(),
         fd.lastModified(),
         fd.positions());
   }

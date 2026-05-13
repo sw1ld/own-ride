@@ -15,6 +15,7 @@
                             <th class="sortable has-text-centered">Total ascent <span class="arrow">↑↓</span></th>
                             <th class="sortable has-text-centered">Average Speed <span class="arrow">↑↓</span></th>
                             <th class="sortable has-text-centered">Temperature <span class="arrow">↑↓</span></th>
+                            <th class="sortable has-text-centered">Rating <span class="arrow">↑↓</span></th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -29,6 +30,15 @@
                             <td class="has-text-centered">{entry.totalAscent}</td>
                             <td class="has-text-centered">{entry.avgSpeed}</td>
                             <td class="has-text-centered">{entry.temperature}</td>
+                            <td class="has-text-centered">
+                                <div class="rating" data-id="{entry.id}" data-rate="{entry.rate}">
+                                    <i class="fas fa-star {#if entry.rate >= 5}active{/if}" data-value="5"></i>
+                                    <i class="fas fa-star {#if entry.rate >= 4}active{/if}" data-value="4"></i>
+                                    <i class="fas fa-star {#if entry.rate >= 3}active{/if}" data-value="3"></i>
+                                    <i class="fas fa-star {#if entry.rate >= 2}active{/if}" data-value="2"></i>
+                                    <i class="fas fa-star {#if entry.rate >= 1}active{/if}" data-value="1"></i>
+                                </div>
+                            </td>
                             <td class="has-text-centered">
                                 <button class="button is-small is-danger is-outlined delete-route" title="Delete Route" data-id="{entry.id}">
                                     <span class="icon is-small">
@@ -59,6 +69,7 @@
                     <script src="/altitude.js" defer></script>
                     <script src="/map.js" defer></script>
                     <script src="/modal.js" defer></script>
+                    <script src="/rating.js" defer></script>
                 </div>
 
                 <h2 class="title is-4">Altitude Profile</h2>

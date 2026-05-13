@@ -12,6 +12,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -153,11 +154,33 @@ public class FitResource {
 
   @PUT
   @Path("details/id/{id}")
+  @Produces(MediaType.APPLICATION_JSON)
   public Response recalculate(@PathParam("id") UUID id) {
     Optional<FitData> fitData = fitService.fetchDetailsBy(id);
     if (fitData.isEmpty()) {
       return Response.status(404).build();
     }
     return Response.ok().entity(new FitResponse(uploadService.recalculateActivity(id))).build();
+  }
+
+  @PUT
+  @Path("details/id/{id}/rate")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response rate(@PathParam("id") UUID id, Integer rate) {
+    Optional<FitData> fitData = fitService.fetchDetailsBy(id);
+    if (fitData.isEmpty()) {
+      return Response.status(404).build();
+    }
+    Rate validRate;
+    try {
+      validRate = new Rate(rate);
+    } catch (Exception e) {
+      return Response.status(Status.BAD_REQUEST).build(); // TODO introduce HTTP Problem?
+    }
+
+    return Response.ok()
+        .entity(new FitResponse(uploadService.setUserRating(id, validRate)))
+        .build();
   }
 }

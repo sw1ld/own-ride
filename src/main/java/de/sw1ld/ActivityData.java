@@ -79,6 +79,9 @@ public class ActivityData {
 
   @Column private Integer temperature;
 
+  @Column(nullable = false)
+  private Integer rate;
+
   @Column
   @JdbcTypeCode(SqlTypes.JSON)
   @Convert(converter = PositionListJsonConverter.class)
@@ -178,6 +181,14 @@ public class ActivityData {
 
   public void setTemperature(Integer temperature) {
     this.temperature = temperature;
+  }
+
+  public Integer getRate() {
+    return rate;
+  }
+
+  public void setRate(Integer rate) {
+    this.rate = rate;
   }
 
   public List<Position> getPositions() {

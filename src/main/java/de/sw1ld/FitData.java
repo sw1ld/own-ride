@@ -16,6 +16,7 @@ public record FitData(
     Integer temperature,
     Integer totalAscent,
     LocalDateTime lastModified,
+    Integer rate,
     List<Position> positions) {
 
   public FitData(ActivityData data) {
@@ -29,6 +30,7 @@ public record FitData(
         data.getTemperature(),
         data.getTotalAscent(),
         data.getLastModified(),
+        data.getRate(),
         data.getPositions());
   }
 }
