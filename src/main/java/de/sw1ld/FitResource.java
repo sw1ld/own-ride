@@ -1,5 +1,6 @@
 package de.sw1ld;
 
+import io.quarkiverse.httpproblem.HttpProblem;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -139,7 +140,7 @@ public class FitResource {
   public Response dataById(@PathParam("id") UUID id) {
     Optional<FitData> fitData = fitService.fetchDetailsBy(id);
     if (fitData.isEmpty()) {
-      return Response.status(404).build();
+      return Response.status(404).entity(notFoundProblem(id)).build();
     }
     return Response.ok().entity(new FitResponse(fitData.get())).build();
   }
@@ -149,7 +150,7 @@ public class FitResource {
   public Response delete(@PathParam("id") UUID id) {
     return fitService.deleteActivity(id)
         ? Response.noContent().build()
-        : Response.status(404).build();
+        : Response.status(404).entity(notFoundProblem(id)).build();
   }
 
   @PUT
@@ -158,7 +159,7 @@ public class FitResource {
   public Response recalculate(@PathParam("id") UUID id) {
     Optional<FitData> fitData = fitService.fetchDetailsBy(id);
     if (fitData.isEmpty()) {
-      return Response.status(404).build();
+      return Response.status(404).entity(notFoundProblem(id)).build();
     }
     return Response.ok().entity(new FitResponse(uploadService.recalculateActivity(id))).build();
   }
@@ -170,17 +171,24 @@ public class FitResource {
   public Response rate(@PathParam("id") UUID id, Integer rate) {
     Optional<FitData> fitData = fitService.fetchDetailsBy(id);
     if (fitData.isEmpty()) {
-      return Response.status(404).build();
+      return Response.status(404).entity(notFoundProblem(id)).build();
     }
     Rate validRate;
     try {
       validRate = new Rate(rate);
-    } catch (Exception e) {
-      return Response.status(Status.BAD_REQUEST).build(); // TODO introduce HTTP Problem?
+    } catch (IllegalArgumentException e) {
+      return Response.status(Status.BAD_REQUEST)
+          .entity(HttpProblem.valueOf(Status.BAD_REQUEST, e.getMessage()))
+          .build();
     }
 
     return Response.ok()
         .entity(new FitResponse(uploadService.setUserRating(id, validRate)))
         .build();
+  }
+
+  private static HttpProblem notFoundProblem(UUID id) {
+    return HttpProblem.valueOf(
+        Status.NOT_FOUND, "Activity with id '%s' does not exist".formatted(id));
   }
 }
