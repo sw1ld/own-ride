@@ -51,6 +51,11 @@
       <version>21.195.0</version>
     </dependency>
     <dependency>
+      <groupId>io.quarkiverse.httpproblem</groupId>
+      <artifactId>quarkus-http-problem</artifactId>
+      <version>3.33.1</version>
+    </dependency>
+    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-hibernate-orm</artifactId>
     </dependency>

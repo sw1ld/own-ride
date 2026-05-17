@@ -56,7 +56,8 @@ class FitResourceTest {
         .when()
         .get("/fit/details/id/" + randomId)
         .then()
-        .statusCode(404);
+        .statusCode(404)
+        .body("detail", equalTo("Activity with id '%s' does not exist".formatted(randomId)));
   }
 
   @Test
@@ -145,8 +146,6 @@ class FitResourceTest {
   @Order(5)
   void rateActivity() {
     FitResponse activity = firstActivity(YEAR);
-
-    // rate activity
     assertThat(activity.rate()).isZero(); // default rating
 
     // set rating to 3
@@ -176,6 +175,21 @@ class FitResourceTest {
 
   @Test
   @Order(6)
+  void rateActivityWithInvalidRating_shouldFail() {
+    FitResponse activity = firstActivity(YEAR);
+
+    given()
+        .contentType(ContentType.JSON)
+        .body(7)
+        .when()
+        .put("/fit/details/id/%s/rate".formatted(activity.id()))
+        .then()
+        .statusCode(400)
+        .body("detail", equalTo("Rate value must be between 0 and 5"));
+  }
+
+  @Test
+  @Order(7)
   void deleteActivity() {
     UUID id = firstActivity(YEAR).id();
 
@@ -193,10 +207,16 @@ class FitResourceTest {
         .when()
         .get("/fit/details/id/" + id)
         .then()
-        .statusCode(404);
+        .statusCode(404)
+        .body("detail", equalTo("Activity with id '%s' does not exist".formatted(id)));
 
     // delete again -> 404
-    given().when().delete("/fit/details/id/" + id).then().statusCode(404);
+    given()
+        .when()
+        .delete("/fit/details/id/" + id)
+        .then()
+        .statusCode(404)
+        .body("detail", equalTo("Activity with id '%s' does not exist".formatted(id)));
   }
 
   private static FitResponse firstActivity(int year) {
