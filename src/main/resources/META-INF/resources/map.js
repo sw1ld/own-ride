@@ -14,10 +14,11 @@ window.showHoverPointOnMap = function(index) {
     const p = currentRoute[index];
     const latLng = [p.lat, p.lon];
     if (!hoverMarker) {
+      const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim() || '#0B4587';
       hoverMarker = L.circleMarker(latLng, {
         radius: 8,
-        color: 'blue',
-        fillColor: '#30f',
+        color: primaryColor,
+        fillColor: primaryColor,
         fillOpacity: 0.8
       }).addTo(map);
     } else {
@@ -49,7 +50,8 @@ async function loadRoute(id) {
 
     // Draw new route
     const latLngs = currentRoute.map(p => [p.lat, p.lon]);
-    currentPolyline = L.polyline(latLngs, { color: 'red', weight: 4 }).addTo(map);
+    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim() || '#0B4587';
+    currentPolyline = L.polyline(latLngs, { color: primaryColor, weight: 4 }).addTo(map);
 
     map.on('mousemove', function(e) {
       if (!currentRoute || currentRoute.length === 0) return;
@@ -97,6 +99,14 @@ async function loadRoute(id) {
 
     updateAltitudeChart(currentRoute, data.distance);
 
+    // Highlight the selected row in the table
+    document.querySelectorAll('.clickable-row').forEach(row => {
+      row.classList.remove('is-selected');
+      if (row.dataset.id === id) {
+        row.classList.add('is-selected');
+      }
+    });
+
   } catch (err) {
     console.error(err);
     alert("Failed to load route.");
@@ -109,4 +119,12 @@ document.querySelectorAll('.clickable-row').forEach(row => {
     const id = row.dataset.id;
     loadRoute(id);
   });
+});
+
+// Auto-load first route on page load
+document.addEventListener('DOMContentLoaded', () => {
+  const firstRow = document.querySelector('.clickable-row');
+  if (firstRow) {
+    loadRoute(firstRow.dataset.id);
+  }
 });

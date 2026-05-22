@@ -51,10 +51,16 @@ document.addEventListener('DOMContentLoaded', () => {
             cellB = cellBElement.textContent.trim();
         }
 
-        const numA = parseFloat(cellA.replace(/[^0-9.-]/g, ''));
-        const numB = parseFloat(cellB.replace(/[^0-9.-]/g, ''));
+        const numA = parseFloat(cellA.replace(/[^0-9,.-]/g, '').replace(',', '.'));
+        const numB = parseFloat(cellB.replace(/[^0-9,.-]/g, '').replace(',', '.'));
 
-        if (!isNaN(numA) && !isNaN(numB)) {
+        // Special handling for dates (YYYY-MM-DD)
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (dateRegex.test(cellA) && dateRegex.test(cellB)) {
+            return ascending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+        }
+
+        if (!isNaN(numA) && !isNaN(numB) && !dateRegex.test(cellA)) {
           return ascending ? numA - numB : numB - numA;
         }
         return ascending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);

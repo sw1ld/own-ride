@@ -20,16 +20,170 @@
             href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         />
         <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+        <script src="/chart-utils.js" defer></script>
 
         <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <style>
+            :root {
+                --primary-color: #0B4587;
+                --primary-light: #1260b5;
+                --primary-dark: #072d59;
+                --bg-color: #f5f7fa;
+                --card-bg: #ffffff;
+                --text-color: #4a4a4a;
+                --title-color: #072d59;
+                --subtitle-color: #0B4587;
+                --border-color: #dbdbdb;
+                --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --bg-color: #1a1a1a;
+                    --card-bg: #2a2a2a;
+                    --text-color: #e0e0e0;
+                    --title-color: #64b5f6;
+                    --subtitle-color: #9be7ff;
+                    --primary-color: #64b5f6;
+                    --primary-light: #9be7ff;
+                    --primary-dark: #2286c3;
+                    --border-color: #444444;
+                }
+            }
+
+            body {
+                font-family: var(--font-family);
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                transition: background-color 0.3s ease, color 0.3s ease;
+            }
+
+            .navbar {
+                background-color: var(--primary-color);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .navbar-item, .navbar-link {
+                color: white !important;
+            }
+            .navbar-item:hover, .navbar-link:hover,
+            .navbar-item:focus, .navbar-link:focus,
+            .navbar-item:focus-within, .navbar-link:focus-within,
+            .navbar-item.is-active, .navbar-link.is-active {
+                background-color: var(--primary-light) !important;
+                color: white !important;
+            }
+            .navbar-burger span {
+                background-color: white;
+            }
+
+            .button.is-primary {
+                background-color: var(--primary-color);
+                border-color: transparent;
+                transition: background-color 0.3s ease;
+            }
+            .button.is-primary:hover {
+                background-color: var(--primary-light);
+            }
+
+            .button.is-info.is-outlined {
+                color: var(--primary-color);
+                border-color: var(--primary-color);
+            }
+            .button.is-info.is-outlined:hover {
+                background-color: var(--primary-color);
+                color: white;
+            }
+            
+            .title, .subtitle {
+                font-family: var(--font-family);
+                font-weight: 700;
+                color: var(--title-color);
+            }
+
+            .table {
+                background-color: transparent;
+                color: var(--text-color);
+            }
+
+            .table thead th {
+                color: var(--subtitle-color);
+            }
+
+            .table.is-striped tbody tr:nth-child(even) {
+                background-color: rgba(0,0,0,0.02);
+            }
+
+            .table tbody tr.is-selected {
+                background-color: rgba(11, 69, 135, 0.1) !important;
+                color: inherit !important;
+            }
+
+            .table tbody tr.is-selected td {
+                color: inherit !important;
+                font-weight: 600;
+            }
+
+            .table tbody tr.is-selected .rating i {
+                color: rgba(0,0,0,0.2);
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .table tbody tr.is-selected {
+                    background-color: rgba(100, 181, 246, 0.2) !important;
+                }
+                .table tbody tr.is-selected .rating i {
+                    color: rgba(255,255,255,0.2);
+                }
+            }
+
+            .table tbody tr.is-selected .rating i.active {
+                color: #ffd700;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .table.is-striped tbody tr:nth-child(even) {
+                    background-color: rgba(255,255,255,0.02);
+                }
+                .table td, .table th {
+                    border-color: var(--border-color);
+                }
+            }
+
+            .card {
+                background-color: var(--card-bg);
+                color: var(--text-color);
+            }
+            .card-header-title {
+                color: var(--title-color) !important;
+            }
+            .label {
+                color: var(--text-color) !important;
+            }
+
+            .box {
+                background-color: var(--card-bg);
+                border-radius: 12px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            }
+
             #map {
                 height: 60vh;
                 width: 100%;
                 z-index: 1;
+            }
+            .leaflet-tile-pane {
+                filter: hue-rotate(10deg) saturate(0.8) brightness(1.05);
+            }
+            @media (prefers-color-scheme: dark) {
+                .leaflet-tile-pane {
+                    filter: invert(100%) hue-rotate(180deg) brightness(0.95) contrast(0.9);
+                }
             }
             .modal {
                 z-index: 1000;
@@ -44,8 +198,8 @@
             }
             .charts {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-                gap: 1.5rem;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 2rem;
                 align-items: start;
             }
             .chart {
@@ -72,6 +226,9 @@
             .rating i.active ~ i {
                 color: #ffd700;
             }
+            .navbar-brand .navbar-item img {
+                max-height: 2.5rem;
+            }
         </style>
     </head>
 
@@ -79,7 +236,7 @@
         <nav class="navbar" role="navigation" aria-label="main navigation">
             <div class="navbar-brand">
                 <a class="navbar-item" href="/fit/stats">
-                    <strong>OwnRide</strong>
+                    <img src="/logo_ownride_inverted.png" alt="OwnRide Logo">
                 </a>
 
                 <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="mainNavbar">
@@ -106,7 +263,7 @@
                         <div class="field">
                             <div class="control">
                                 <div class="select is-fullwidth">
-                                    <select id="yearFilter">
+                                    <select id="yearFilter" style="border-radius: 8px;">
                                         {#for y in availableYears}
                                             <option value="{y}">{y}</option>
                                         {/for}
