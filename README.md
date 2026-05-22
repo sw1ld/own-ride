@@ -1,4 +1,4 @@
-# OwnRide
+<img src="src/main/resources/META-INF/resources/logo_ownride.png" alt="OwnRide logo" width="200"/>
 
 [![Java CI with Maven](https://github.com/sw1ld/own-ride/actions/workflows/maven.yml/badge.svg)](https://github.com/sw1ld/own-ride/actions/workflows/maven.yml) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 

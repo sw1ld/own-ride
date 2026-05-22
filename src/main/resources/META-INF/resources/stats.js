@@ -1,31 +1,3 @@
-function createBarChart(canvasId, labels, data, label, title, color, barThickness) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx) return;
-    
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels,
-            datasets: [{
-                label,
-                data,
-                backgroundColor: color,
-                barThickness: barThickness
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: {
-                    display: true,
-                    text: title
-                }
-            }
-        }
-    });
-}
-
 async function loadStatistics() {
     const urlParams = new URLSearchParams(window.location.search);
     const year = urlParams.get('year') || new Date().getFullYear();
@@ -60,14 +32,32 @@ async function loadStatistics() {
 }
 
 function initStatistics(dailyDates, dailyDistance) {
+    const theme = getChartTheme();
+
+    const createBarChart = (canvasId, labels, data, xLabel, yLabel) => {
+        const options = getBaseOptions(xLabel, yLabel);
+        
+        createChart(canvasId, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Distance',
+                    data,
+                    backgroundColor: theme.barColor,
+                    borderRadius: 4
+                }]
+            },
+            options: options
+        });
+    };
+
     createBarChart(
         "routesInYearChart",
         dailyDates,
         dailyDistance,
-        'Kilometers',
-        'Distribution over time',
-        'rgba(54, 162, 235, 0.6)',
-        5
+        '',
+        'kilometers'
     );
 
     const distances = dailyDistance.filter(v => v > 0);
@@ -92,16 +82,14 @@ function initStatistics(dailyDates, dailyDistance) {
         }
     });
 
-    const labelPerBin = bins.map(b => b.end.toFixed(1));
+    const labelPerBin = bins.map(b => Math.round(b.end).toString());
     const dataPerBin = bins.map(b => b.count);
 
     createBarChart(
         "routeLengthChart",
         labelPerBin,
         dataPerBin,
-        '#routes',
-        'Activity days per kilometer',
-        'rgba(75, 192, 192, 0.6)',
-        40
+        'kilometers',
+        'active days'
     );
 }

@@ -4,7 +4,7 @@
         <div class="box">
             <h2 class="title is-4">Details</h2>
 
-            <div id="fitResponses">
+            <div id="fitResponses" class="table-container">
                 <table class="table is-striped is-hoverable is-fullwidth">
                     <thead>
                         <tr>
@@ -14,7 +14,7 @@
                             <th class="sortable has-text-centered">Duration <span class="arrow">↑↓</span></th>
                             <th class="sortable has-text-centered">Total ascent <span class="arrow">↑↓</span></th>
                             <th class="sortable has-text-centered">Average Speed <span class="arrow">↑↓</span></th>
-                            <th class="sortable has-text-centered">Temperature <span class="arrow">↑↓</span></th>
+                            {!<th class="sortable has-text-centered">Temperature <span class="arrow">↑↓</span></th>!}
                             <th class="sortable has-text-centered">Rating <span class="arrow">↑↓</span></th>
                             <th>Actions</th>
                         </tr>
@@ -29,7 +29,7 @@
                             <td class="has-text-centered">{entry.duration}</td>
                             <td class="has-text-centered">{entry.totalAscent}</td>
                             <td class="has-text-centered">{entry.avgSpeed}</td>
-                            <td class="has-text-centered">{entry.temperature}</td>
+                            {!<td class="has-text-centered">{entry.temperature}</td>!}
                             <td class="has-text-centered">
                                 <div class="rating" data-id="{entry.id}" data-rate="{entry.rate}">
                                     <i class="fas fa-star {#if entry.rate >= 5}active{/if}" data-value="5"></i>
