@@ -1,8 +1,9 @@
 # Contribution Guidelines
 
-We welcome contributions to `OwnRide`! To maintain high code quality and consistency, please follow these guidelines.
+Everybody is warmly welcome to contribute to `OwnRide`! 
+To maintain high code quality and consistency, please follow these guidelines.
 
-## 📝 Commit Message Guidelines
+## Commit Message Guidelines
 
 We follow the standard Git commit message conventions, primarily based on [The Seven Rules of a Good Git Commit Message](https://cbea.ms/git-commit/).
 
@@ -32,16 +33,16 @@ If you have a body, ensure it doesn't run too long per line for better readabili
 Focus on the motivation behind the change, not a literal description of the code changes (the diff shows "what"). 
 Explain what problem this solves and why this approach was taken.
 
-### 🚫 NO Prefixes
+### NO Prefixes
 We do **not** use prefixes like `feat:`, `fix:`, `refactor:`, or `bug:` in the subject line. 
 Just a clean, imperative subject.
 
-### 🌐 Language
+### Language
 All commit messages must be in **English**.
 
 ---
 
-## 🛠️ Development Workflow
+## Development Workflow
 
 1.  **Fork** the repository.
 2.  Create a **Feature Branch** (`git checkout -b amazingFeature`).
