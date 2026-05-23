@@ -2,16 +2,24 @@
 
 [![Java CI with Maven](https://github.com/sw1ld/own-ride/actions/workflows/maven.yml/badge.svg)](https://github.com/sw1ld/own-ride/actions/workflows/maven.yml) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-`OwnRide` is a lightweight Quarkus application for analyzing and managing Garmin FIT files.
-I believe that your fitness data should belong to you, and only you.
+When doing sports people track their activities to see how they improve over time.
 
-## 🚀 Key Features
+I believe that your fitness data you create while tracking your activities should belong to you, and only you.
+It should not matter how you track nor analyze it.
+When cool applications grow bigger the focus usually switches from "serving customers needs" to "increasing cash flow".
+The first thing that users will recognize is less free-to-use functionality.
+To me personally, adding a premium version is fine in order to keep developing the product.
+However, the red line gets crossed, when the focus shifts to "making it less attractive to switch to other applications" by e.g. disabling features such as "bulk export" of your own data.
 
-- **FIT File Upload:** Easily upload single or multiple FIT files via a web frontend
-- **Statistics Dashboard:** Visualization of activity data per year
-- **Details View:** Provide activity details in a list format as well as the route using open street maps
-- **Data Persistence:** Metadata storage in a PostgreSQL database
-- **HTTP API:** Access detailed activity data and statistics in JSON format
+At some point you feel like: "this application was once cool; now it sucks, but I am too deeply integrated".
+With `OwnRide` I try to give a lightweight, community driven alternative to maintain your fitness data focused on bike riding.
+
+## Key Features
+
+- **File Upload:** Import single or multiple FIT files via a web frontend
+- **Dashboard:** Get a visual overview of your activities summarized per year
+- **Details View:** See a list of your activities, including route and altitude profiles
+- **Persistence:** Add additional information to each activity
 
 <table>
     <tr><td><img src="src/main/resources/screenshots/dashboard.png" alt="Dashboard Screenshot" width="800"></td></tr>
@@ -19,80 +27,73 @@ I believe that your fitness data should belong to you, and only you.
     <tr><td><img src="src/main/resources/screenshots/upload.png" alt="Upload Screenshot" width="800"></td></tr>
 </table>
 
-
-## 🚲 Why .FIT?
-
-The **Flexible and Interoperable Data Transfer (FIT)** protocol is the industry standard for fitness devices (Garmin, Wahoo, etc.).
-
-- **Efficiency:** Unlike XML-based formats, FIT is a **binary format**, making files significantly smaller and faster to process.
-- **Rich Data:** It supports a vast array of sensor data (Heart Rate, Power, Cadence, Temperature) within a single message-based structure.
-- **Extensibility:** Custom developer fields allow for device-specific metrics.
-
-## 🛠️ Local Setup
-
-### Prerequisites
-
-- **Java 21** or higher
-- **Maven 3.9+**
-- **PostgreSQL** database
-
-### Configuration
-
-Create an `.env` file in the project directory and define the data source.
-Here is an example for a local PostgreSQL instance:
-
-```properties
-_DEV_QUARKUS_DATASOURCE_DB_KIND=postgresql
-_DEV_QUARKUS_DATASOURCE_USERNAME=someuser
-_DEV_QUARKUS_DATASOURCE_PASSWORD=somepassword
-_DEV_QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://localhost:5432/fitdb
-```
-
-### Build
-
-```shell script
-./mvn clean install 
-```
-
-### Start
-
-```shell script
-./mvn quarkus:dev
-```
-
-The application is then accessible at [http://localhost:8080/fit/stats](http://localhost:8080/fit/stats).
-
-## 📖 API Usage
-
-The application provides both an HTML interface and a JSON API:
-
-- **Web Frontend (Stats):** `GET /fit/stats` (with Header `Accept: text/html`)
-- **JSON Statistics:** `GET /fit/stats?year=2025` (with Header `Accept: application/json`)
-- **Activity Details:** `GET /fit/details?year=2025`
-- **File Upload:** `POST /fit/upload` (Multipart Form Data)
-
-## 🤝 Contribution
-
-Contributions are welcome! 
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on our development workflow and commit message guidelines.
-
-### Development & Testing
-
-- **Code Style:** The project uses `spotless` with Google Java Format.
-Run `./mvn spotless:apply` to format the code.
-- **Run Tests:** `./mvn test`
-- **Dev UI:** Accessible in development mode at [http://localhost:8080/q/dev/](http://localhost:8080/q/dev/).
-
-## 🗺️ Roadmap / Open TODOs
+## Roadmap / Open TODOs
 
 - [ ] Add swagger docs
-- [ ] Disable /q/dev endpoints for "prod usage"!
-- [ ] Additional tags for filtering (Bike, Route, etc.)
-- [ ] Expand database for metadata persistence
-- [ ] Speed graphs & slope display
-- [ ] Performance optimization (caching, persistent pre-calculation)
+- [ ] Insert "events" such as "repair/service meeting"
+- [ ] Export all files (including meta data)?
+- [ ] Add additional tags for filtering (Bike, Route, Equipment?, etc.)
+- [ ] Add more graphs for e.g. "Speed & slope"
+- [ ] Optimize performance (caching, persistent pre-calculation)
 
-## ⚖️ License
+
+## Local Setup
+
+Make sure you have the following prerequisites installed:
+
+- Java 21 or higher
+- Maven 3.9+
+- Docker
+
+#### 1. Database Setup
+
+The application requires a level of persistence. 
+I decided to use a PostgreSQL database, which you can start locally using Docker. 
+The following command will create a container named `ownride-pg` with the necessary configuration.
+
+```shell
+docker run -d --name ownride-pg \
+  -p 5432:5432 \
+  -e POSTGRES_DB=ownridedb \
+  -e POSTGRES_USER=someuser \
+  -e POSTGRES_PASSWORD=somepassword \
+  postgres:16
+```
+
+#### 2. Application Configuration
+
+Create an `.env` file in the project's root directory to configure the database connection for local development.
+
+```properties
+# .env
+QUARKUS_DATASOURCE_DB_KIND=postgresql
+QUARKUS_DATASOURCE_USERNAME=someuser
+QUARKUS_DATASOURCE_PASSWORD=somepassword
+QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://localhost:5432/ownridedb
+```
+
+#### 3. Build and Run
+
+Build the project using Maven:
+```shell
+mvn clean verify
+```
+
+Start the application in development mode:
+```shell
+mvn quarkus:dev
+```
+
+The application will be accessible at [http://localhost:8080/fit/stats](http://localhost:8080/fit/stats).
+
+## Contribution
+
+Looks like you managed to run the application locally. 
+If you have a good idea for a cool feature, feel welcome to contribute!
+
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on the development workflow and commit message guidelines.
+
+## License
 
 This project is licensed under the **GNU General Public License v3.0**.  
 See the [LICENSE](LICENSE) file for details.
