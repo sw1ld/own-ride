@@ -2,6 +2,20 @@ let altitudeChart = null;
 let currentFilteredRoute = [];
 let routeOffset = 0;
 
+function getDistance(p1, p2) {
+  if (!p1 || !p2) return 0;
+  const R = 6371; // Radius of the earth in km
+  const dLat = (p2.lat - p1.lat) * Math.PI / 180;
+  const dLon = (p2.lon - p1.lon) * Math.PI / 180;
+  const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(p1.lat * Math.PI / 180) * Math.cos(p2.lat * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distance in km
+}
+
+
 function updateAltitudeChart(route, distance) {
   const theme = getChartTheme();
   
@@ -15,15 +29,18 @@ function updateAltitudeChart(route, distance) {
   const totalDistance = parseFloat(distance) || 0;
 
   // Smoothing: use last value if current is 0 or missing
+  // And calculate cumulative distance
   let lastAltitude = 0;
-  const altitudes = currentFilteredRoute.map(p => {
+  let cumulativeDistance = 0;
+  const chartData = currentFilteredRoute.map((p, index) => {
     if (p.altitude !== undefined && p.altitude !== null && p.altitude !== 0) {
       lastAltitude = p.altitude;
     }
-    return lastAltitude;
+    if (index > 0) {
+      cumulativeDistance += getDistance(currentFilteredRoute[index - 1], p);
+    }
+    return { x: cumulativeDistance, y: lastAltitude };
   });
-
-  const labels = currentFilteredRoute.map((_, index) => index);
 
   if (altitudeChart) {
     altitudeChart.destroy();
@@ -44,37 +61,21 @@ function updateAltitudeChart(route, distance) {
     axis: 'x',
     callbacks: {
       title: function(context) {
-        const index = context[0].dataIndex;
-        const dist = (index / (altitudes.length - 1)) * totalDistance;
+        const dist = context[0].parsed.x;
         return `Distance: ${dist.toFixed(2)} km`;
       }
     }
   };
   
+  options.scales.x.type = 'linear';
+  options.scales.x.min = 0;
+  options.scales.x.max = totalDistance;
   options.scales.x.ticks = {
     color: theme.subtitleColor,
-    callback: function(value, index) {
-      const totalPoints = altitudes.length;
-      const dist = (index / (totalPoints - 1)) * totalDistance;
-      const targetDistance = Math.round(dist / interval) * interval;
-      const targetIndex = Math.round((targetDistance / totalDistance) * (totalPoints - 1));
-      
-      // Always show 0 and the very last point
-      if (index === 0 || index === totalPoints - 1) {
-        return Math.round(dist) + " km";
-      }
-
-      // Show interval points, but only if they are not too close to the end
-      if (index === targetIndex) {
-        // Prevent overlap with the last label (totalPoints - 1)
-        // If the gap to the end is less than half an interval, don't show the penultimate interval label
-        const remainingDist = totalDistance - dist;
-        if (remainingDist > interval * 0.5) {
-            return Math.round(dist) + " km";
-        }
-      }
-      return null;
+    callback: function(value) {
+      return Math.round(value) + " km";
     },
+    stepSize: interval,
     autoSkip: true,
     maxRotation: 0
   };
@@ -88,7 +89,7 @@ function updateAltitudeChart(route, distance) {
   options.onHover = (event, chartElements) => {
     if (chartElements.length > 0) {
       const index = chartElements[0].index;
-      if (index % 5 !== 0 && index !== altitudes.length - 1) return;
+      // Use index from chartData (corresponds to currentFilteredRoute)
       const originalIndex = index + routeOffset;
       if (window.showHoverPointOnMap) {
         window.showHoverPointOnMap(originalIndex);
@@ -103,10 +104,9 @@ function updateAltitudeChart(route, distance) {
   altitudeChart = createChart('altitudeChart', {
     type: 'line',
     data: {
-      labels: labels,
       datasets: [{
         label: 'Altitude (m)',
-        data: altitudes,
+        data: chartData,
         borderColor: theme.primaryColor,
         backgroundColor: theme.lineBgColor,
         fill: true,
