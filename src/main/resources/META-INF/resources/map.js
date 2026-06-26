@@ -1,7 +1,12 @@
-const map = L.map('map').setView([49.4521, 11.0767], 10); // Position: Nuremberg
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
+const mapElement = document.getElementById('map');
+let map = null;
+
+if (mapElement) {
+  map = L.map('map').setView([49.4521, 11.0767], 10); // Position: Nuremberg
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+}
 
 let currentPolyline = null;
 let startMarker = null;
@@ -10,7 +15,7 @@ let hoverMarker = null;
 let currentRoute = [];
 
 window.showHoverPointOnMap = function(index) {
-  if (currentRoute && currentRoute[index]) {
+  if (map && currentRoute && currentRoute[index]) {
     const p = currentRoute[index];
     const latLng = [p.lat, p.lon];
     if (!hoverMarker) {
@@ -28,15 +33,21 @@ window.showHoverPointOnMap = function(index) {
 };
 
 window.hideHoverPointOnMap = function() {
-  if (hoverMarker) {
+  if (map && hoverMarker) {
     map.removeLayer(hoverMarker);
     hoverMarker = null;
   }
 };
 
-async function loadRoute(id) {
+window.loadRoute = async function(id) {
+  if (!map) return;
   try {
-    const response = await fetch(`/fit/details/id/${encodeURIComponent(id)}`);
+    const response = await fetch(`/fit/activities/id/${encodeURIComponent(id)}`, {
+      headers: {
+        'Accept': 'application/json'
+      },
+    });
+
     if (!response.ok) throw new Error("HTTP " + response.status);
 
     const data = await response.json();
@@ -99,32 +110,8 @@ async function loadRoute(id) {
 
     updateAltitudeChart(currentRoute, data.distance);
 
-    // Highlight the selected row in the table
-    document.querySelectorAll('.clickable-row').forEach(row => {
-      row.classList.remove('is-selected');
-      if (row.dataset.id === id) {
-        row.classList.add('is-selected');
-      }
-    });
-
   } catch (err) {
     console.error(err);
     alert("Failed to load route.");
   }
 }
-
-document.querySelectorAll('.clickable-row').forEach(row => {
-  row.addEventListener('click', (e) => {
-    if (e.target.closest('.button')) return; // Ignore clicks on action buttons
-    const id = row.dataset.id;
-    loadRoute(id);
-  });
-});
-
-// Auto-load first route on page load
-document.addEventListener('DOMContentLoaded', () => {
-  const firstRow = document.querySelector('.clickable-row');
-  if (firstRow) {
-    loadRoute(firstRow.dataset.id);
-  }
-});

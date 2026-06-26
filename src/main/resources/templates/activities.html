@@ -1,5 +1,5 @@
 {#include base showYearFilter=true}
-    <h1 class="title">Details</h1>
+    <h1 class="title">Activities</h1>
     <section class="f-switch">
         <div class="box">
             <h2 class="title is-4">Details</h2>
@@ -16,14 +16,13 @@
                             <th class="sortable has-text-centered">Average Speed <span class="arrow">↑↓</span></th>
                             {!<th class="sortable has-text-centered">Temperature <span class="arrow">↑↓</span></th>!}
                             <th class="sortable has-text-centered">Rating <span class="arrow">↑↓</span></th>
-                            <th>Actions</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         {#for entry in data}
-                        <tr class="clickable-row" data-id="{entry.id}">
-                            <td>{entry.displayName}</td>
+                        <tr class="clickable-row" data-id="{entry.id}" onclick="window.location.href='/fit/activities/id/{entry.id}'" style="cursor: pointer;">
+                            <td><a href="/fit/activities/id/{entry.id}">{entry.displayName}</a></td>
                             <td class="has-text-centered">{entry.date}</td>
                             <td class="has-text-centered">{entry.distance}</td>
                             <td class="has-text-centered">{entry.duration}</td>
@@ -39,61 +38,21 @@
                                     <i class="fas fa-star {#if entry.rate >= 1}active{/if}" data-value="1"></i>
                                 </div>
                             </td>
-                            <td class="has-text-centered">
-                                <button class="button is-small is-danger is-outlined delete-route" title="Delete Route" data-id="{entry.id}">
-                                    <span class="icon is-small">
-                                        <i class="fas fa-trash"></i>
-                                    </span>
-                                </button>
-                                <button class="button is-small is-info is-outlined recalculate-route" title="Recalculate Route" data-id="{entry.id}">
-                                    <span class="icon is-small">
-                                        <i class="fas fa-sync"></i>
-                                    </span>
-                                </button>
-                            </td>
                         </tr>
                         {/for}
                     </tbody>
                 </table>
             </div>
             <script src="/arrow-toggler.js" defer></script>
-
-            <section class="section">
-                <h2 class="title is-4">Route</h2>
-
-                <div class="box">
-                    <div id="map"></div>
-
-                    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                    <script src="/altitude.js" defer></script>
-                    <script src="/map.js" defer></script>
-                    <script src="/modal.js" defer></script>
-                    <script src="/rating.js" defer></script>
-                </div>
-
-                <h2 class="title is-4">Altitude Profile</h2>
-                <div class="box" style="height: 200px;">
-                    <canvas id="altitudeChart"></canvas>
-                </div>
-            </section>
+            <script src="/rating.js" defer></script>
+            <script>
+                document.querySelectorAll('.clickable-row').forEach(row => {
+                    row.addEventListener('click', (e) => {
+                        if (e.target.closest('button') || e.target.closest('a') || e.target.closest('.rating')) return;
+                        window.location.href = '/fit/activities/id/' + row.dataset.id;
+                    });
+                });
+            </script>
         </div>
     </section>
-
-    <div id="confirmModal" class="modal">
-        <div class="modal-background"></div>
-        <div class="modal-card">
-            <header class="modal-card-head">
-                <p class="modal-card-title" id="confirmModalTitle">Confirm Action</p>
-                <button class="delete" aria-label="close" id="closeModal"></button>
-            </header>
-            <section class="modal-card-body">
-                <p id="confirmModalMessage">Are you sure you want to proceed?</p>
-            </section>
-            <footer class="modal-card-foot">
-                <button class="button is-success" id="confirmModalAction">Confirm</button>
-                <button class="button" id="cancelModal">Cancel</button>
-            </footer>
-        </div>
-    </div>
 {/include}

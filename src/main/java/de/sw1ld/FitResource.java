@@ -83,7 +83,7 @@ public class FitResource {
     if (year == null) {
       year = LocalDate.now().getYear();
     }
-    List<FitData> fitData = fitService.fetchDetails(year);
+    List<FitData> fitData = fitService.fetchActivities(year);
     var stats = StatsService.getStats(fitData, year);
     var years = fitService.getAvailableYears();
 
@@ -97,16 +97,33 @@ public class FitResource {
     if (year == null) {
       year = LocalDate.now().getYear();
     }
-    List<FitData> fitData = fitService.fetchDetails(year);
+    List<FitData> fitData = fitService.fetchActivities(year);
 
     return Response.ok().entity(StatsService.getStats(fitData, year)).build();
   }
 
   @GET
-  @Path("/details")
+  @Path("/activities")
+  @Produces(MediaType.TEXT_HTML)
+  public Response allActivities(@QueryParam("year") Integer year) {
+    List<FitData> fitData = fitService.fetchActivities(year);
+    var years = fitService.getAvailableYears();
+
+    return Response.ok(
+            Templates.activities(
+                fitData.stream()
+                    .map(FitResponse::new)
+                    .sorted(Comparator.comparing(FitResponse::date).reversed())
+                    .toList(),
+                years))
+        .build();
+  }
+
+  @GET
+  @Path("/activities")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response allData(@QueryParam("year") Integer year) {
-    List<FitData> fitData = fitService.fetchDetails(year);
+  public Response activities(@QueryParam("year") Integer year) {
+    List<FitData> fitData = fitService.fetchActivities(year);
 
     return Response.ok()
         .entity(
@@ -118,27 +135,21 @@ public class FitResource {
   }
 
   @GET
-  @Path("/details")
+  @Path("/activities/id/{id}")
   @Produces(MediaType.TEXT_HTML)
-  public Response details(@QueryParam("year") Integer year) {
-    List<FitData> fitData = fitService.fetchDetails(year);
-    var years = fitService.getAvailableYears();
-
-    return Response.ok(
-            Templates.details(
-                fitData.stream()
-                    .map(FitResponse::new)
-                    .sorted(Comparator.comparing(FitResponse::date).reversed())
-                    .toList(),
-                years))
-        .build();
+  public Response activity(@PathParam("id") UUID id) {
+    Optional<FitData> fitData = fitService.fetchActivityBy(id);
+    if (fitData.isEmpty()) {
+      return Response.status(404).entity(notFoundProblem(id)).build();
+    }
+    return Response.ok(Templates.activity(new FitResponse(fitData.get()))).build();
   }
 
   @GET
-  @Path("details/id/{id}")
+  @Path("/activities/id/{id}")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response dataById(@PathParam("id") UUID id) {
-    Optional<FitData> fitData = fitService.fetchDetailsBy(id);
+  public Response activityById(@PathParam("id") UUID id) {
+    Optional<FitData> fitData = fitService.fetchActivityBy(id);
     if (fitData.isEmpty()) {
       return Response.status(404).entity(notFoundProblem(id)).build();
     }
@@ -146,18 +157,18 @@ public class FitResource {
   }
 
   @DELETE
-  @Path("details/id/{id}")
-  public Response delete(@PathParam("id") UUID id) {
+  @Path("/activities/id/{id}")
+  public Response deleteActivity(@PathParam("id") UUID id) {
     return fitService.deleteActivity(id)
         ? Response.noContent().build()
         : Response.status(404).entity(notFoundProblem(id)).build();
   }
 
   @PUT
-  @Path("details/id/{id}")
+  @Path("/activities/id/{id}")
   @Produces(MediaType.APPLICATION_JSON)
   public Response recalculate(@PathParam("id") UUID id) {
-    Optional<FitData> fitData = fitService.fetchDetailsBy(id);
+    Optional<FitData> fitData = fitService.fetchActivityBy(id);
     if (fitData.isEmpty()) {
       return Response.status(404).entity(notFoundProblem(id)).build();
     }
@@ -165,11 +176,11 @@ public class FitResource {
   }
 
   @PUT
-  @Path("details/id/{id}/rate")
+  @Path("/activities/id/{id}/rate")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  public Response rate(@PathParam("id") UUID id, Integer rate) {
-    Optional<FitData> fitData = fitService.fetchDetailsBy(id);
+  public Response rateActivity(@PathParam("id") UUID id, Integer rate) {
+    Optional<FitData> fitData = fitService.fetchActivityBy(id);
     if (fitData.isEmpty()) {
       return Response.status(404).entity(notFoundProblem(id)).build();
     }

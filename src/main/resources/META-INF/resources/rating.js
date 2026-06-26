@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       try {
-        const response = await fetch(`/fit/details/id/${id}/rate`, {
+        const response = await fetch(`/fit/activities/id/${id}/rate`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'

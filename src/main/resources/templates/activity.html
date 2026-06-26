@@ -1,0 +1,145 @@
+{#include base showYearFilter=false}
+    <div class="container">
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+            <ul>
+                <li><a href="/fit/activities?year={data.date.year}">Activities</a></li>
+                <li class="is-active"><a href="#" aria-current="page">{data.displayName}</a></li>
+            </ul>
+        </nav>
+
+        <div class="level">
+            <div class="level-left">
+                <div>
+                    <h1 class="title">{data.displayName}</h1>
+                    <h2 class="subtitle">{data.date}</h2>
+                    <div class="rating" data-id="{data.id}" data-rate="{data.rate}">
+                        <i class="fas fa-star {#if data.rate >= 5}active{/if}" data-value="5"></i>
+                        <i class="fas fa-star {#if data.rate >= 4}active{/if}" data-value="4"></i>
+                        <i class="fas fa-star {#if data.rate >= 3}active{/if}" data-value="3"></i>
+                        <i class="fas fa-star {#if data.rate >= 2}active{/if}" data-value="2"></i>
+                        <i class="fas fa-star {#if data.rate >= 1}active{/if}" data-value="1"></i>
+                    </div>
+
+                </div>
+            </div>
+            <div class="level-right">
+                <a href="/fit/activities?year={data.date.year}" class="button is-link is-outlined">
+                    <span class="icon">
+                        <i class="fas fa-arrow-left"></i>
+                    </span>
+                    <span>Back to list</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="box">
+            <div class="level mb-4">
+                <div class="level-left">
+                    <h3 class="title is-5">Tour Information</h3>
+                </div>
+
+                <div class="level-right">
+                    <div class="buttons are-small">
+                        <button class="button is-danger is-outlined delete-route" data-id="{data.id}">
+                            <span class="icon">
+                                <i class="fas fa-trash"></i>
+                            </span>
+                            {!<span>Delete</span>!}
+                        </button>
+                        <button class="button is-info is-outlined recalculate-route" data-id="{data.id}">
+                            <span class="icon">
+                                <i class="fas fa-sync"></i>
+                            </span>
+                            {!<span>Recalculate</span>!}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- show less important infos as tags -->
+            <div class="tags are-medium">
+                {#if data.temperature != '/'}
+                <span class="tag">{data.temperature}</span>
+                {/if}
+            </div>
+
+            <table class="table is-fullwidth">
+                <tbody>
+                    <tr>
+                        <td class="has-text-centered p-4">
+                            <p class="title is-5 mb-1">{data.distance}</p>
+                            <p class="heading">Distance</p>
+                        </td>
+                        <td class="has-text-centered p-4">
+                            <p class="title is-5 mb-1">{data.duration}</p>
+                            <div class="heading">Duration</div>
+                        </td>
+                        <td class="has-text-centered p-4">
+                            <p class="title is-5 mb-1">{data.avgSpeed}</p>
+                            <div class="heading">Ø Speed</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="has-text-centered p-4">
+                            <p class="title is-5 mb-1">{data.totalAscent}</p>
+                            <div class="heading">Total Ascent</div>
+                        </td>
+                        <td class="has-text-centered p-4">
+                            <p class="title is-5 mb-1">{data.elapsedTime}</p>
+                            <div class="heading">Elapsed Time</div>
+                        </td>
+                        <td class="has-text-centered p-4">
+                            <p class="title is-5 mb-1">{data.maxSpeed}</p>
+                            <div class="heading">Max Speed</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="box">
+            <h3 class="title is-5">Route</h3>
+            <div id="map" style="height: 400px;"></div>
+        </div>
+
+        <div class="box">
+            <h3 class="title is-5">Altitude profile</h3>
+            <div style="height: 200px;">
+                <canvas id="altitudeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/altitude.js" defer></script>
+    <script src="/map.js" defer></script>
+    <script src="/modal.js" defer></script>
+    <script src="/rating.js" defer></script>
+
+    <div id="confirmModal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title" id="confirmModalTitle">Aktion bestätigen</p>
+                <button class="delete" aria-label="close" id="closeModal"></button>
+            </header>
+            <section class="modal-card-body">
+                <p id="confirmModalMessage">Sind Sie sicher?</p>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-success" id="confirmModalAction">Bestätigen</button>
+                <button class="button" id="cancelModal">Abbrechen</button>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof loadRoute === 'function') {
+                loadRoute('{data.id}');
+            }
+        });
+    </script>
+{/include}

@@ -18,11 +18,11 @@ public class FitService {
     this.activityDataRepository = activityDataRepository;
   }
 
-  Optional<FitData> fetchDetailsBy(UUID id) {
+  Optional<FitData> fetchActivityBy(UUID id) {
     return activityDataRepository.findById(id).map(FitData::new);
   }
 
-  List<FitData> fetchDetails(@Nullable Integer year) {
+  List<FitData> fetchActivities(@Nullable Integer year) {
     if (year == null) {
       return activityDataRepository.findAll().stream().map(FitData::new).toList();
     } else {
