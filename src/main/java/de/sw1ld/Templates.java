@@ -12,8 +12,10 @@ public class Templates {
   public static native TemplateInstance statistics(
       StatisticResponse stats, List<Integer> availableYears);
 
-  public static native TemplateInstance details(
+  public static native TemplateInstance activities(
       List<FitResponse> data, List<Integer> availableYears);
+
+  public static native TemplateInstance activity(FitResponse data);
 
   public static native TemplateInstance upload(List<UploadResult> results);
 }

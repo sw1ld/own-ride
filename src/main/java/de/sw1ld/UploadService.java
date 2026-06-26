@@ -127,6 +127,7 @@ public class UploadService {
       data.setDate(rec.getDate());
       data.setDistance(ses.getDistance());
       data.setDuration(ses.getTimeWithoutBreaks());
+      data.setElapsedTime(ses.getElapsedTime());
       data.setAvgSpeed(ses.getAverageSpeed());
       data.setMaxSpeed(rec.getMaxSpeed());
       data.setTemperature(ses.getTemperature());

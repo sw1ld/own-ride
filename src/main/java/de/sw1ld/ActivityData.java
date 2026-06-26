@@ -62,6 +62,9 @@ public class ActivityData {
 
   @Column private Duration duration;
 
+  @Column(name = "elapsed_time")
+  private Duration elapsedTime;
+
   @Column(name = "avg_speed")
   private Double avgSpeed;
 
@@ -133,6 +136,14 @@ public class ActivityData {
 
   public void setDuration(Duration duration) {
     this.duration = duration;
+  }
+
+  public Duration getElapsedTime() {
+    return elapsedTime;
+  }
+
+  public void setElapsedTime(Duration elapsedTime) {
+    this.elapsedTime = elapsedTime;
   }
 
   public Double getAvgSpeed() {

@@ -45,7 +45,7 @@ class FitResourceTest {
         .accept(MediaType.APPLICATION_JSON)
         .queryParam("year", YEAR)
         .when()
-        .get("/fit/details")
+        .get("/fit/activities")
         .then()
         .statusCode(200)
         .body("", empty());
@@ -54,7 +54,7 @@ class FitResourceTest {
     given()
         .accept(MediaType.APPLICATION_JSON)
         .when()
-        .get("/fit/details/id/" + randomId)
+        .get("/fit/activities/id/" + randomId)
         .then()
         .statusCode(404)
         .body("detail", equalTo("Activity with id '%s' does not exist".formatted(randomId)));
@@ -129,12 +129,12 @@ class FitResourceTest {
   void recalculateActivity() {
     FitResponse activity = firstActivity(YEAR);
 
-    given().when().put("/fit/details/id/" + activity.id()).then().statusCode(200);
+    given().when().put("/fit/activities/id/" + activity.id()).then().statusCode(200);
 
     given()
         .accept(MediaType.APPLICATION_JSON)
         .when()
-        .get("/fit/details/id/" + activity.id())
+        .get("/fit/activities/id/" + activity.id())
         .then()
         .statusCode(200)
         .body("id", equalTo(activity.id().toString()))
@@ -155,7 +155,7 @@ class FitResourceTest {
     given()
         .accept(MediaType.APPLICATION_JSON)
         .when()
-        .get("/fit/details/id/" + activity.id())
+        .get("/fit/activities/id/" + activity.id())
         .then()
         .statusCode(200)
         .body("rate", equalTo(3));
@@ -167,7 +167,7 @@ class FitResourceTest {
     given()
         .accept(MediaType.APPLICATION_JSON)
         .when()
-        .get("/fit/details/id/" + activity.id())
+        .get("/fit/activities/id/" + activity.id())
         .then()
         .statusCode(200)
         .body("rate", equalTo(0));
@@ -182,7 +182,7 @@ class FitResourceTest {
         .contentType(ContentType.JSON)
         .body(7)
         .when()
-        .put("/fit/details/id/%s/rate".formatted(activity.id()))
+        .put("/fit/activities/id/%s/rate".formatted(activity.id()))
         .then()
         .statusCode(400)
         .body("detail", equalTo("Rate value must be between 0 and 5"));
@@ -190,22 +190,39 @@ class FitResourceTest {
 
   @Test
   @Order(7)
+  void activitiesPageHtml() {
+    FitResponse activity = firstActivity(YEAR);
+
+    given()
+        .accept(MediaType.TEXT_HTML)
+        .when()
+        .get("/fit/activities/id/" + activity.id())
+        .then()
+        .statusCode(200)
+        .body(containsString(activity.displayName()))
+        .body(containsString("Back to list"))
+        .body(containsString("id=\"map\""))
+        .body(containsString("id=\"altitudeChart\""));
+  }
+
+  @Test
+  @Order(100)
   void deleteActivity() {
     UUID id = firstActivity(YEAR).id();
 
     given()
         .accept(MediaType.APPLICATION_JSON)
         .when()
-        .get("/fit/details/id/" + id)
+        .get("/fit/activities/id/" + id)
         .then()
         .statusCode(200);
 
-    given().when().delete("/fit/details/id/" + id).then().statusCode(204);
+    given().when().delete("/fit/activities/id/" + id).then().statusCode(204);
 
     given()
         .accept(MediaType.APPLICATION_JSON)
         .when()
-        .get("/fit/details/id/" + id)
+        .get("/fit/activities/id/" + id)
         .then()
         .statusCode(404)
         .body("detail", equalTo("Activity with id '%s' does not exist".formatted(id)));
@@ -213,7 +230,7 @@ class FitResourceTest {
     // delete again -> 404
     given()
         .when()
-        .delete("/fit/details/id/" + id)
+        .delete("/fit/activities/id/" + id)
         .then()
         .statusCode(404)
         .body("detail", equalTo("Activity with id '%s' does not exist".formatted(id)));
@@ -224,7 +241,7 @@ class FitResourceTest {
         .accept(MediaType.APPLICATION_JSON)
         .queryParam("year", year)
         .when()
-        .get("/fit/details")
+        .get("/fit/activities")
         .then()
         .statusCode(200)
         .body("", hasSize(1))
@@ -237,7 +254,7 @@ class FitResourceTest {
         .contentType(ContentType.JSON)
         .body(rate)
         .when()
-        .put("/fit/details/id/%s/rate".formatted(activityId))
+        .put("/fit/activities/id/%s/rate".formatted(activityId))
         .then()
         .statusCode(200);
   }

@@ -1,0 +1,1 @@
+ALTER TABLE activity_data ADD COLUMN elapsed_time NUMERIC(21);
