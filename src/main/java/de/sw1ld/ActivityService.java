@@ -2,24 +2,53 @@ package de.sw1ld;
 
 import com.garmin.fit.Decode;
 import com.garmin.fit.MesgBroadcaster;
+import jakarta.annotation.Nullable;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 @ApplicationScoped
-public class UploadService {
+public class ActivityService {
 
   @PersistenceContext EntityManager em;
   private final ActivityDataRepository activityDataRepository;
 
-  public UploadService(ActivityDataRepository activityDataRepository) {
+  public ActivityService(ActivityDataRepository activityDataRepository) {
     this.activityDataRepository = activityDataRepository;
+  }
+
+  Optional<Activity> fetchActivityBy(UUID id) {
+    return activityDataRepository.findById(id).map(Activity::new);
+  }
+
+  List<Activity> fetchActivities(@Nullable Integer year) {
+    if (year == null) {
+      return activityDataRepository.findAll().stream().map(Activity::new).toList();
+    } else {
+      return activityDataRepository.findByYear(year).stream().map(Activity::new).toList();
+    }
+  }
+
+  List<Integer> getAvailableYears() {
+    int currentYear = LocalDate.now().getYear();
+    int minYear = activityDataRepository.findMinYear().orElse(currentYear);
+
+    // We want a descending list (most recent year first)
+    return IntStream.rangeClosed(minYear, currentYear).boxed().sorted((a, b) -> b - a).toList();
+  }
+
+  @Transactional
+  boolean deleteActivity(UUID id) {
+    return activityDataRepository.delete(id);
   }
 
   @Transactional
@@ -84,7 +113,7 @@ public class UploadService {
   }
 
   @Transactional
-  FitData setUserRating(UUID id, Rate rate) {
+  Activity setUserRating(UUID id, Rate rate) {
     ActivityData data =
         activityDataRepository
             .findById(id)
@@ -100,11 +129,11 @@ public class UploadService {
 
     em.merge(data);
 
-    return new FitData(data);
+    return new Activity(data);
   }
 
   @Transactional
-  FitData recalculateActivity(UUID id) {
+  Activity recalculateActivity(UUID id) {
     ActivityData data =
         activityDataRepository
             .findById(id)
@@ -137,7 +166,7 @@ public class UploadService {
       data.setPositions(rec.getPositions());
 
       em.merge(data);
-      return new FitData(data);
+      return new Activity(data);
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }

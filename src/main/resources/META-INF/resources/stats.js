@@ -3,7 +3,7 @@ async function loadStatistics() {
     const year = urlParams.get('year') || new Date().getFullYear();
 
     try {
-        const response = await fetch(`/fit/stats?year=${year}`, {
+        const response = await fetch(`/own/stats?year=${year}`, {
             headers: {
                 'Accept': 'application/json'
             }

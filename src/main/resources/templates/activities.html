@@ -4,7 +4,7 @@
         <div class="box">
             <h2 class="title is-4">Details</h2>
 
-            <div id="fitResponses" class="table-container">
+            <div id="activityResponses" class="table-container">
                 <table class="table is-striped is-hoverable is-fullwidth">
                     <thead>
                         <tr>
@@ -21,8 +21,8 @@
 
                     <tbody>
                         {#for entry in data}
-                        <tr class="clickable-row" data-id="{entry.id}" onclick="window.location.href='/fit/activities/id/{entry.id}'" style="cursor: pointer;">
-                            <td><a href="/fit/activities/id/{entry.id}">{entry.displayName}</a></td>
+                        <tr class="clickable-row" data-id="{entry.id}" onclick="window.location.href='/own/activities/id/{entry.id}'" style="cursor: pointer;">
+                            <td><a href="/own/activities/id/{entry.id}">{entry.displayName}</a></td>
                             <td class="has-text-centered">{entry.date}</td>
                             <td class="has-text-centered">{entry.distance}</td>
                             <td class="has-text-centered">{entry.duration}</td>
@@ -43,13 +43,13 @@
                     </tbody>
                 </table>
             </div>
-            <script src="/arrow-toggler.js" defer></script>
-            <script src="/rating.js" defer></script>
+            <script src="/own/arrow-toggler.js" defer></script>
+            <script src="/own/rating.js" defer></script>
             <script>
                 document.querySelectorAll('.clickable-row').forEach(row => {
                     row.addEventListener('click', (e) => {
                         if (e.target.closest('button') || e.target.closest('a') || e.target.closest('.rating')) return;
-                        window.location.href = '/fit/activities/id/' + row.dataset.id;
+                        window.location.href = '/own/activities/id/' + row.dataset.id;
                     });
                 });
             </script>

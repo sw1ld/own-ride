@@ -2,7 +2,7 @@
     <div class="container">
         <nav class="breadcrumb" aria-label="breadcrumbs">
             <ul>
-                <li><a href="/fit/activities?year={data.date.year}">Activities</a></li>
+                <li><a href="/own/activities?year={data.date.year}">Activities</a></li>
                 <li class="is-active"><a href="#" aria-current="page">{data.displayName}</a></li>
             </ul>
         </nav>
@@ -23,7 +23,7 @@
                 </div>
             </div>
             <div class="level-right">
-                <a href="/fit/activities?year={data.date.year}" class="button is-link is-outlined">
+                <a href="/own/activities?year={data.date.year}" class="button is-link is-outlined">
                     <span class="icon">
                         <i class="fas fa-arrow-left"></i>
                     </span>
@@ -113,10 +113,10 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="/altitude.js" defer></script>
-    <script src="/map.js" defer></script>
-    <script src="/modal.js" defer></script>
-    <script src="/rating.js" defer></script>
+    <script src="/own/altitude.js" defer></script>
+    <script src="/own/map.js" defer></script>
+    <script src="/own/modal.js" defer></script>
+    <script src="/own/rating.js" defer></script>
 
     <div id="confirmModal" class="modal">
         <div class="modal-background"></div>

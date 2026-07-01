@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public record FitData(
+public record Activity(
     UUID id,
     String name,
     LocalDate date,
@@ -21,7 +21,7 @@ public record FitData(
     Integer rate,
     List<Position> positions) {
 
-  public FitData(ActivityData data) {
+  public Activity(ActivityData data) {
     this(
         data.getId(),
         data.getName(),

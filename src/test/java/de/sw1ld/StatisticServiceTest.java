@@ -9,15 +9,15 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
-class StatsServiceTest {
+class StatisticServiceTest {
 
   @Test
   void sumStatsForSameDate() {
     int year = 2025;
     LocalDate date = LocalDate.of(year, 6, 7);
     LocalDateTime now = LocalDateTime.now();
-    FitData ride1 =
-        new FitData(
+    Activity ride1 =
+        new Activity(
             UUID.randomUUID(),
             "Hinfahrt",
             date,
@@ -31,8 +31,8 @@ class StatsServiceTest {
             now,
             0,
             List.of());
-    FitData ride2 =
-        new FitData(
+    Activity ride2 =
+        new Activity(
             UUID.randomUUID(),
             "Rückfahrt",
             date,
@@ -47,9 +47,9 @@ class StatsServiceTest {
             0,
             List.of());
 
-    List<FitData> fitData = List.of(ride1, ride2);
+    List<Activity> activities = List.of(ride1, ride2);
 
-    StatisticResponse stats = StatsService.getStats(fitData, year);
+    StatisticResponse stats = StatisticService.getStats(activities, year);
 
     assertThat(stats.rides()).isEqualTo(2);
     assertThat(stats.distance()).isEqualTo("25.50 km");

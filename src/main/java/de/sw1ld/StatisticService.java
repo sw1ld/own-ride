@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class StatsService {
+public class StatisticService {
 
-  private StatsService() {}
+  private StatisticService() {}
 
-  static StatisticResponse getStats(List<FitData> fitData, Integer year) {
-    double total = fitData.stream().map(FitData::distance).mapToDouble(Double::doubleValue).sum();
+  static StatisticResponse getStats(List<Activity> activities, Integer year) {
+    double total =
+        activities.stream().map(Activity::distance).mapToDouble(Double::doubleValue).sum();
 
     Map<LocalDate, Double> basicTourStatistics = new TreeMap<>();
     LocalDate start = LocalDate.of(year, 1, 1);
@@ -22,8 +23,8 @@ public class StatsService {
     }
 
     // set/merge with concrete values
-    fitData.forEach(f -> basicTourStatistics.merge(f.date(), f.distance(), Double::sum));
+    activities.forEach(f -> basicTourStatistics.merge(f.date(), f.distance(), Double::sum));
 
-    return new StatisticResponse(fitData.size(), total, basicTourStatistics);
+    return new StatisticResponse(activities.size(), total, basicTourStatistics);
   }
 }

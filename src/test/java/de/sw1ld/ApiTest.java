@@ -22,7 +22,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 @QuarkusTest
 @TestMethodOrder(OrderAnnotation.class)
-class FitResourceTest {
+class ApiTest {
 
   private static final int YEAR = 2021;
 
@@ -33,7 +33,7 @@ class FitResourceTest {
         .accept(MediaType.APPLICATION_JSON)
         .queryParam("year", YEAR)
         .when()
-        .get("/fit/stats")
+        .get("/stats")
         .then()
         .statusCode(200)
         .body("rides", equalTo(0))
@@ -45,7 +45,7 @@ class FitResourceTest {
         .accept(MediaType.APPLICATION_JSON)
         .queryParam("year", YEAR)
         .when()
-        .get("/fit/activities")
+        .get("/activities")
         .then()
         .statusCode(200)
         .body("", empty());
@@ -54,7 +54,7 @@ class FitResourceTest {
     given()
         .accept(MediaType.APPLICATION_JSON)
         .when()
-        .get("/fit/activities/id/" + randomId)
+        .get("/activities/id/" + randomId)
         .then()
         .statusCode(404)
         .body("detail", equalTo("Activity with id '%s' does not exist".formatted(randomId)));
@@ -69,7 +69,7 @@ class FitResourceTest {
         .contentType(ContentType.MULTIPART)
         .multiPart("file", fitFile)
         .when()
-        .post("/fit/upload")
+        .post("/upload")
         .then()
         .statusCode(200);
 
@@ -77,7 +77,7 @@ class FitResourceTest {
         .accept(MediaType.APPLICATION_JSON)
         .queryParam("year", YEAR)
         .when()
-        .get("/fit/stats")
+        .get("/stats")
         .then()
         .statusCode(200)
         .body("rides", equalTo(1))
@@ -85,7 +85,7 @@ class FitResourceTest {
         .body("tourDates.2021-01-01", equalTo(0.0F))
         .body("tourDates.2021-04-27", greaterThan(34.0F));
 
-    FitResponse activity = firstActivity(YEAR);
+    ActivityResponse activity = firstActivity(YEAR);
     assertThat(activity.displayName()).isEqualTo("Route1");
     assertThat(activity.name()).isEqualTo("2021-04-27_Route1.fit");
     assertThat(activity.date()).isEqualTo("2021-04-27");
@@ -106,7 +106,7 @@ class FitResourceTest {
         .contentType(ContentType.MULTIPART)
         .multiPart("file", fitFile)
         .when()
-        .post("/fit/upload")
+        .post("/upload")
         .then()
         .log()
         .body()
@@ -118,7 +118,7 @@ class FitResourceTest {
         .accept(MediaType.APPLICATION_JSON)
         .queryParam("year", YEAR)
         .when()
-        .get("/fit/stats")
+        .get("/stats")
         .then()
         .statusCode(200)
         .body("rides", equalTo(1));
@@ -127,14 +127,14 @@ class FitResourceTest {
   @Test
   @Order(4)
   void recalculateActivity() {
-    FitResponse activity = firstActivity(YEAR);
+    ActivityResponse activity = firstActivity(YEAR);
 
-    given().when().put("/fit/activities/id/" + activity.id()).then().statusCode(200);
+    given().when().put("/activities/id/" + activity.id()).then().statusCode(200);
 
     given()
         .accept(MediaType.APPLICATION_JSON)
         .when()
-        .get("/fit/activities/id/" + activity.id())
+        .get("/activities/id/" + activity.id())
         .then()
         .statusCode(200)
         .body("id", equalTo(activity.id().toString()))
@@ -145,7 +145,7 @@ class FitResourceTest {
   @Test
   @Order(5)
   void rateActivity() {
-    FitResponse activity = firstActivity(YEAR);
+    ActivityResponse activity = firstActivity(YEAR);
     assertThat(activity.rate()).isZero(); // default rating
 
     // set rating to 3
@@ -155,7 +155,7 @@ class FitResourceTest {
     given()
         .accept(MediaType.APPLICATION_JSON)
         .when()
-        .get("/fit/activities/id/" + activity.id())
+        .get("/activities/id/" + activity.id())
         .then()
         .statusCode(200)
         .body("rate", equalTo(3));
@@ -167,7 +167,7 @@ class FitResourceTest {
     given()
         .accept(MediaType.APPLICATION_JSON)
         .when()
-        .get("/fit/activities/id/" + activity.id())
+        .get("/activities/id/" + activity.id())
         .then()
         .statusCode(200)
         .body("rate", equalTo(0));
@@ -176,13 +176,13 @@ class FitResourceTest {
   @Test
   @Order(6)
   void rateActivityWithInvalidRating_shouldFail() {
-    FitResponse activity = firstActivity(YEAR);
+    ActivityResponse activity = firstActivity(YEAR);
 
     given()
         .contentType(ContentType.JSON)
         .body(7)
         .when()
-        .put("/fit/activities/id/%s/rate".formatted(activity.id()))
+        .put("/activities/id/%s/rate".formatted(activity.id()))
         .then()
         .statusCode(400)
         .body("detail", equalTo("Rate value must be between 0 and 5"));
@@ -191,12 +191,12 @@ class FitResourceTest {
   @Test
   @Order(7)
   void activitiesPageHtml() {
-    FitResponse activity = firstActivity(YEAR);
+    ActivityResponse activity = firstActivity(YEAR);
 
     given()
         .accept(MediaType.TEXT_HTML)
         .when()
-        .get("/fit/activities/id/" + activity.id())
+        .get("/activities/id/" + activity.id())
         .then()
         .statusCode(200)
         .body(containsString(activity.displayName()))
@@ -213,16 +213,16 @@ class FitResourceTest {
     given()
         .accept(MediaType.APPLICATION_JSON)
         .when()
-        .get("/fit/activities/id/" + id)
+        .get("/activities/id/" + id)
         .then()
         .statusCode(200);
 
-    given().when().delete("/fit/activities/id/" + id).then().statusCode(204);
+    given().when().delete("/activities/id/" + id).then().statusCode(204);
 
     given()
         .accept(MediaType.APPLICATION_JSON)
         .when()
-        .get("/fit/activities/id/" + id)
+        .get("/activities/id/" + id)
         .then()
         .statusCode(404)
         .body("detail", equalTo("Activity with id '%s' does not exist".formatted(id)));
@@ -230,23 +230,23 @@ class FitResourceTest {
     // delete again -> 404
     given()
         .when()
-        .delete("/fit/activities/id/" + id)
+        .delete("/activities/id/" + id)
         .then()
         .statusCode(404)
         .body("detail", equalTo("Activity with id '%s' does not exist".formatted(id)));
   }
 
-  private static FitResponse firstActivity(int year) {
+  private static ActivityResponse firstActivity(int year) {
     return given()
         .accept(MediaType.APPLICATION_JSON)
         .queryParam("year", year)
         .when()
-        .get("/fit/activities")
+        .get("/activities")
         .then()
         .statusCode(200)
         .body("", hasSize(1))
         .extract()
-        .as(FitResponse[].class)[0];
+        .as(ActivityResponse[].class)[0];
   }
 
   private static ValidatableResponse setRating(UUID activityId, int rate) {
@@ -254,7 +254,7 @@ class FitResourceTest {
         .contentType(ContentType.JSON)
         .body(rate)
         .when()
-        .put("/fit/activities/id/%s/rate".formatted(activityId))
+        .put("/activities/id/%s/rate".formatted(activityId))
         .then()
         .statusCode(200);
   }
