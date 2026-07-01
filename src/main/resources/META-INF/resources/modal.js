@@ -27,11 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const id = btn.dataset.id;
       showConfirm("Löschen bestätigen", "Möchtest du diese Route wirklich löschen?", async () => {
         try {
-          const response = await fetch(`/fit/activities/id/${id}`, { method: 'DELETE' });
+          const response = await fetch(`/own/activities/id/${id}`, { method: 'DELETE' });
           if (response.ok) {
             if (window.location.pathname.includes('/id/')) {
                // If we are on the detail page, go back to the list
-               window.location.href = '/fit/activities';
+               window.location.href = '/own/activities';
             } else {
                window.location.reload();
             }
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const id = btn.dataset.id;
       showConfirm("Neuberechnung bestätigen", "Möchtest du diese Route wirklich neu berechnen?", async () => {
         try {
-          const response = await fetch(`/fit/activities/id/${id}`, { method: 'PUT' });
+          const response = await fetch(`/own/activities/id/${id}`, { method: 'PUT' });
           if (response.ok) {
             window.location.reload();
           } else {

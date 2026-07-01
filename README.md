@@ -84,7 +84,7 @@ Start the application in development mode:
 mvn quarkus:dev
 ```
 
-The application will be accessible at [http://localhost:8080/fit/stats](http://localhost:8080/fit/stats).
+The application will be accessible at [http://localhost:8080/own/stats](http://localhost:8080/own/stats).
 
 ## Contribution
 

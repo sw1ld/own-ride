@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public record FitResponse(
+public record ActivityResponse(
     UUID id,
     String displayName,
     String name, // used as ID right now
@@ -21,7 +21,7 @@ public record FitResponse(
     LocalDateTime lastModified,
     List<Position> positions) {
 
-  public FitResponse(FitData fd) {
+  public ActivityResponse(Activity fd) {
     this(
         fd.id(),
         toDisplayName(fd.name()),

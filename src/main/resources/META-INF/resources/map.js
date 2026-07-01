@@ -42,7 +42,7 @@ window.hideHoverPointOnMap = function() {
 window.loadRoute = async function(id) {
   if (!map) return;
   try {
-    const response = await fetch(`/fit/activities/id/${encodeURIComponent(id)}`, {
+    const response = await fetch(`/own/activities/id/${encodeURIComponent(id)}`, {
       headers: {
         'Accept': 'application/json'
       },
