@@ -29,7 +29,6 @@ With `OwnRide` I try to give a lightweight, community driven alternative to main
 
 ## Roadmap / Open TODOs
 
-- [ ] Add swagger docs
 - [ ] Insert "events" such as "repair/service meeting"
 - [ ] Export all files (including meta data)?
 - [ ] Add additional tags for filtering (Bike, Route, Equipment?, etc.)
@@ -44,6 +43,7 @@ Make sure you have the following prerequisites installed:
 - Java 21 or higher
 - Maven 3.9+
 - Docker
+- [PlantUML](https://plantuml.com/download)
 
 #### 1. Database Setup
 
@@ -74,9 +74,15 @@ QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://localhost:5432/ownridedb
 
 #### 3. Build and Run
 
+Generate diagrams (optional, required for full documentation):
+```shell
+mkdir -p src/main/resources/diagrams/generated && \
+plantuml src/main/resources/diagrams/*.puml -tsvg -o generated
+```
+
 Build the project using Maven:
 ```shell
-mvn clean verify
+mvn clean verify -Pdocs
 ```
 
 Start the application in development mode:
@@ -85,6 +91,7 @@ mvn quarkus:dev
 ```
 
 The application will be accessible at [http://localhost:8080/own/stats](http://localhost:8080/own/stats).
+For technical details there is also an OpenApiSpecification published via [Swagger-UI](http://localhost:8080/own/q/swagger-ui).
 
 ## Contribution
 

@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public record Activity(
     UUID id,
-    String name,
+    String name, // upload file name
     LocalDate date,
     double distance,
     Duration duration,

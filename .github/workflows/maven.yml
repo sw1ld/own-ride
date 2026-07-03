@@ -40,6 +40,16 @@ jobs:
     - name: Check Code Formatting (Spotless & Sortpom)
       run: mvn spotless:check sortpom:verify
 
+    - name: Install PlantUML
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y plantuml
+
+    - name: Generate PlantUML Diagrams
+      run: |
+        mkdir -p src/main/resources/diagrams/generated
+        plantuml src/main/resources/diagrams/*.puml -tsvg -o generated
+
     - name: Build with Maven (including Tests)
       run: mvn -B verify
 
@@ -58,3 +68,10 @@ jobs:
         name: coverage-report
         path: target/site/jacoco/
         retention-days: 5
+
+    - name: Upload Generated Diagrams
+      uses: actions/upload-artifact@v7
+      with:
+        name: generated-diagrams
+        path: src/main/resources/diagrams/generated/
+        retention-days: 1

@@ -54,6 +54,7 @@ public class ActivitiesResource {
                   .map(ActivityResponse::new)
                   .sorted(Comparator.comparing(ActivityResponse::date).reversed())
                   .toList())
+          .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
           .build();
     }
   }
@@ -66,15 +67,20 @@ public class ActivitiesResource {
 
     if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
       if (activity.isEmpty()) {
-        // TODO return proper HTML error page over JSON response!
-        return Response.status(404).entity(notFoundProblem(id)).build();
+        return Response.status(404).entity(Templates.notFound()).build();
       }
       return Response.ok(Templates.activity(new ActivityResponse(activity.get()))).build();
     } else {
       if (activity.isEmpty()) {
-        return Response.status(404).entity(notFoundProblem(id)).build();
+        return Response.status(404)
+            .entity(notFoundProblem(id))
+            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+            .build();
       }
-      return Response.ok().entity(new ActivityResponse(activity.get())).build();
+      return Response.ok()
+          .entity(new ActivityResponse(activity.get()))
+          .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+          .build();
     }
   }
 

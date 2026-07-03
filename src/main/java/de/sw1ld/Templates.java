@@ -17,5 +17,7 @@ public class Templates {
 
   public static native TemplateInstance activity(ActivityResponse data);
 
+  public static native TemplateInstance notFound();
+
   public static native TemplateInstance upload(List<UploadResult> results);
 }

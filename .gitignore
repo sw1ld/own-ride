@@ -23,4 +23,5 @@ pom.xml.releaseBackup
 pom.xml.tag
 pom.xml.versionsBackup
 release.properties
+src/main/resources/diagrams/generated/
 target/
