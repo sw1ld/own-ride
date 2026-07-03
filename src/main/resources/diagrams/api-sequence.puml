@@ -1,0 +1,40 @@
+@startuml
+
+title OwnRide API Sequence Diagram
+
+actor Caller
+participant API
+database Extracted
+database Binary
+
+Caller -> API: <b>POST</b> /own/upload
+group Transaction
+    API -> API: extract
+    API -> Binary: persist binary
+    Binary --> API
+    API -> Extracted: persist extracted
+    Extracted --> API:
+end
+API --> Caller: 201
+
+
+Caller -> API: <b>GET</b> /own/activities/{id}
+API -> Extracted: fetch by Id
+Extracted --> API:
+API --> Caller: 200
+
+Caller -> API: <b>GET</b> /own/stats?year=2026
+API -> Extracted:
+Extracted --> API: fetch all, filtered by year
+API --> Caller: 200
+
+== New Release Version of OwnRide ==
+hnote across: When a new release extracts more data in a newer version, existing "extracted" \ndata is not changed. This is what the recalculate endpoint is responsible for.
+
+Caller -> API: <b>PUT</b> /own/activities/{id}/recalculate
+API -> Binary:
+Binary --> Extracted: recalculate
+Extracted --> API:
+API --> Caller: 200
+
+@enduml

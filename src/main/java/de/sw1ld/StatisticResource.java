@@ -36,7 +36,9 @@ public class StatisticResource {
       var years = activityService.getAvailableYears();
       return Response.ok(Templates.statistics(stats, years)).build();
     } else {
-      return Response.ok(stats).build();
+      return Response.ok(stats)
+          .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+          .build();
     }
   }
 }

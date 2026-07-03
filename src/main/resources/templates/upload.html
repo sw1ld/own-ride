@@ -26,14 +26,14 @@
                                             </thead>
                                             <tbody>
                                                 {#for res in results}
-                                                    <tr class="{res.success ? 'has-text-success' : 'has-text-danger'}">
+                                                    <tr class="{res.result == 'SUCCESS' ? 'has-text-success' : 'has-text-danger'}">
                                                         <td style="word-break: break-all;">{res.fileName}</td>
-                                                        <td style="white-space: nowrap;">{res.success ? '✅ OK' : '❌ Error'}</td>
+                                                        <td style="white-space: nowrap;">{res.result == 'SUCCESS' ? '✅ OK' : '❌ Error'}</td>
                                                         <td style="word-break: break-all;">
-                                                            {#if res.success}
-                                                                <small class="has-text-grey">{res.id}</small>
+                                                            {#if res.result == 'SUCCESS'}
+                                                                <small class="has-text-grey">{res.asUploadSuccess.id}</small>
                                                             {#else}
-                                                                <span class="duplicate-error">{res.message}</span>
+                                                                <span class="duplicate-error">{res.asUploadFailure.message}</span>
                                                             {/if}
                                                         </td>
                                                     </tr>

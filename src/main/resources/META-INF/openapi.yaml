@@ -1,0 +1,366 @@
+openapi: 3.0.0
+info:
+  title: OwnRide API
+  description: |
+    API for analyzing and managing Garmin FIT files. 
+    This API supports both JSON for programmatic access and HTML for direct browser viewing.
+    
+    ![OwnRide API - Sequence diagram](/own/diagrams/api-sequence.svg)
+  version: 0.1.0
+
+tags:
+  - name: Activities
+  - name: Statistics
+  - name: Upload
+
+paths:
+  /own/activities:
+    get:
+      operationId: getActivities
+      summary: 'Fetch all activities'
+      description: 'Returns a list of all activities, optionally filtered by year. Supports JSON and HTML.'
+      tags:
+        - Activities
+      parameters:
+        - name: year
+          in: query
+          description: 'Filter for a specific year'
+          schema:
+            type: integer
+            example: 2026
+      responses:
+        '200':
+          description: A list of activities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityResponseList'
+            text/html:
+              schema:
+                type: string
+                format: html
+  /own/activities/id/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          example: '6e87e7a4-6326-4e40-933c-750e78f23439'
+    get:
+      operationId: getActivityById
+      summary: 'Fetch an activity by ID'
+      tags:
+        - Activities
+      responses:
+        '200':
+          description: 'The requested activity.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityResponse'
+            text/html:
+              schema:
+                type: string
+                format: html
+        '404':
+          description: 'Activity with requested ID does not exist'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundProblem'
+            text/html:
+              schema:
+                type: string
+                format: html
+    delete:
+      operationId: deleteActivity
+      summary: 'Delete an activity by ID'
+      tags:
+        - Activities
+      responses:
+        '204':
+          description: 'Activity deleted successfully'
+        '404':
+          description: 'Activity with requested ID does not exist'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundProblem'
+    put:
+      operationId: recalculateActivity
+      summary: 'Recalculate an activity using the lastest algorithm.'
+      tags:
+        - Activities
+      responses:
+        '200':
+          description: 'The updated activity.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityResponse'
+        '404':
+          description: 'Activity with requested ID does not exist'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundProblem'
+  /own/activities/id/{id}/rate:
+    put:
+      operationId: rateActivity
+      summary: 'Add or overwrite a 0-5 star rating of the chosen activity'
+      tags:
+        - Activities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: integer
+              minimum: 0
+              maximum: 5
+              example: 4
+      responses:
+        '200':
+          description: 'The updated activity.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityResponse'
+        '400':
+          description: 'Request body is invalid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestProblem'
+        '404':
+          description: 'Activity with requested ID does not exist'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundProblem'
+
+  /own/stats:
+    get:
+      operationId: getStatistics
+      summary: 'Fetch aggregated statistics for the current year.'
+      tags:
+        - Statistics
+      parameters:
+        - name: year
+          in: query
+          schema:
+            type: integer
+            example: 2026
+      responses:
+        '200':
+          description: 'Overall statistics for the year.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatisticResponse'
+            text/html:
+              schema:
+                type: string
+                format: html
+  /own/upload:
+    get:
+      operationId: getUploadPage
+      summary: 'Get HTML page for uploading a FIT file'
+      tags:
+        - Upload
+      responses:
+        '200':
+          description: Upload page.
+          content:
+            text/html:
+              schema:
+                type: string
+                format: html
+    post:
+      operationId: uploadFile
+      summary: 'Upload and persist a FIT file'
+      tags:
+        - Upload
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '201':
+          description: Upload results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResponseList'
+            text/html:
+              schema:
+                type: string
+                format: html
+
+components:
+  schemas:
+    ActivityResponseList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ActivityResponse'
+
+    ActivityResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: '016e8bce-d617-40a6-8321-c8d58525042a'
+        displayName:
+          type: string
+          example: 'Ammerndorf über Tennenlohe Runde'
+        date:
+          type: string
+          format: date
+          example: '2022-06-25'
+        distance:
+          type: string
+          example: '67.46 km'
+        duration:
+          type: string
+          example: '3:19:04'
+        elapsedTime:
+          type: string
+          example: '3:36:22'
+        avgSpeed:
+          type: string
+          example: '20.33 km/h'
+        maxSpeed:
+          type: string
+          example: '51.95 km/h'
+        temperature:
+          type: string
+          example: '26 °C'
+        totalAscent:
+          type: string
+          example: '743 m'
+        rate:
+          type: integer
+          example: 4
+        positions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Position'
+
+    BadRequestProblem:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 400
+        title:
+          type: string
+          example: 'Bad Request'
+        detail:
+          type: string
+          example: "Request body contains invalid values"
+
+    NotFoundProblem:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 404
+        title:
+          type: string
+          example: 'Not Found'
+        detail:
+          type: string
+          example: "Activity with id '6e87e7a4-6326-4e40-933c-750e78f23439' does not exist"
+
+    Position:
+      type: object
+      properties:
+        lat:
+          type: number
+          example: 49.50781602412462
+        lon:
+          type: number
+          example: 10.907890610396862
+        altitude:
+          type: number
+          example: 294.8
+        timestamp:
+          type: string
+          example: '2022-06-25'
+
+    StatisticResponse:
+      type: object
+      properties:
+        rides:
+          type: integer
+          example: 17
+        distance:
+          type: string
+          example: '821.84 km'
+        tourDates:
+          type: object
+          description: 'Map of dates to distance'
+          additionalProperties:
+            type: number
+            format: double
+          example:
+            '2026-07-03': 46.77071875
+            '2026-07-04': 0.0
+            '2026-07-05': 0.0
+            '2026-07-06': 39.5099296875
+
+    UploadResponseList:
+        type: array
+        items:
+          $ref: '#/components/schemas/UploadResult'
+
+    UploadResult:
+      type: object
+      description: 'Result of file upload'
+      properties:
+        fileName:
+          type: string
+          example: '2022-06-25_Ammerndorf_über_Tennenlohe_Runde.fit'
+        result:
+          type: string
+          description: 'Acts as discriminator controlling additional properties.'
+          enum:
+            - SUCCESS
+            - FAILURE
+          example: 'SUCCESS'
+      discriminator:
+        propertyName: result
+        mapping:
+          SUCCESS: '#/components/schemas/UploadSuccess'
+          FAILURE: '#/components/schemas/UploadFailure'
+      oneOf:
+        - $ref: '#/components/schemas/UploadSuccess'
+        - $ref: '#/components/schemas/UploadFailure'
+
+    UploadFailure:
+      type: object
+      description: 'Upload failed'
+      properties:
+        message:
+          type: string
+          description: 'Reason for failure'
+          example: 'Uploaded file must not be empty!'
+
+    UploadSuccess:
+      type: object
+      description: 'Upload succeeded'
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 'ID of the created activity'
+          example: '6e87e7a4-6326-4e40-933c-750e78f23439'

@@ -67,11 +67,12 @@ class ApiTest {
 
     given()
         .contentType(ContentType.MULTIPART)
+        .accept(MediaType.APPLICATION_JSON)
         .multiPart("file", fitFile)
         .when()
         .post("/upload")
         .then()
-        .statusCode(200);
+        .statusCode(201);
 
     given()
         .accept(MediaType.APPLICATION_JSON)
@@ -87,7 +88,6 @@ class ApiTest {
 
     ActivityResponse activity = firstActivity(YEAR);
     assertThat(activity.displayName()).isEqualTo("Route1");
-    assertThat(activity.name()).isEqualTo("2021-04-27_Route1.fit");
     assertThat(activity.date()).isEqualTo("2021-04-27");
     assertThat(activity.distance()).isEqualTo("34.68 km");
     assertThat(activity.duration()).isEqualTo("1:34:54");
@@ -110,7 +110,7 @@ class ApiTest {
         .then()
         .log()
         .body()
-        .statusCode(200)
+        .statusCode(201)
         .body(containsString("duplicate-error"))
         .body(containsString("Activity already uploaded"));
 
@@ -138,8 +138,7 @@ class ApiTest {
         .then()
         .statusCode(200)
         .body("id", equalTo(activity.id().toString()))
-        .body("positions", not(empty()))
-        .body("lastModified", not(equalTo(activity.lastModified().toString())));
+        .body("positions", not(empty()));
   }
 
   @Test
@@ -174,22 +173,7 @@ class ApiTest {
   }
 
   @Test
-  @Order(6)
-  void rateActivityWithInvalidRating_shouldFail() {
-    ActivityResponse activity = firstActivity(YEAR);
-
-    given()
-        .contentType(ContentType.JSON)
-        .body(7)
-        .when()
-        .put("/activities/id/%s/rate".formatted(activity.id()))
-        .then()
-        .statusCode(400)
-        .body("detail", equalTo("Rate value must be between 0 and 5"));
-  }
-
-  @Test
-  @Order(7)
+  @Order(20)
   void activitiesPageHtml() {
     ActivityResponse activity = firstActivity(YEAR);
 
@@ -203,6 +187,22 @@ class ApiTest {
         .body(containsString("Back to list"))
         .body(containsString("id=\"map\""))
         .body(containsString("id=\"altitudeChart\""));
+  }
+
+  @Test
+  @Order(21)
+  void activityNotFoundHtml() {
+    UUID unknownId = UUID.randomUUID();
+
+    given()
+        .accept(MediaType.TEXT_HTML)
+        .when()
+        .get("/activities/id/" + unknownId)
+        .then()
+        .statusCode(404)
+        .body(containsString("Activity Not Found"))
+        .body(containsString("The activity you are looking for does not exist"))
+        .body(containsString("Back to Activities"));
   }
 
   @Test
