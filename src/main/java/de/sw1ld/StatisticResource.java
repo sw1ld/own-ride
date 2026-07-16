@@ -24,7 +24,7 @@ public class StatisticResource {
   }
 
   @GET
-  @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_HTML})
   public Response statistics(@QueryParam("year") Integer year) {
     if (year == null) {
       year = LocalDate.now().getYear();
@@ -36,9 +36,7 @@ public class StatisticResource {
       var years = activityService.getAvailableYears();
       return Response.ok(Templates.statistics(stats, years)).build();
     } else {
-      return Response.ok(stats)
-          .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-          .build();
+      return Response.ok(stats).build();
     }
   }
 }

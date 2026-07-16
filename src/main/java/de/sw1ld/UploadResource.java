@@ -38,7 +38,7 @@ public class UploadResource {
 
   @POST
   @Consumes(MediaType.MULTIPART_FORM_DATA)
-  @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_HTML})
   public Response upload(MultipartFormDataInput fitfile) {
     var parts = fitfile.getFormDataMap().get("file");
     if (parts == null || parts.isEmpty()) {
@@ -60,7 +60,6 @@ public class UploadResource {
       return Response.status(Status.CREATED)
           .location(getFirstLocation(results))
           .entity(results)
-          .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
           .build();
     }
   }
