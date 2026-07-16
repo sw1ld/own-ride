@@ -1,5 +1,5 @@
 {#include base showYearFilter=true}
-    <h1 class="title">Statistics</h1>
+    <h1 class="title">Dashboard</h1>
     <div class="box">
         <h2 class="title is-4">Summary</h2>
 
@@ -7,8 +7,9 @@
             <table class="table is-fullwidth">
                 <thead>
                     <tr>
-                        <th class="has-text-centered">Total number of rides</th>
+                        <th class="has-text-centered">Activities</th>
                         <th class="has-text-centered">Total distance</th>
+                        <th class="has-text-centered">Total ascent</th>
                     </tr>
                 </thead>
 
@@ -16,6 +17,7 @@
                     <tr>
                         <td id="ridesCount" class="has-text-centered">{stats.rides}</td>
                         <td id="totalDistance" class="has-text-centered">{stats.distance}</td>
+                        <td id="totalDistance" class="has-text-centered">{stats.ascent}</td>
                     </tr>
                 </tbody>
             </table>

@@ -42,6 +42,18 @@ public class ActivityDataRepositoryJpa implements ActivityDataRepository {
   }
 
   @Override
+  public List<PerformanceData> fetchPerformanceDataByYear(int year) {
+    LocalDate start = LocalDate.of(year, 1, 1);
+    LocalDate end = start.plusYears(1);
+
+    return entityManager
+        .createNamedQuery(ActivityData.QUERY_PERFORMANCE_BY_YEAR, PerformanceData.class)
+        .setParameter("startOfYear", start)
+        .setParameter("startOfNextYear", end)
+        .getResultList();
+  }
+
+  @Override
   public List<ActivityData> findAll() {
     return entityManager
         .createNamedQuery(ActivityData.QUERY_FIND_ALL, ActivityData.class)

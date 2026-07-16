@@ -37,10 +37,16 @@ import org.hibernate.type.SqlTypes;
 @NamedQuery(
     name = ActivityData.QUERY_DELETE_BY_ID,
     query = "DELETE FROM ActivityData ed WHERE id = :id")
+@NamedQuery(
+    name = ActivityData.QUERY_PERFORMANCE_BY_YEAR,
+    query =
+        "SELECT new de.sw1ld.PerformanceData(ed.date, ed.distance, ed.totalAscent) "
+            + "FROM ActivityData ed WHERE ed.date >= :startOfYear AND ed.date < :startOfNextYear")
 public class ActivityData {
 
   public static final String QUERY_FIND_BY_ID = "ExtractedData.findById";
   public static final String QUERY_FIND_BY_YEAR = "ExtractedData.findByYear";
+  public static final String QUERY_PERFORMANCE_BY_YEAR = "ExtractedData.fetchPerformanceDataByYear";
   public static final String QUERY_FIND_ALL = "ExtractedData.findAll";
   public static final String QUERY_FIND_MIN_DATE = "ExtractedData.findMinDate";
   public static final String QUERY_FIND_BY_TIME_CREATED = "ExtractedData.findByTimeCreated";

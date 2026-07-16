@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
+import org.jspecify.annotations.NonNull;
 
 @ApplicationScoped
 public class ActivityService {
@@ -36,6 +37,10 @@ public class ActivityService {
     } else {
       return activityDataRepository.findByYear(year).stream().map(Activity::new).toList();
     }
+  }
+
+  List<PerformanceData> fetchPerformanceData(@NonNull Integer year) {
+    return activityDataRepository.fetchPerformanceDataByYear(year);
   }
 
   List<Integer> getAvailableYears() {
