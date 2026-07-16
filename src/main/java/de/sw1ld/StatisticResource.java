@@ -29,8 +29,8 @@ public class StatisticResource {
     if (year == null) {
       year = LocalDate.now().getYear();
     }
-    List<Activity> activities = activityService.fetchActivities(year);
-    var stats = StatisticService.getStats(activities, year);
+    List<PerformanceData> performanceData = activityService.fetchPerformanceData(year);
+    var stats = StatisticService.getStats(performanceData, year);
 
     if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
       var years = activityService.getAvailableYears();

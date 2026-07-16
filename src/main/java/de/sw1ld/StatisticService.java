@@ -3,15 +3,26 @@ package de.sw1ld;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 public class StatisticService {
 
   private StatisticService() {}
 
-  static StatisticResponse getStats(List<Activity> activities, Integer year) {
-    double total =
-        activities.stream().map(Activity::distance).mapToDouble(Double::doubleValue).sum();
+  static StatisticResponse getStats(List<PerformanceData> performanceData, Integer year) {
+    double totalDistance =
+        performanceData.stream()
+            .map(PerformanceData::distance)
+            .mapToDouble(Double::doubleValue)
+            .sum();
+
+    int totalAscent =
+        performanceData.stream()
+            .map(PerformanceData::totalAscent)
+            .filter(Objects::nonNull)
+            .mapToInt(Integer::intValue)
+            .sum();
 
     Map<LocalDate, Double> basicTourStatistics = new TreeMap<>();
     LocalDate start = LocalDate.of(year, 1, 1);
@@ -23,8 +34,9 @@ public class StatisticService {
     }
 
     // set/merge with concrete values
-    activities.forEach(f -> basicTourStatistics.merge(f.date(), f.distance(), Double::sum));
+    performanceData.forEach(f -> basicTourStatistics.merge(f.date(), f.distance(), Double::sum));
 
-    return new StatisticResponse(activities.size(), total, basicTourStatistics);
+    return new StatisticResponse(
+        performanceData.size(), totalDistance, totalAscent, basicTourStatistics);
   }
 }

@@ -11,11 +11,8 @@ import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +31,8 @@ class StatisticResourceTest {
 
   @Test
   void statisticsDefaultingToJson() {
-    when(activityService.fetchActivities(anyInt())).thenReturn(List.of(mockedActivity()));
+    when(activityService.fetchPerformanceData(anyInt()))
+        .thenReturn(List.of(mockedPerformanceData()));
 
     StatisticResponse response =
         RestAssured.given()
@@ -55,7 +53,8 @@ class StatisticResourceTest {
 
   @Test
   void statisticsPageAsHtml() {
-    when(activityService.fetchActivities(anyInt())).thenReturn(List.of(mockedActivity()));
+    when(activityService.fetchPerformanceData(anyInt()))
+        .thenReturn(List.of(mockedPerformanceData()));
     when(activityService.getAvailableYears()).thenReturn(List.of(2026));
 
     given()
@@ -66,16 +65,16 @@ class StatisticResourceTest {
         .statusCode(200)
         .contentType(ContentType.HTML)
         .body(
-            containsString("Statistics"),
+            containsString("Dashboard"),
             containsString("Summary"),
-            containsString("Total number of rides"),
+            containsString("Total distance"),
             containsString("100.00 km"));
   }
 
   @Test
   void statisticsWithYearParam() {
     int year = 2025;
-    when(activityService.fetchActivities(year)).thenReturn(List.of());
+    when(activityService.fetchPerformanceData(year)).thenReturn(List.of());
 
     RestAssured.given()
         .queryParam("year", year)
@@ -88,20 +87,7 @@ class StatisticResourceTest {
         .body("distance", org.hamcrest.Matchers.equalTo("0.00 km"));
   }
 
-  private Activity mockedActivity() {
-    return new Activity(
-        UUID.randomUUID(),
-        "2026-07-16_Some_Name",
-        LocalDate.now(),
-        100.0,
-        Duration.ofHours(2),
-        Duration.ofHours(3),
-        25.0,
-        55.0,
-        null,
-        222,
-        LocalDateTime.now(),
-        3,
-        List.of());
+  private PerformanceData mockedPerformanceData() {
+    return new PerformanceData(LocalDate.now(), 100.0, 222);
   }
 }

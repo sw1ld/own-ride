@@ -2,11 +2,8 @@ package de.sw1ld;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class StatisticServiceTest {
@@ -15,39 +12,10 @@ class StatisticServiceTest {
   void sumStatsForSameDate() {
     int year = 2025;
     LocalDate date = LocalDate.of(year, 6, 7);
-    LocalDateTime now = LocalDateTime.now();
-    Activity ride1 =
-        new Activity(
-            UUID.randomUUID(),
-            "Hinfahrt",
-            date,
-            10.5,
-            Duration.ofHours(1),
-            Duration.ofHours(2),
-            10.5,
-            30.8,
-            20,
-            100,
-            now,
-            0,
-            List.of());
-    Activity ride2 =
-        new Activity(
-            UUID.randomUUID(),
-            "Rückfahrt",
-            date,
-            15.0,
-            Duration.ofHours(1),
-            Duration.ofHours(2),
-            15.0,
-            30.8,
-            22,
-            150,
-            now,
-            0,
-            List.of());
+    PerformanceData ride1 = new PerformanceData(date, 10.5, 100);
+    PerformanceData ride2 = new PerformanceData(date, 15.0, 150);
 
-    List<Activity> activities = List.of(ride1, ride2);
+    List<PerformanceData> activities = List.of(ride1, ride2);
 
     StatisticResponse stats = StatisticService.getStats(activities, year);
 
