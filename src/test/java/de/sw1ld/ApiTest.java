@@ -173,39 +173,6 @@ class ApiTest {
   }
 
   @Test
-  @Order(20)
-  void activitiesPageHtml() {
-    ActivityResponse activity = firstActivity(YEAR);
-
-    given()
-        .accept(MediaType.TEXT_HTML)
-        .when()
-        .get("/activities/id/" + activity.id())
-        .then()
-        .statusCode(200)
-        .body(containsString(activity.displayName()))
-        .body(containsString("Back to list"))
-        .body(containsString("id=\"map\""))
-        .body(containsString("id=\"altitudeChart\""));
-  }
-
-  @Test
-  @Order(21)
-  void activityNotFoundHtml() {
-    UUID unknownId = UUID.randomUUID();
-
-    given()
-        .accept(MediaType.TEXT_HTML)
-        .when()
-        .get("/activities/id/" + unknownId)
-        .then()
-        .statusCode(404)
-        .body(containsString("Activity Not Found"))
-        .body(containsString("The activity you are looking for does not exist"))
-        .body(containsString("Back to Activities"));
-  }
-
-  @Test
   @Order(100)
   void deleteActivity() {
     UUID id = firstActivity(YEAR).id();

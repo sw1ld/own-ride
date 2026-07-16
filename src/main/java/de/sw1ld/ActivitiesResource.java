@@ -32,7 +32,7 @@ public class ActivitiesResource {
   }
 
   @GET
-  @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_HTML})
   public Response activities(@QueryParam("year") Integer year) {
     List<Activity> activities = activityService.fetchActivities(year);
 
@@ -54,14 +54,13 @@ public class ActivitiesResource {
                   .map(ActivityResponse::new)
                   .sorted(Comparator.comparing(ActivityResponse::date).reversed())
                   .toList())
-          .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
           .build();
     }
   }
 
   @GET
   @Path("/id/{id}")
-  @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_HTML})
   public Response activity(@PathParam("id") UUID id) {
     Optional<Activity> activity = activityService.fetchActivityBy(id);
 
@@ -72,15 +71,9 @@ public class ActivitiesResource {
       return Response.ok(Templates.activity(new ActivityResponse(activity.get()))).build();
     } else {
       if (activity.isEmpty()) {
-        return Response.status(404)
-            .entity(notFoundProblem(id))
-            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-            .build();
+        return Response.status(404).entity(notFoundProblem(id)).build();
       }
-      return Response.ok()
-          .entity(new ActivityResponse(activity.get()))
-          .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-          .build();
+      return Response.ok().entity(new ActivityResponse(activity.get())).build();
     }
   }
 
