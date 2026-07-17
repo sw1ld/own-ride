@@ -92,4 +92,13 @@ public class ActivityDataRepositoryJpa implements ActivityDataRepository {
     }
     return false;
   }
+
+  @Override
+  public void removeBikeAssignments(UUID bikeId) {
+
+    entityManager
+        .createNamedQuery(ActivityData.QUERY_REMOVE_BIKE_ASSIGNMENTS)
+        .setParameter("bikeId", bikeId)
+        .executeUpdate();
+  }
 }

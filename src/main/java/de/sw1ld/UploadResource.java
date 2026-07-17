@@ -51,7 +51,18 @@ public class UploadResource {
 
     List<UploadResult> results = new ArrayList<>();
     for (var part : parts) {
-      results.add(uploadSingleFile(part));
+      String fileName = part.getFileName();
+      if (fileName != null && !fileName.isEmpty()) {
+        results.add(uploadSingleFile(part));
+      }
+    }
+
+    if (results.isEmpty()) {
+      return Response.status(400)
+          .entity(
+              Templates.upload(
+                  List.of(new UploadFailure("N/A", "Uploaded file must not be empty!"))))
+          .build();
     }
 
     if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {

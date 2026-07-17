@@ -39,18 +39,40 @@
                 </div>
 
                 <div class="level-right">
-                    <div class="buttons are-small">
-                        <button class="button is-danger is-outlined delete-route" data-id="{data.id}">
-                            <span class="icon">
-                                <i class="fas fa-trash"></i>
-                            </span>
-                            {!<span>Delete</span>!}
-                        </button>
+                    <div class="buttons">
+                        <div class="dropdown is-right mr-2" id="bikeDropdown">
+                            <div class="dropdown-trigger">
+                                <button class="button is-info is-outlined" aria-haspopup="true" aria-controls="dropdown-menu">
+                                    <span class="icon">
+                                        <i class="fas fa-bicycle"></i>
+                                    </span>
+                                </button>
+                            </div>
+                            <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                                <div class="dropdown-content">
+                                    <a href="#" class="dropdown-item bike-option" data-bike-id="">
+                                        No Bike
+                                    </a>
+                                    <hr class="dropdown-divider">
+                                    {#for bike in bikes}
+                                    <a href="#" class="dropdown-item bike-option {#if data.bike && data.bike.id == bike.id}is-active{/if}" data-bike-id="{bike.id}">
+                                        {bike.producer} {bike.name}
+                                    </a>
+                                    {/for}
+                                </div>
+                            </div>
+                        </div>
                         <button class="button is-info is-outlined recalculate-route" data-id="{data.id}">
                             <span class="icon">
                                 <i class="fas fa-sync"></i>
                             </span>
                             {!<span>Recalculate</span>!}
+                        </button>
+                        <button class="button is-danger is-outlined delete-route" data-id="{data.id}">
+                            <span class="icon">
+                                <i class="fas fa-trash"></i>
+                            </span>
+                            {!<span>Delete</span>!}
                         </button>
                     </div>
                 </div>
@@ -60,6 +82,14 @@
             <div class="tags are-medium">
                 {#if data.temperature != '/'}
                 <span class="tag">{data.temperature}</span>
+                {/if}
+                {#if data.bike}
+                <span class="tag">
+                    <span class="icon is-small mr-1">
+                        <i class="fas fa-bicycle"></i>
+                    </span>
+                    {data.bike.producer} {data.bike.name}
+                </span>
                 {/if}
             </div>
 
@@ -117,20 +147,51 @@
     <script src="/own/map.js" defer></script>
     <script src="/own/modal.js" defer></script>
     <script src="/own/rating.js" defer></script>
+    <script>
+        const dropdown = document.getElementById('bikeDropdown');
+        dropdown.querySelector('.dropdown-trigger button').addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('is-active');
+        });
 
+        document.addEventListener('click', () => {
+            dropdown.classList.remove('is-active');
+        });
+
+        document.querySelectorAll('.bike-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.preventDefault();
+                const bikeId = option.dataset.bikeId || null;
+                const activityId = '{data.id}';
+                fetch('/own/activities/id/' + activityId + '/bike', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(bikeId)
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Failed to update bike.');
+                    }
+                });
+            });
+        });
+    </script>
     <div id="confirmModal" class="modal">
         <div class="modal-background"></div>
         <div class="modal-card">
             <header class="modal-card-head">
-                <p class="modal-card-title" id="confirmModalTitle">Aktion bestätigen</p>
+                <p class="modal-card-title" id="confirmModalTitle">Confirm Action</p>
                 <button class="delete" aria-label="close" id="closeModal"></button>
             </header>
             <section class="modal-card-body">
-                <p id="confirmModalMessage">Sind Sie sicher?</p>
+                <p id="confirmModalMessage">Are you sure?</p>
             </section>
             <footer class="modal-card-foot">
-                <button class="button is-success" id="confirmModalAction">Bestätigen</button>
-                <button class="button" id="cancelModal">Abbrechen</button>
+                <button class="button is-success" id="confirmModalAction">Confirm</button>
+                <button class="button" id="cancelModal">Cancel</button>
             </footer>
         </div>
     </div>

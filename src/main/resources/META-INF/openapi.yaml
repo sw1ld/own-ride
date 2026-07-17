@@ -12,6 +12,7 @@ tags:
   - name: Activities
   - name: Statistics
   - name: Upload
+  - name: Bikes
 
 paths:
   /own/activities:
@@ -140,6 +141,170 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundProblem'
 
+  /own/activities/id/{id}/bike:
+    put:
+      operationId: setActivityBike
+      summary: 'Link or unlink a bike to an activity'
+      tags:
+        - Activities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              format: uuid
+              nullable: true
+              example: '016e8bce-d617-40a6-8321-c8d58525042a'
+      responses:
+        '200':
+          description: 'The updated activity.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityResponse'
+        '404':
+          description: 'Activity with requested ID does not exist'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundProblem'
+
+  /own/bikes:
+    get:
+      operationId: getBikes
+      summary: 'Inventory of all bikes'
+      tags:
+        - Bikes
+      responses:
+        '200':
+          description: 'Inventory of bikes with total driven distance each.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BikeResponse'
+            text/html:
+              schema:
+                type: string
+                format: html
+    post:
+      operationId: addBike
+      summary: 'Add a new bike to the inventory'
+      tags:
+        - Bikes
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                producer:
+                  type: string
+                  example: 'Trek'
+                name:
+                  type: string
+                  example: 'Domane'
+      responses:
+        '201':
+          description: 'Bike added to inventory'
+          headers:
+            Location:
+              description: 'URL of the added bike'
+              schema:
+                type: string
+                example: '/own/bikes/id/aac460c9-1246-47e2-9a4c-342b7ad32189'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bike'
+        '303':
+          description: 'Redirect to bikes list'
+          headers:
+            Location:
+              description: 'URL to redirect to'
+              schema:
+                type: string
+                example: '/own/bikes'
+
+  /own/bikes/id/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          example: 'aac460c9-1246-47e2-9a4c-342b7ad32189'
+    get:
+      operationId: getBike
+      summary: 'Fetch bike from inventory'
+      tags:
+        - Bikes
+      responses:
+        '200':
+          description: 'Bike from inventory'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bike'
+        '404':
+          description: 'Bike with requested ID does not exist'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundProblem'
+    put:
+      operationId: updateBike
+      summary: 'Update a bike'
+      tags:
+        - Bikes
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                producer:
+                  type: string
+                name:
+                  type: string
+      responses:
+        '200':
+          description: 'Updated bike'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bike'
+        '303':
+          description: 'Redirect to bikes list'
+          headers:
+            Location:
+              description: 'URL to redirect to'
+              schema:
+                type: string
+                example: '/own/bikes'
+        '404':
+          description: 'Bike with requested ID does not exist'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundProblem'
+    delete:
+      operationId: deleteBike
+      summary: 'Delete a bike'
+      tags:
+        - Bikes
+      responses:
+        '204':
+          description: 'Bike deleted'
+        '404':
+          description: 'Bike with requested ID does not exist'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundProblem'
+
   /own/stats:
     get:
       operationId: getStatistics
@@ -196,6 +361,12 @@ paths:
       responses:
         '201':
           description: Upload results.
+          headers:
+            Location:
+              description: 'URL of the first successfully created activity'
+              schema:
+                type: string
+                example: '/own/activities/id/6e87e7a4-6326-4e40-933c-750e78f23439'
           content:
             application/json:
               schema:
@@ -250,6 +421,8 @@ components:
         rate:
           type: integer
           example: 4
+        bike:
+          $ref: '#/components/schemas/Bike'
         positions:
           type: array
           items:
@@ -279,7 +452,7 @@ components:
           example: 'Not Found'
         detail:
           type: string
-          example: "Activity with id '6e87e7a4-6326-4e40-933c-750e78f23439' does not exist"
+          example: "Resource with id '6e87e7a4-6326-4e40-933c-750e78f23439' does not exist"
 
     Position:
       type: object
@@ -296,6 +469,29 @@ components:
         timestamp:
           type: string
           example: '2022-06-25'
+
+    Bike:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 'eb98fb4b-333d-421f-a8b4-03edd5c9826b'
+        producer:
+          type: string
+          example: 'Trek'
+        name:
+          type: string
+          example: 'Domane'
+
+    BikeResponse:
+      type: object
+      properties:
+        bike:
+          $ref: '#/components/schemas/Bike'
+        totalDistance:
+          type: string
+          example: '743 km'
 
     StatisticResponse:
       type: object

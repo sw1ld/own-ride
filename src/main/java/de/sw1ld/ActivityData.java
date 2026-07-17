@@ -6,6 +6,7 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -38,6 +39,9 @@ import org.hibernate.type.SqlTypes;
     name = ActivityData.QUERY_DELETE_BY_ID,
     query = "DELETE FROM ActivityData ed WHERE id = :id")
 @NamedQuery(
+    name = ActivityData.QUERY_REMOVE_BIKE_ASSIGNMENTS,
+    query = "UPDATE ActivityData ed SET ed.bike = null WHERE ed.bike.id = :bikeId")
+@NamedQuery(
     name = ActivityData.QUERY_PERFORMANCE_BY_YEAR,
     query =
         "SELECT new de.sw1ld.PerformanceData(ed.date, ed.distance, ed.totalAscent) "
@@ -51,6 +55,7 @@ public class ActivityData {
   public static final String QUERY_FIND_MIN_DATE = "ExtractedData.findMinDate";
   public static final String QUERY_FIND_BY_TIME_CREATED = "ExtractedData.findByTimeCreated";
   public static final String QUERY_DELETE_BY_ID = "ExtractedData.deleteById";
+  public static final String QUERY_REMOVE_BIKE_ASSIGNMENTS = "ExtractedData.removeBikeAssignments";
 
   @Id @Column private UUID id;
 
@@ -90,6 +95,10 @@ public class ActivityData {
 
   @Column(nullable = false)
   private Integer rate;
+
+  @ManyToOne
+  @JoinColumn(name = "bike_id")
+  private BikeData bike;
 
   @Column
   @JdbcTypeCode(SqlTypes.JSON)
@@ -206,6 +215,14 @@ public class ActivityData {
 
   public void setRate(Integer rate) {
     this.rate = rate;
+  }
+
+  public BikeData getBike() {
+    return bike;
+  }
+
+  public void setBike(BikeData bike) {
+    this.bike = bike;
   }
 
   public List<Position> getPositions() {

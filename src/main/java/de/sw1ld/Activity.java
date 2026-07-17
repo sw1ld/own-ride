@@ -19,6 +19,7 @@ public record Activity(
     Integer totalAscent,
     LocalDateTime lastModified,
     Integer rate,
+    Bike bike,
     List<Position> positions) {
 
   public Activity(ActivityData data) {
@@ -35,6 +36,7 @@ public record Activity(
         data.getTotalAscent(),
         data.getLastModified(),
         data.getRate(),
+        data.getBike() == null ? null : new Bike(data.getBike()),
         data.getPositions());
   }
 }

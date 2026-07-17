@@ -168,6 +168,7 @@ class ActivityResourceTest {
         222,
         LocalDateTime.now(),
         3,
+        null,
         List.of());
   }
 }
