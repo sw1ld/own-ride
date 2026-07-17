@@ -10,10 +10,12 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import jakarta.ws.rs.core.MediaType;
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -58,6 +60,18 @@ class ApiTest {
         .then()
         .statusCode(404)
         .body("detail", equalTo("Activity with id '%s' does not exist".formatted(randomId)));
+
+    BikeResponse[] bikes =
+        given()
+            .accept(MediaType.APPLICATION_JSON)
+            .when()
+            .get("/bikes")
+            .then()
+            .statusCode(200)
+            .extract()
+            .as(BikeResponse[].class);
+
+    assertThat(bikes).isEmpty();
   }
 
   @Test
@@ -69,10 +83,12 @@ class ApiTest {
         .contentType(ContentType.MULTIPART)
         .accept(MediaType.APPLICATION_JSON)
         .multiPart("file", fitFile)
+        .multiPart("file", "") // empty input by HTML form
         .when()
         .post("/upload")
         .then()
-        .statusCode(201);
+        .statusCode(201)
+        .body("", hasSize(1));
 
     given()
         .accept(MediaType.APPLICATION_JSON)
@@ -173,7 +189,102 @@ class ApiTest {
   }
 
   @Test
+  @Order(20)
+  void addBikeToInventory() {
+    given()
+        .redirects()
+        .follow(false)
+        .contentType(ContentType.URLENC)
+        .formParam("producer", "Canyon")
+        .formParam("name", "Endurace")
+        .when()
+        .post("/bikes")
+        .then()
+        .statusCode(201);
+
+    given()
+        .accept(MediaType.APPLICATION_JSON)
+        .when()
+        .get("/bikes")
+        .then()
+        .statusCode(200)
+        .body("[0].bike.producer", equalTo("Canyon"))
+        .body("[0].bike.name", equalTo("Endurace"))
+        .body("[0].totalDistance", equalTo("0.00 km"));
+  }
+
+  @Test
+  @Order(21)
+  void linkBikeToActivity() {
+    UUID bikeId = firstBikeId();
+    ActivityResponse activity = firstActivity(YEAR);
+
+    given()
+        .contentType(ContentType.JSON)
+        .body("\"" + bikeId + "\"")
+        .when()
+        .put("/activities/id/%s/bike".formatted(activity.id()))
+        .then()
+        .statusCode(200)
+        .body("bike.id", equalTo(bikeId.toString()));
+
+    given()
+        .accept(MediaType.APPLICATION_JSON)
+        .when()
+        .get("/bikes")
+        .then()
+        .statusCode(200)
+        .body("[0].totalDistance", containsString("34.68 km"));
+  }
+
+  @Test
+  @Order(22)
+  void updateBikeInventory() {
+    UUID bikeId = firstBikeId();
+
+    given()
+        .redirects()
+        .follow(false)
+        .contentType(ContentType.URLENC)
+        .formParam("producer", "Canyon Updated")
+        .formParam("name", "Endurace CF")
+        .when()
+        .put("/bikes/id/" + bikeId)
+        .then()
+        .statusCode(200);
+
+    // explicit HTTP GET to verify changes are persisted
+    given()
+        .accept(MediaType.APPLICATION_JSON)
+        .when()
+        .get("/bikes")
+        .then()
+        .statusCode(200)
+        .body("[0].bike.producer", equalTo("Canyon Updated"))
+        .body("[0].bike.name", equalTo("Endurace CF"))
+        .body("[0].totalDistance", containsString("34.68 km"));
+  }
+
+  @Test
   @Order(100)
+  void deleteBikeAndAssignments() {
+    Bike bike = firstActivity(YEAR).bike();
+
+    given().when().delete("/bikes/id/" + bike.id()).then().statusCode(204);
+
+    given()
+        .accept(MediaType.APPLICATION_JSON)
+        .when()
+        .get("/bikes")
+        .then()
+        .statusCode(200)
+        .body("", hasSize(0));
+
+    assertThat(firstActivity(YEAR).bike()).isNull();
+  }
+
+  @Test
+  @Order(101)
   void deleteActivity() {
     UUID id = firstActivity(YEAR).id();
 
@@ -214,6 +325,20 @@ class ApiTest {
         .body("", hasSize(1))
         .extract()
         .as(ActivityResponse[].class)[0];
+  }
+
+  private static UUID firstBikeId() {
+    List<BikeResponse> bikes =
+        given()
+            .accept(MediaType.APPLICATION_JSON)
+            .when()
+            .get("/bikes")
+            .then()
+            .statusCode(200)
+            .extract()
+            .as(new TypeRef<>() {});
+
+    return bikes.getFirst().bike().id();
   }
 
   private static ValidatableResponse setRating(UUID activityId, int rate) {

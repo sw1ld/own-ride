@@ -25,10 +25,12 @@ import java.util.UUID;
 public class ActivitiesResource {
 
   private final ActivityService activityService;
+  private final BikeService bikeService;
   @Context private HttpHeaders headers;
 
-  public ActivitiesResource(ActivityService activityService) {
+  public ActivitiesResource(ActivityService activityService, BikeService bikeService) {
     this.activityService = activityService;
+    this.bikeService = bikeService;
   }
 
   @GET
@@ -68,7 +70,8 @@ public class ActivitiesResource {
       if (activity.isEmpty()) {
         return Response.status(404).entity(Templates.notFound()).build();
       }
-      return Response.ok(Templates.activity(new ActivityResponse(activity.get()))).build();
+      List<Bike> bikes = bikeService.findAll();
+      return Response.ok(Templates.activity(new ActivityResponse(activity.get()), bikes)).build();
     } else {
       if (activity.isEmpty()) {
         return Response.status(404).entity(notFoundProblem(id)).build();
@@ -119,6 +122,18 @@ public class ActivitiesResource {
     return Response.ok()
         .entity(new ActivityResponse(activityService.setUserRating(id, validRate)))
         .build();
+  }
+
+  @PUT
+  @Path("/id/{id}/bike")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response setBike(@PathParam("id") UUID id, UUID bikeId) {
+    Optional<Activity> activity = activityService.fetchActivityBy(id);
+    if (activity.isEmpty()) {
+      return Response.status(404).entity(notFoundProblem(id)).build();
+    }
+    return Response.ok().entity(new ActivityResponse(activityService.linkBike(id, bikeId))).build();
   }
 
   private static HttpProblem notFoundProblem(UUID id) {

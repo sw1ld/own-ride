@@ -16,6 +16,7 @@ public record ActivityResponse(
     String temperature,
     String totalAscent,
     Integer rate,
+    Bike bike,
     List<Position> positions) {
 
   public ActivityResponse(Activity fd) {
@@ -31,6 +32,7 @@ public record ActivityResponse(
         Prettyfier.temperatureWithUnit(fd.temperature()),
         Prettyfier.withMeter(fd.totalAscent()),
         fd.rate(),
+        fd.bike(),
         fd.positions());
   }
 

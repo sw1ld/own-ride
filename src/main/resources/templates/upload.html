@@ -138,6 +138,14 @@
                     e.preventDefault();
                     alert('Please select at least one file or folder.');
                 }
+                
+                // Disable empty file inputs to avoid sending empty parts
+                if (fileInput.files.length === 0) {
+                    fileInput.disabled = true;
+                }
+                if (folderInput.files.length === 0) {
+                    folderInput.disabled = true;
+                }
             };
         });
     </script>

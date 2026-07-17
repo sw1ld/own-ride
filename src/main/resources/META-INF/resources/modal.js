@@ -21,11 +21,31 @@ function showConfirm(title, message, onConfirm) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.delete-bike').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      showConfirm("Confirm Deletion", "Do you really want to delete this bike and all its activity assignments?", async () => {
+        try {
+          const response = await fetch(`/own/bikes/${id}`, { method: 'DELETE' });
+          if (response.ok) {
+            window.location.reload();
+          } else {
+            alert("Error during deletion");
+          }
+        } catch (err) {
+          console.error(err);
+          alert("Error during deletion");
+        }
+      });
+    });
+  });
+
   document.querySelectorAll('.delete-route').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const id = btn.dataset.id;
-      showConfirm("Löschen bestätigen", "Möchtest du diese Route wirklich löschen?", async () => {
+      showConfirm("Confirm Deletion", "Do you really want to delete this route?", async () => {
         try {
           const response = await fetch(`/own/activities/id/${id}`, { method: 'DELETE' });
           if (response.ok) {
@@ -36,11 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
                window.location.reload();
             }
           } else {
-            alert("Fehler beim Löschen");
+            alert("Error during deletion");
           }
         } catch (err) {
           console.error(err);
-          alert("Fehler beim Löschen");
+          alert("Error during deletion");
         }
       });
     });
@@ -50,17 +70,17 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const id = btn.dataset.id;
-      showConfirm("Neuberechnung bestätigen", "Möchtest du diese Route wirklich neu berechnen?", async () => {
+      showConfirm("Confirm Recalculation", "Do you really want to recalculate this route?", async () => {
         try {
           const response = await fetch(`/own/activities/id/${id}`, { method: 'PUT' });
           if (response.ok) {
             window.location.reload();
           } else {
-            alert("Fehler bei der Neuberechnung");
+            alert("Error during recalculation");
           }
         } catch (err) {
           console.error(err);
-          alert("Fehler bei der Neuberechnung");
+          alert("Error during recalculation");
         }
       });
     });

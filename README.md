@@ -29,9 +29,9 @@ With `OwnRide` I try to give a lightweight, community driven alternative to main
 
 ## Roadmap / Open TODOs
 
+- [ ] Add picture of bike, date of purchase, ...?
 - [ ] Insert "events" such as "repair/service meeting"
 - [ ] Export all files (including meta data)?
-- [ ] Add additional tags for filtering (Bike, Route, Equipment?, etc.)
 - [ ] Add more graphs for e.g. "Speed & slope"
 - [ ] Optimize performance (caching, persistent pre-calculation)
 

@@ -1,0 +1,109 @@
+{#include base showYearFilter=false}
+    <h1 class="title">Bikes</h1>
+
+    <div class="box">
+        <h2 class="title is-4">Add New Bike</h2>
+        <form action="/own/bikes" method="POST">
+            <div class="field is-horizontal">
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input class="input" type="text" name="producer" placeholder="Producer (e.g. Canyon)" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <input class="input" type="text" name="name" placeholder="Name (e.g. Endurace)" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <button class="button is-primary" type="submit">Create</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="box">
+        <h2 class="title is-4">Inventory</h2>
+        <table class="table is-striped is-hoverable is-fullwidth">
+            <thead>
+                <tr>
+                    <th>Producer</th>
+                    <th>Name</th>
+                    <th class="has-text-centered">Total Distance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {#for entry in bikes}
+                <tr>
+                    <td>
+                        <form id="edit-form-{entry.bike.id}" action="/own/bikes/{entry.bike.id}" method="POST" style="display: none;">
+                            <input class="input is-small" type="text" name="producer" value="{entry.bike.producer}" required>
+                        </form>
+                        <span id="view-producer-{entry.bike.id}">{entry.bike.producer}</span>
+                    </td>
+                    <td>
+                        <input class="input is-small" type="text" name="name" value="{entry.bike.name}" required form="edit-form-{entry.bike.id}" style="display: none;" id="edit-form-name-{entry.bike.id}">
+                        <span id="view-name-{entry.bike.id}">{entry.bike.name}</span>
+                    </td>
+                    <td class="has-text-centered">{entry.totalDistance}</td>
+                    <td>
+                        <div class="buttons are-small">
+                            <button class="button is-info is-outlined edit-button" data-id="{entry.bike.id}">
+                                <span class="icon">
+                                    <i class="fas fa-edit"></i>
+                                </span>
+                            </button>
+                            <button class="button is-success is-outlined save-button" data-id="{entry.bike.id}" style="display: none;" onclick="document.getElementById('edit-form-{entry.bike.id}').submit()">
+                                <span class="icon">
+                                    <i class="fas fa-save"></i>
+                                </span>
+                            </button>
+                            <button class="button is-danger is-outlined delete-bike" data-id="{entry.bike.id}">
+                                <span class="icon">
+                                    <i class="fas fa-trash"></i>
+                                </span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {/for}
+            </tbody>
+        </table>
+    </div>
+
+    <script src="/own/modal.js" defer></script>
+    <script>
+        document.querySelectorAll('.edit-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const id = button.dataset.id;
+                document.getElementById('edit-form-' + id).style.display = 'block';
+                document.getElementById('edit-form-name-' + id).style.display = 'block';
+                document.getElementById('view-producer-' + id).style.display = 'none';
+                document.getElementById('view-name-' + id).style.display = 'none';
+                button.style.display = 'none';
+                button.parentElement.querySelector('.save-button').style.display = 'inline-flex';
+            });
+        });
+    </script>
+    <div id="confirmModal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title" id="confirmModalTitle">Confirm Action</p>
+                <button class="delete" aria-label="close" id="closeModal"></button>
+            </header>
+            <section class="modal-card-body">
+                <p id="confirmModalMessage">Are you sure?</p>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-success" id="confirmModalAction">Confirm</button>
+                <button class="button" id="cancelModal">Cancel</button>
+            </footer>
+        </div>
+    </div>
+{/include}

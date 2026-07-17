@@ -15,7 +15,9 @@ public class Templates {
   public static native TemplateInstance activities(
       List<ActivityResponse> data, List<Integer> availableYears);
 
-  public static native TemplateInstance activity(ActivityResponse data);
+  public static native TemplateInstance activity(ActivityResponse data, List<Bike> bikes);
+
+  public static native TemplateInstance bikes(List<BikeResponse> bikes);
 
   public static native TemplateInstance notFound();
 

@@ -139,6 +139,27 @@ public class ActivityService {
   }
 
   @Transactional
+  Activity linkBike(UUID id, @Nullable UUID bikeId) {
+    ActivityData data =
+        activityDataRepository
+            .findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Activity data not found"));
+
+    if (bikeId == null) {
+      data.setBike(null);
+    } else {
+      BikeData bike = em.find(BikeData.class, bikeId);
+      if (bike == null) {
+        throw new IllegalArgumentException("Bike not found");
+      }
+      data.setBike(bike);
+    }
+
+    em.merge(data);
+    return new Activity(data);
+  }
+
+  @Transactional
   Activity recalculateActivity(UUID id) {
     ActivityData data =
         activityDataRepository
