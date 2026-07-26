@@ -8,10 +8,11 @@ function getChartTheme() {
         subtitleColor,
         barColor: primaryColor + '99', // ~60% opacity
         lineBgColor: primaryColor + '33', // ~20% opacity
-        slopeEasy: style.getPropertyValue('--slope-easy').trim() || '#add8e6',
-        slopeMedium: style.getPropertyValue('--slope-medium').trim() || '#87ceeb',
-        slopeHard: style.getPropertyValue('--slope-hard').trim() || '#4682b4',
-        slopeVeryHard: style.getPropertyValue('--slope-very-hard').trim() || '#00008b',
+        slopeVeryEasy: style.getPropertyValue('--slope-easy').trim() || '#add8e6',
+        slopeEasy: style.getPropertyValue('--slope-easy').trim() || '#87ceeb',
+        slopeMedium: style.getPropertyValue('--slope-medium').trim() || '#4682b4',
+        slopeHard: style.getPropertyValue('--slope-hard').trim() || '#1e0bd0',
+        slopeVeryHard: style.getPropertyValue('--slope-very-hard').trim() || '#1f104f',
         fontFamily: "'Inter', sans-serif"
     };
 }
