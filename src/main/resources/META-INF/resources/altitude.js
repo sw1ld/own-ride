@@ -119,9 +119,10 @@ function updateAltitudeChart(route, distance) {
 
   const getSlopeColor = (slope) => {
     const absSlope = Math.abs(slope);
-    if (absSlope <= 3) return theme.slopeEasy;
-    if (absSlope <= 8) return theme.slopeMedium;
-    if (absSlope <= 13) return theme.slopeHard;
+    if (absSlope <= 3) return theme.slopeVeryEasy;
+    if (absSlope <= 6) return theme.slopeEasy;
+    if (absSlope <= 9) return theme.slopeMedium;
+    if (absSlope <= 12) return theme.slopeHard;
     return theme.slopeVeryHard;
   };
 
