@@ -136,6 +136,18 @@ public class ActivitiesResource {
     return Response.ok().entity(new ActivityResponse(activityService.linkBike(id, bikeId))).build();
   }
 
+  @PUT
+  @Path("/id/{id}/name")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response setName(@PathParam("id") UUID id, String name) {
+    Optional<Activity> activity = activityService.fetchActivityBy(id);
+    if (activity.isEmpty()) {
+      return Response.status(404).entity(notFoundProblem(id)).build();
+    }
+    return Response.ok().entity(new ActivityResponse(activityService.updateName(id, name))).build();
+  }
+
   private static HttpProblem notFoundProblem(UUID id) {
     return HttpProblem.valueOf(
         Status.NOT_FOUND, "Activity with id '%s' does not exist".formatted(id));

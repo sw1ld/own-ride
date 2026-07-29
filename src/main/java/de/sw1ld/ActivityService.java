@@ -160,6 +160,22 @@ public class ActivityService {
   }
 
   @Transactional
+  Activity updateName(UUID id, String name) {
+    // 404 cannot happen since it was fetched in the controller already
+    // TODO do not only pass the ID but the whole object?
+    ActivityData data =
+        activityDataRepository
+            .findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Activity data not found"));
+
+    data.setName(name);
+    data.setLastModified(LocalDateTime.now());
+
+    em.merge(data);
+    return new Activity(data);
+  }
+
+  @Transactional
   Activity recalculateActivity(UUID id) {
     ActivityData data =
         activityDataRepository
