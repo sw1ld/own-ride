@@ -33,7 +33,9 @@ With `OwnRide` I try to give a lightweight, community driven alternative to main
 - [ ] Insert "events" such as "repair/service meeting"
 - [ ] Export all files (including meta data)?
 - [ ] Add more graphs for e.g. "Speed & slope"
-- [ ] Optimize performance (caching, persistent pre-calculation)
+- [ ] Optimize performance (caching)
+- [ ] Add notes to route (explain e.g. grading)
+- [ ] Allow grouping of routes (aggregate data for e.g. multiple days trip)
 
 
 ## Local Setup
