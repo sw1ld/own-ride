@@ -10,7 +10,7 @@
         <div class="level">
             <div class="level-left">
                 <div>
-                    <h1 class="title">{data.displayName}</h1>
+                    <h1 class="title editable-name" contenteditable="true" data-id="{data.id}">{data.displayName}</h1>
                     <h2 class="subtitle">{data.date}</h2>
                     <div class="rating" data-id="{data.id}" data-rate="{data.rate}">
                         <i class="fas fa-star {#if data.rate >= 5}active{/if}" data-value="5"></i>
@@ -147,6 +147,45 @@
     <script src="/own/map.js" defer></script>
     <script src="/own/modal.js" defer></script>
     <script src="/own/rating.js" defer></script>
+    <script>
+        document.querySelectorAll('.editable-name').forEach(element => {
+            element.addEventListener('blur', async (e) => {
+                const id = element.dataset.id;
+                const newName = element.innerText.trim();
+                
+                try {
+                    const response = await fetch('/own/activities/id/' + id + '/name', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: newName
+                    });
+
+                    if (response.ok) {
+                        const updated = await response.json();
+                        // Update breadcrumb and other places if needed, but for KISS, reload or just let it be
+                        // window.location.reload(); 
+                        // Just update the element to the display name returned by the server
+                        element.innerText = updated.displayName;
+                        document.querySelector('.breadcrumb li.is-active a').innerText = updated.displayName;
+                    } else {
+                        alert("Fehler beim Speichern des Namens");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Fehler beim Speichern des Namens");
+                }
+            });
+
+            element.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    element.blur();
+                }
+            });
+        });
+    </script>
     <script>
         const dropdown = document.getElementById('bikeDropdown');
         dropdown.querySelector('.dropdown-trigger button').addEventListener('click', (e) => {
