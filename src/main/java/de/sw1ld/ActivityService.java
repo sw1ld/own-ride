@@ -119,12 +119,14 @@ public class ActivityService {
   }
 
   @Transactional
-  Activity setUserRating(UUID id, Rate rate) {
-    ActivityData data =
-        activityDataRepository
-            .findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Activity data not found"));
+  Optional<Activity> setUserRating(UUID activityId, Integer unvalidatedRate) {
+    Optional<ActivityData> activityData = activityDataRepository.findById(activityId);
+    if (activityData.isEmpty()) {
+      return Optional.empty();
+    }
+    Rate rate = new Rate(unvalidatedRate);
 
+    ActivityData data = activityData.get();
     Integer existingRate = data.getRate();
 
     if (existingRate != null && existingRate.equals(rate.value())) {
@@ -135,15 +137,16 @@ public class ActivityService {
 
     em.merge(data);
 
-    return new Activity(data);
+    return Optional.of(new Activity(data));
   }
 
   @Transactional
-  Activity linkBike(UUID id, @Nullable UUID bikeId) {
-    ActivityData data =
-        activityDataRepository
-            .findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Activity data not found"));
+  Optional<Activity> linkBike(UUID activityId, @Nullable UUID bikeId) {
+    Optional<ActivityData> activityData = activityDataRepository.findById(activityId);
+    if (activityData.isEmpty()) {
+      return Optional.empty();
+    }
+    ActivityData data = activityData.get();
 
     if (bikeId == null) {
       data.setBike(null);
@@ -156,31 +159,30 @@ public class ActivityService {
     }
 
     em.merge(data);
-    return new Activity(data);
+    return Optional.of(new Activity(data));
   }
 
   @Transactional
-  Activity updateName(UUID id, String name) {
-    // 404 cannot happen since it was fetched in the controller already
-    // TODO do not only pass the ID but the whole object?
-    ActivityData data =
-        activityDataRepository
-            .findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Activity data not found"));
-
+  Optional<Activity> updateName(UUID activityId, String name) {
+    Optional<ActivityData> activityData = activityDataRepository.findById(activityId);
+    if (activityData.isEmpty()) {
+      return Optional.empty();
+    }
+    ActivityData data = activityData.get();
     data.setName(name);
     data.setLastModified(LocalDateTime.now());
 
     em.merge(data);
-    return new Activity(data);
+    return Optional.of(new Activity(data));
   }
 
   @Transactional
-  Activity recalculateActivity(UUID id) {
-    ActivityData data =
-        activityDataRepository
-            .findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Activity data not found"));
+  Optional<Activity> recalculateActivity(UUID activityId) {
+    Optional<ActivityData> activityData = activityDataRepository.findById(activityId);
+    if (activityData.isEmpty()) {
+      return Optional.empty();
+    }
+    ActivityData data = activityData.get();
 
     Decode decode = new Decode();
     MesgBroadcaster broadcaster = new MesgBroadcaster(decode);
@@ -209,7 +211,7 @@ public class ActivityService {
       data.setPositions(rec.getPositions());
 
       em.merge(data);
-      return new Activity(data);
+      return Optional.of(new Activity(data));
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }
