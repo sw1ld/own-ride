@@ -142,7 +142,8 @@ class ActivityResourceTest {
 
   @Test
   void rateActivityWithInvalidRating_shouldFail() {
-    when(activityService.fetchActivityBy(any())).thenReturn(Optional.of(mock(Activity.class)));
+    when(activityService.setUserRating(any(), any()))
+        .thenThrow(new IllegalRateException("Rate value must be between 0 and 5"));
 
     given()
         .when()

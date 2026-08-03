@@ -92,13 +92,12 @@ public class ActivitiesResource {
   @Path("/id/{id}")
   @Produces(MediaType.APPLICATION_JSON)
   public Response recalculate(@PathParam("id") UUID id) {
-    Optional<Activity> activity = activityService.fetchActivityBy(id);
+    Optional<Activity> activity = activityService.recalculateActivity(id);
     if (activity.isEmpty()) {
       return Response.status(404).entity(notFoundProblem(id)).build();
     }
-    return Response.ok()
-        .entity(new ActivityResponse(activityService.recalculateActivity(id)))
-        .build();
+
+    return Response.ok().entity(new ActivityResponse(activity.get())).build();
   }
 
   @PUT
@@ -106,22 +105,18 @@ public class ActivitiesResource {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response rateActivity(@PathParam("id") UUID id, Integer rate) {
-    Optional<Activity> activity = activityService.fetchActivityBy(id);
-    if (activity.isEmpty()) {
-      return Response.status(404).entity(notFoundProblem(id)).build();
-    }
-    Rate validRate;
     try {
-      validRate = new Rate(rate);
-    } catch (IllegalArgumentException e) {
+      Optional<Activity> activity = activityService.setUserRating(id, rate);
+      if (activity.isEmpty()) {
+        return Response.status(404).entity(notFoundProblem(id)).build();
+      }
+
+      return Response.ok().entity(new ActivityResponse(activity.get())).build();
+    } catch (IllegalRateException e) {
       return Response.status(Status.BAD_REQUEST)
           .entity(HttpProblem.valueOf(Status.BAD_REQUEST, e.getMessage()))
           .build();
     }
-
-    return Response.ok()
-        .entity(new ActivityResponse(activityService.setUserRating(id, validRate)))
-        .build();
   }
 
   @PUT
@@ -129,11 +124,12 @@ public class ActivitiesResource {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response setBike(@PathParam("id") UUID id, UUID bikeId) {
-    Optional<Activity> activity = activityService.fetchActivityBy(id);
+    Optional<Activity> activity = activityService.linkBike(id, bikeId);
     if (activity.isEmpty()) {
       return Response.status(404).entity(notFoundProblem(id)).build();
     }
-    return Response.ok().entity(new ActivityResponse(activityService.linkBike(id, bikeId))).build();
+
+    return Response.ok().entity(new ActivityResponse(activity.get())).build();
   }
 
   @PUT
@@ -141,11 +137,12 @@ public class ActivitiesResource {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response setName(@PathParam("id") UUID id, String name) {
-    Optional<Activity> activity = activityService.fetchActivityBy(id);
+    Optional<Activity> activity = activityService.updateName(id, name);
     if (activity.isEmpty()) {
       return Response.status(404).entity(notFoundProblem(id)).build();
     }
-    return Response.ok().entity(new ActivityResponse(activityService.updateName(id, name))).build();
+
+    return Response.ok().entity(new ActivityResponse(activity.get())).build();
   }
 
   private static HttpProblem notFoundProblem(UUID id) {
