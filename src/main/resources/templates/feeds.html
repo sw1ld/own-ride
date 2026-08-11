@@ -1,0 +1,76 @@
+{#for entry in data}
+    <div class="card mb-2 clickable-card" draggable="true" data-id="{entry.id}" data-type="{entry.type}" style="cursor: pointer; border-radius: 6px; transition: transform 0.1s, box-shadow 0.1s; {#if entry.type.name == 'GROUP'}border-left: 3px solid #0B4587;{/if}">
+        <div class="card-content p-3">
+            <div class="columns is-mobile is-vcentered">
+                <div class="column is-narrow">
+                    <div style="width: 64px; height: 64px; background-color: #e8f1ff; border: 1px solid #0B4587; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                        {#if entry.thumbnail}
+                            {entry.thumbnail.raw}
+                        {#else}
+                            <i class="fas fa-layer-group has-text-link"></i>
+                        {/if}
+                    </div>
+                </div>
+                <div class="column">
+                    <h3 class="title is-6 mb-0 has-text-dark">{entry.displayName}</h3>
+                    <p></p> <!-- do not overlap name and date -->
+                    <p class="subtitle is-7 has-text-grey mb-0">{entry.date}</p>
+                </div>
+                <div class="column is-hidden-mobile">
+                    <div class="columns is-mobile has-text-centered">
+                        <div class="column py-0">
+                            {#if entry.type.name == 'GROUP'}
+                                <p class="heading mb-0">Total Distance</p>
+                            {#else}
+                                <p class="heading mb-0">Distance</p>
+                            {/if}
+                            <p class="is-size-7 has-text-weight-bold">{entry.distance}</p>
+                        </div>
+                        <div class="column py-0">
+                            {#if entry.type.name == 'GROUP'}
+                                <p class="heading mb-0">Total Duration</p>
+                            {#else}
+                                <p class="heading mb-0">Duration</p>
+                            {/if}
+                            <p class="is-size-7 has-text-weight-bold">{entry.duration}</p>
+                        </div>
+                        <div class="column py-0">
+                            <p class="heading mb-0">Ø Speed</p>
+                            <p class="is-size-7 has-text-weight-bold">{entry.avgSpeed}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-narrow has-text-right">
+                    <div class="rating is-small" data-id="{entry.id}" data-type="{entry.type}" data-rate="{entry.rate ?: 0}">
+                        <i class="fas fa-star {#if entry.rate && entry.rate >= 5}active{/if}" data-value="5"></i>
+                        <i class="fas fa-star {#if entry.rate && entry.rate >= 4}active{/if}" data-value="4"></i>
+                        <i class="fas fa-star {#if entry.rate && entry.rate >= 3}active{/if}" data-value="3"></i>
+                        <i class="fas fa-star {#if entry.rate && entry.rate >= 2}active{/if}" data-value="2"></i>
+                        <i class="fas fa-star {#if entry.rate && entry.rate >= 1}active{/if}" data-value="1"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="columns is-mobile is-hidden-tablet has-text-centered mt-1 pt-1" style="border-top: 1px solid #eee;">
+                <div class="column py-0">
+                    <p class="heading mb-0">Distance</p>
+                    <p class="is-size-7">{entry.distance}</p>
+                </div>
+                <div class="column py-0">
+                    <p class="heading mb-0">Duration</p>
+                    <p class="is-size-7">{entry.duration}</p>
+                </div>
+                <div class="column py-0">
+                    <p class="heading mb-0">Ø Speed</p>
+                    <p class="is-size-7">{entry.avgSpeed}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{/for}
+{#if nextCursor}
+    <div hx-get="/own/activities/feed?cursor={nextCursor}"
+         hx-trigger="revealed"
+         hx-swap="outerHTML">
+        Fetch more ...
+    </div>
+{/if}

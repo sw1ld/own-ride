@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="{width}" height="{height}">
+
+  <rect width="{width}" height="{height}" rx="14" fill="#f5f5f5"/>
+
+  <polyline points="{points.raw}"
+    fill="none"
+    stroke="#072d59"
+    stroke-width="{strokeWidth}"
+    stroke-linecap="round"
+    stroke-linejoin="round"/>
+
+  <circle cx="{startX}" cy="{startY}" r="6" fill="#2ecc71" stroke="white" stroke-width="1"/>
+  <circle cx="{endX}" cy="{endY}" r="6" fill="#f14668" stroke="white" stroke-width="1"/>
+</svg>

@@ -12,10 +12,13 @@ public class Templates {
   public static native TemplateInstance statistics(
       StatisticResponse stats, List<Integer> availableYears);
 
-  public static native TemplateInstance activities(
-      List<ActivityResponse> data, List<Integer> availableYears);
+  public static native TemplateInstance activities(List<FeedItem> data, String nextCursor);
+
+  public static native TemplateInstance feeds(List<FeedItem> data, String nextCursor);
 
   public static native TemplateInstance activity(ActivityResponse data, List<Bike> bikes);
+
+  public static native TemplateInstance group(GroupResponse data);
 
   public static native TemplateInstance bikes(List<BikeResponse> bikes);
 

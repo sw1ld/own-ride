@@ -42,7 +42,10 @@ window.hideHoverPointOnMap = function() {
 window.loadRoute = async function(id) {
   if (!map) return;
   try {
-    const response = await fetch(`/own/activities/id/${encodeURIComponent(id)}`, {
+    const isGroup = window.location.pathname.includes('/groups/');
+    const url = isGroup ? `/own/groups/id/${encodeURIComponent(id)}` : `/own/activities/id/${encodeURIComponent(id)}`;
+    
+    const response = await fetch(url, {
       headers: {
         'Accept': 'application/json'
       },
@@ -107,8 +110,11 @@ window.loadRoute = async function(id) {
 
     // Zoom map to route
     map.fitBounds(currentPolyline.getBounds());
-
-    updateAltitudeChart(currentRoute, data.distance);
+    
+    const altitudeChart = document.getElementById('altitudeChart');
+    if (altitudeChart && typeof updateAltitudeChart === 'function') {
+      updateAltitudeChart(currentRoute, data.distance);
+    }
 
   } catch (err) {
     console.error(err);

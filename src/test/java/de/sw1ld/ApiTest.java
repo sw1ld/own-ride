@@ -16,7 +16,9 @@ import io.restassured.response.ValidatableResponse;
 import jakarta.ws.rs.core.MediaType;
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -45,7 +47,6 @@ class ApiTest {
 
     given()
         .accept(MediaType.APPLICATION_JSON)
-        .queryParam("year", YEAR)
         .when()
         .get("/activities")
         .then()
@@ -76,19 +77,21 @@ class ApiTest {
 
   @Test
   @Order(2)
-  void uploadFile() {
-    File fitFile = new File("src/test/resources/testdata/2021-04-27_Route1.fit");
+  void uploadFiles() {
+    File route1 = new File("src/test/resources/testdata/2021-04-27_Route1.fit");
+    File route2 = new File("src/test/resources/testdata/2021-08-15_Route2.fit");
 
     given()
         .contentType(ContentType.MULTIPART)
         .accept(MediaType.APPLICATION_JSON)
-        .multiPart("file", fitFile)
+        .multiPart("file", route1)
+        .multiPart("file", route2)
         .multiPart("file", "") // empty input by HTML form
         .when()
         .post("/upload")
         .then()
         .statusCode(201)
-        .body("", hasSize(1));
+        .body("", hasSize(2));
 
     given()
         .accept(MediaType.APPLICATION_JSON)
@@ -97,12 +100,12 @@ class ApiTest {
         .get("/stats")
         .then()
         .statusCode(200)
-        .body("rides", equalTo(1))
-        .body("distance", equalTo("34.68 km"))
+        .body("rides", equalTo(2))
+        .body("distance", equalTo("66.71 km"))
         .body("tourDates.2021-01-01", equalTo(0.0F))
         .body("tourDates.2021-04-27", greaterThan(34.0F));
 
-    ActivityResponse activity = firstActivity(YEAR);
+    ActivityResponse activity = firstActivity();
     assertThat(activity.displayName()).isEqualTo("Route1");
     assertThat(activity.date()).isEqualTo("2021-04-27");
     assertThat(activity.distance()).isEqualTo("34.68 km");
@@ -137,13 +140,13 @@ class ApiTest {
         .get("/stats")
         .then()
         .statusCode(200)
-        .body("rides", equalTo(1));
+        .body("rides", equalTo(2));
   }
 
   @Test
   @Order(4)
   void recalculateActivity() {
-    ActivityResponse activity = firstActivity(YEAR);
+    ActivityResponse activity = firstActivity();
 
     given().when().put("/activities/id/" + activity.id()).then().statusCode(200);
 
@@ -160,7 +163,7 @@ class ApiTest {
   @Test
   @Order(5)
   void rateActivity() {
-    ActivityResponse activity = firstActivity(YEAR);
+    ActivityResponse activity = firstActivity();
     assertThat(activity.rate()).isZero(); // default rating
 
     // set rating to 3
@@ -217,7 +220,7 @@ class ApiTest {
   @Order(21)
   void linkBikeToActivity() {
     UUID bikeId = firstBikeId();
-    ActivityResponse activity = firstActivity(YEAR);
+    ActivityResponse activity = firstActivity();
 
     given()
         .contentType(ContentType.JSON)
@@ -266,9 +269,58 @@ class ApiTest {
   }
 
   @Test
+  @Order(30)
+  void groupActivity() {
+    Set<UUID> activityIds =
+        fetchActvities().stream().map(ActivityResponse::id).collect(Collectors.toSet());
+
+    GroupResponse groupResponse =
+        given()
+            .contentType(ContentType.JSON)
+            .body(activityIds)
+            .when()
+            .post("/groups")
+            .then()
+            .statusCode(201)
+            .extract()
+            .as(GroupResponse.class);
+
+    assertThat(groupResponse.id()).isNotNull();
+    assertThat(groupResponse.displayName()).isEqualTo("New Group");
+    assertThat(groupResponse.distance()).isEqualTo("66.71 km");
+    assertThat(groupResponse.activities()).hasSize(2);
+  }
+
+  @Test
+  @Order(31)
+  void ungroup() {
+    List<GroupResponse> allGroups =
+        given().when().get("/groups").then().statusCode(200).extract().as(new TypeRef<>() {});
+
+    assertThat(allGroups).hasSize(1);
+    GroupResponse groupToUnresolve = allGroups.getFirst();
+
+    UUID anyActivityIdToUngroup =
+        groupToUnresolve.activities().stream().map(ActivityResponse::id).findAny().get();
+
+    given()
+        .when()
+        .contentType(ContentType.JSON)
+        .body("\"" + anyActivityIdToUngroup + "\"")
+        .delete("/groups/id/" + groupToUnresolve.id())
+        .then()
+        .statusCode(200)
+        .header("X-Group-Dissolved", "true");
+
+    List<GroupResponse> groupsAfterUnresolvingActivity =
+        given().when().get("/groups").then().statusCode(200).extract().as(new TypeRef<>() {});
+    assertThat(groupsAfterUnresolvingActivity).isEmpty();
+  }
+
+  @Test
   @Order(100)
   void deleteBikeAndAssignments() {
-    Bike bike = firstActivity(YEAR).bike();
+    Bike bike = firstActivity().bike();
 
     given().when().delete("/bikes/id/" + bike.id()).then().statusCode(204);
 
@@ -280,13 +332,13 @@ class ApiTest {
         .statusCode(200)
         .body("", hasSize(0));
 
-    assertThat(firstActivity(YEAR).bike()).isNull();
+    assertThat(firstActivity().bike()).isNull();
   }
 
   @Test
   @Order(101)
   void deleteActivity() {
-    UUID id = firstActivity(YEAR).id();
+    UUID id = firstActivity().id();
 
     given()
         .accept(MediaType.APPLICATION_JSON)
@@ -314,17 +366,19 @@ class ApiTest {
         .body("detail", equalTo("Activity with id '%s' does not exist".formatted(id)));
   }
 
-  private static ActivityResponse firstActivity(int year) {
+  private static List<ActivityResponse> fetchActvities() {
     return given()
         .accept(MediaType.APPLICATION_JSON)
-        .queryParam("year", year)
         .when()
         .get("/activities")
         .then()
         .statusCode(200)
-        .body("", hasSize(1))
         .extract()
-        .as(ActivityResponse[].class)[0];
+        .as(new TypeRef<>() {});
+  }
+
+  private static ActivityResponse firstActivity() {
+    return fetchActvities().getLast(); // newest activity are ranked first!
   }
 
   private static UUID firstBikeId() {

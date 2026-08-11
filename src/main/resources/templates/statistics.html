@@ -1,4 +1,19 @@
-{#include base showYearFilter=true}
+{#include base}
+    <div class="columns">
+        <div class="column is-3-tablet is-12-mobile">
+            <div class="field">
+                <div class="control">
+                    <div class="select is-fullwidth">
+                        <select id="yearFilter" style="border-radius: 8px;">
+                            {#for y in availableYears}
+                                <option value="{y}">{y}</option>
+                            {/for}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <h1 class="title">Dashboard</h1>
     <div class="box">
         <h2 class="title is-4">Summary</h2>
@@ -42,6 +57,7 @@
     </div>
 
     <script src="/own/stats.js" defer></script>
+    <script src="/own/filters.js" defer></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             if (typeof loadStatistics === 'function') {

@@ -2,6 +2,7 @@ package de.sw1ld;
 
 import com.garmin.fit.Decode;
 import com.garmin.fit.MesgBroadcaster;
+import de.sw1ld.thumbnails.ThumbnailService;
 import jakarta.annotation.Nullable;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
@@ -20,23 +21,35 @@ import org.jspecify.annotations.NonNull;
 @ApplicationScoped
 public class ActivityService {
 
+  private static final int FEED_LIMIT = 20;
   @PersistenceContext EntityManager em;
   private final ActivityDataRepository activityDataRepository;
+  private final ThumbnailService thumbnailService;
 
-  public ActivityService(ActivityDataRepository activityDataRepository) {
+  public ActivityService(
+      ActivityDataRepository activityDataRepository, ThumbnailService thumbnailService) {
     this.activityDataRepository = activityDataRepository;
+    this.thumbnailService = thumbnailService;
   }
 
   Optional<Activity> fetchActivityBy(UUID id) {
     return activityDataRepository.findById(id).map(Activity::new);
   }
 
-  List<Activity> fetchActivities(@Nullable Integer year) {
-    if (year == null) {
-      return activityDataRepository.findAll().stream().map(Activity::new).toList();
-    } else {
-      return activityDataRepository.findByYear(year).stream().map(Activity::new).toList();
+  Fragment fetchActivities(@Nullable String encodedCursor) {
+    Cursor cursor = Cursor.decode(encodedCursor);
+
+    List<Activity> items =
+        activityDataRepository.fetchFeed(cursor, FEED_LIMIT).stream().map(Activity::new).toList();
+
+    boolean hasMore = items.size() > FEED_LIMIT;
+    Cursor nextCursor = null;
+    if (hasMore) {
+      items = items.subList(0, FEED_LIMIT);
+      nextCursor = new Cursor(items.getLast().date(), items.getLast().id());
     }
+
+    return new Fragment(items, nextCursor);
   }
 
   List<PerformanceData> fetchPerformanceData(@NonNull Integer year) {
@@ -108,6 +121,7 @@ public class ActivityService {
       data.setLastModified(LocalDateTime.now());
       data.setRate(0);
       data.setPositions(rec.getPositions());
+      data.setThumbnail(thumbnailService.renderSvg(rec.getPositions()));
 
       em.persist(activityRaw);
       em.persist(data);
@@ -209,6 +223,7 @@ public class ActivityService {
       data.setTimeCreated(fileId.getTimeCreated());
       data.setLastModified(LocalDateTime.now());
       data.setPositions(rec.getPositions());
+      data.setThumbnail(thumbnailService.renderSvg(rec.getPositions()));
 
       em.merge(data);
       return Optional.of(new Activity(data));

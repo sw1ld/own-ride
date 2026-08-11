@@ -1,0 +1,162 @@
+{#include base}
+    <div class="container">
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+            <ul>
+                <li><a href="/own/activities">Activities</a></li>
+                <li class="is-active"><a href="#" aria-current="page">{data.displayName}</a></li>
+            </ul>
+        </nav>
+
+        <div class="level">
+            <div class="level-left">
+                <div>
+                    <h1 class="title editable-group-name" contenteditable="true" data-id="{data.id}">{data.displayName}</h1>
+                    <p class="subtitle is-6">{data.date}</p>
+                    <div class="rating" data-id="{data.id}" data-type="group" data-rate="{data.rate ?: 0}">
+                        <i class="fas fa-star {#if data.rate && data.rate >= 5}active{/if}" data-value="5"></i>
+                        <i class="fas fa-star {#if data.rate && data.rate >= 4}active{/if}" data-value="4"></i>
+                        <i class="fas fa-star {#if data.rate && data.rate >= 3}active{/if}" data-value="3"></i>
+                        <i class="fas fa-star {#if data.rate && data.rate >= 2}active{/if}" data-value="2"></i>
+                        <i class="fas fa-star {#if data.rate && data.rate >= 1}active{/if}" data-value="1"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="level-right">
+                <a href="/own/activities" class="button is-link is-outlined">
+                <span class="icon">
+                    <i class="fas fa-arrow-left"></i>
+                </span>
+                    <span>Back to list</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="box">
+            <div class="level mb-4">
+                <div class="level-left">
+                    <h3 class="title is-5">Tour Information</h3>
+                </div>
+            </div>
+
+            <!-- show less important infos as tags -->
+            <div class="tags are-medium">
+                {#if data.temperature != '/'}
+                    <span class="tag">{data.temperature}</span>
+                {/if}
+                {#if data.bike}
+                    <span class="tag">
+                    <span class="icon is-small mr-1">
+                        <i class="fas fa-bicycle"></i>
+                    </span>
+                    {data.bike.producer} {data.bike.name}
+                </span>
+                {/if}
+            </div>
+
+            <div class="columns is-multiline has-text-centered mt-4">
+                <div class="column is-3">
+                    <p class="title is-5 mb-1">{data.distance}</p>
+                    <p class="heading">Total Distance</p>
+                </div>
+                <div class="column is-3">
+                    <p class="title is-5 mb-1">{data.duration}</p>
+                    <p class="heading">Total Duration</p>
+                </div>
+                <div class="column is-3">
+                    <p class="title is-5 mb-1">{data.avgSpeed}</p>
+                    <div class="heading">Ø Speed</div>
+                </div>
+                <div class="column is-3">
+                    <p class="title is-5 mb-1">{data.totalAscent}</p>
+                    <p class="heading">Total Ascent</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="box">
+            <h2 class="title is-5">Distinct Activities</h2>
+            <div class="activity-feed">
+                {#for entry in data.activities}
+                    <div class="card mb-2 clickable-activity" data-id="{entry.id}" style="cursor: pointer; border-radius: 6px; transition: transform 0.1s, box-shadow 0.1s;">
+                        <div class="card-content p-3">
+                            <div class="columns is-mobile is-vcentered">
+                                <div class="column is-narrow">
+                                    <div style="width: 64px; height: 64px; background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                                        {#if entry.thumbnail}
+                                            {entry.thumbnail.raw}
+                                        {#else}
+                                            <i class="fas fa-bicycle has-text-grey-light"></i>
+                                        {/if}
+                                    </div>
+                                </div>
+                                <div class="column">
+                                    <h3 class="title is-6 mb-0">
+                                        <a href="/own/activities/id/{entry.id}?groupName={data.displayName}&groupId={data.id}" class="has-text-dark">{entry.displayName}</a>
+                                    </h3>
+                                    <p></p> <!-- do not overlap name and date -->
+                                    <p class="subtitle is-7 has-text-grey mb-0">{entry.date}</p>
+                                </div>
+                                <div class="column is-narrow has-text-right">
+                                    <div class="field is-grouped is-grouped-right is-vcentered">
+                                        <div class="control">
+                                            <span class="tag is-info is-light">{entry.distance}</span>
+                                        </div>
+                                        <div class="control">
+                                            <button class="button is-small is-danger is-light remove-from-group" data-activity-id="{entry.id}" title="Remove from group">
+                                                <span class="icon">
+                                                    <i class="fas fa-unlink"></i>
+                                                </span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {/for}
+            </div>
+        </div>
+
+        <div class="box">
+            <h3 class="title is-5">Route</h3>
+            <div id="map" style="height: 400px;"></div>
+        </div>
+
+        <div class="box">
+            <h3 class="title is-5">Altitude profile</h3>
+            <div style="height: 200px;">
+                <canvas id="altitudeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/own/altitude.js" defer></script>
+    <script src="/own/map.js" defer></script>
+    <script src="/own/editable.js" defer></script>
+    <script src="/own/modal.js" defer></script>
+    <script src="/own/rating.js" defer></script>
+    <script>
+        document.querySelectorAll('.clickable-activity').forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('a') || e.target.closest('button')) return;
+                window.location.href = '/own/activities/id/' + card.dataset.id + '?groupName={data.displayName}&groupId={data.id}';
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof loadRoute === 'function') {
+                loadRoute('{data.id}');
+            }
+        });
+    </script>
+
+    <style>
+        .clickable-activity:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background-color: #fafafa;
+        }
+    </style>
+{/include}

@@ -46,6 +46,11 @@
       <artifactId>quarkus-resteasy-qute</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-jacoco</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.garmin</groupId>
       <artifactId>fit</artifactId>
       <version>21.205.0</version>

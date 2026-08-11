@@ -1,4 +1,4 @@
-{#include base showYearFilter=false}
+{#include base}
     <h1 class="title">Bikes</h1>
 
     <div class="box">
@@ -78,32 +78,18 @@
 
     <script src="/own/modal.js" defer></script>
     <script>
-        document.querySelectorAll('.edit-button').forEach(button => {
-            button.addEventListener('click', () => {
-                const id = button.dataset.id;
-                document.getElementById('edit-form-' + id).style.display = 'block';
-                document.getElementById('edit-form-name-' + id).style.display = 'block';
-                document.getElementById('view-producer-' + id).style.display = 'none';
-                document.getElementById('view-name-' + id).style.display = 'none';
-                button.style.display = 'none';
-                button.parentElement.querySelector('.save-button').style.display = 'inline-flex';
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.edit-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const id = button.dataset.id;
+                    document.getElementById('edit-form-' + id).style.display = 'block';
+                    document.getElementById('edit-form-name-' + id).style.display = 'block';
+                    document.getElementById('view-producer-' + id).style.display = 'none';
+                    document.getElementById('view-name-' + id).style.display = 'none';
+                    button.style.display = 'none';
+                    button.parentElement.querySelector('.save-button').style.display = 'inline-flex';
+                });
             });
         });
     </script>
-    <div id="confirmModal" class="modal">
-        <div class="modal-background"></div>
-        <div class="modal-card">
-            <header class="modal-card-head">
-                <p class="modal-card-title" id="confirmModalTitle">Confirm Action</p>
-                <button class="delete" aria-label="close" id="closeModal"></button>
-            </header>
-            <section class="modal-card-body">
-                <p id="confirmModalMessage">Are you sure?</p>
-            </section>
-            <footer class="modal-card-foot">
-                <button class="button is-success" id="confirmModalAction">Confirm</button>
-                <button class="button" id="cancelModal">Cancel</button>
-            </footer>
-        </div>
-    </div>
 {/include}

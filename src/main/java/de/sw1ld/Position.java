@@ -11,7 +11,7 @@ public record Position(double lat, double lon, float altitude, LocalDate timesta
         toDegree(latSemicircle),
         toDegree(lonSemicircle),
         altitude != null ? altitude : 0.0f,
-        convertDate(timestamp));
+        convertDate(timestamp)); // convert to LocalDateTime?
   }
 
   private static double toDegree(double semicircle) {

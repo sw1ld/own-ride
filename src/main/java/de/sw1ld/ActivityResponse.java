@@ -1,13 +1,13 @@
 package de.sw1ld;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
 public record ActivityResponse(
     UUID id,
+    FeedType type,
     String displayName,
-    LocalDate date,
+    String date,
     String distance,
     String duration,
     String elapsedTime,
@@ -17,23 +17,29 @@ public record ActivityResponse(
     String totalAscent,
     Integer rate,
     Bike bike,
-    List<Position> positions) {
+    UUID groupId,
+    String thumbnail,
+    List<Position> positions)
+    implements FeedItem {
 
-  public ActivityResponse(Activity fd) {
+  public ActivityResponse(Activity a) {
     this(
-        fd.id(),
-        toDisplayName(fd.name()),
-        fd.date(),
-        Prettyfier.distanceWithUnit(fd.distance()),
-        Prettyfier.duration(fd.duration()),
-        Prettyfier.duration(fd.elapsedTime()),
-        Prettyfier.speedWithUnit(fd.avgSpeed()),
-        Prettyfier.speedWithUnit(fd.maxSpeed()),
-        Prettyfier.temperatureWithUnit(fd.temperature()),
-        Prettyfier.withMeter(fd.totalAscent()),
-        fd.rate(),
-        fd.bike(),
-        fd.positions());
+        a.id(),
+        FeedType.ACTIVITY,
+        toDisplayName(a.name()),
+        a.date().toString(),
+        Prettyfier.distanceWithUnit(a.distance()),
+        Prettyfier.duration(a.duration()),
+        Prettyfier.duration(a.elapsedTime()),
+        Prettyfier.speedWithUnit(a.avgSpeed()),
+        Prettyfier.speedWithUnit(a.maxSpeed()),
+        Prettyfier.temperatureWithUnit(a.temperature()),
+        Prettyfier.withMeter(a.totalAscent()),
+        a.rate(),
+        a.bike(),
+        a.groupId(),
+        a.thumbnail(),
+        a.positions());
   }
 
   private static String toDisplayName(String filename) {

@@ -1,6 +1,7 @@
 package de.sw1ld;
 
 import io.quarkiverse.httpproblem.HttpProblem;
+import io.quarkus.qute.TemplateInstance;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -15,7 +16,6 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,47 +24,44 @@ import java.util.UUID;
 @RequestScoped
 public class ActivitiesResource {
 
-  private final ActivityService activityService;
+  private final ActivityApplicationService activityApplicationService;
   private final BikeService bikeService;
   @Context private HttpHeaders headers;
 
-  public ActivitiesResource(ActivityService activityService, BikeService bikeService) {
-    this.activityService = activityService;
+  public ActivitiesResource(
+      ActivityApplicationService activityApplicationService, BikeService bikeService) {
+    this.activityApplicationService = activityApplicationService;
     this.bikeService = bikeService;
   }
 
   @GET
   @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_HTML})
-  public Response activities(@QueryParam("year") Integer year) {
-    List<Activity> activities = activityService.fetchActivities(year);
+  public Response activities() {
+    ResponseFragment response = activityApplicationService.fetchFragment(null);
 
     if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
-      var years = activityService.getAvailableYears();
-
-      return Response.ok(
-              Templates.activities(
-                  activities.stream()
-                      .map(ActivityResponse::new)
-                      .sorted(Comparator.comparing(ActivityResponse::date).reversed())
-                      .toList(),
-                  years))
+      return Response.ok(Templates.activities(response.items(), response.nextEncodedCursor()))
           .build();
     } else {
-      return Response.ok()
-          .entity(
-              activities.stream()
-                  .map(ActivityResponse::new)
-                  .sorted(Comparator.comparing(ActivityResponse::date).reversed())
-                  .toList())
-          .build();
+      // FIXME: returning ResponseFragment causes lots of changes in the tests!
+      return Response.ok().entity(response.items()).build();
     }
+  }
+
+  @GET
+  @Path("/feed")
+  @Produces(MediaType.TEXT_HTML)
+  public TemplateInstance loadMore(@QueryParam("cursor") String encodedCursor) {
+    ResponseFragment response = activityApplicationService.fetchFragment(encodedCursor);
+
+    return Templates.feeds(response.items(), response.nextEncodedCursor());
   }
 
   @GET
   @Path("/id/{id}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_HTML})
   public Response activity(@PathParam("id") UUID id) {
-    Optional<Activity> activity = activityService.fetchActivityBy(id);
+    Optional<Activity> activity = activityApplicationService.fetchActivityBy(id);
 
     if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
       if (activity.isEmpty()) {
@@ -83,7 +80,7 @@ public class ActivitiesResource {
   @DELETE
   @Path("/id/{id}")
   public Response deleteActivity(@PathParam("id") UUID id) {
-    return activityService.deleteActivity(id)
+    return activityApplicationService.deleteActivity(id)
         ? Response.noContent().build()
         : Response.status(404).entity(notFoundProblem(id)).build();
   }
@@ -92,7 +89,7 @@ public class ActivitiesResource {
   @Path("/id/{id}")
   @Produces(MediaType.APPLICATION_JSON)
   public Response recalculate(@PathParam("id") UUID id) {
-    Optional<Activity> activity = activityService.recalculateActivity(id);
+    Optional<Activity> activity = activityApplicationService.recalculateActivity(id);
     if (activity.isEmpty()) {
       return Response.status(404).entity(notFoundProblem(id)).build();
     }
@@ -106,7 +103,7 @@ public class ActivitiesResource {
   @Produces(MediaType.APPLICATION_JSON)
   public Response rateActivity(@PathParam("id") UUID id, Integer rate) {
     try {
-      Optional<Activity> activity = activityService.setUserRating(id, rate);
+      Optional<Activity> activity = activityApplicationService.setUserRating(id, rate);
       if (activity.isEmpty()) {
         return Response.status(404).entity(notFoundProblem(id)).build();
       }
@@ -124,7 +121,7 @@ public class ActivitiesResource {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response setBike(@PathParam("id") UUID id, UUID bikeId) {
-    Optional<Activity> activity = activityService.linkBike(id, bikeId);
+    Optional<Activity> activity = activityApplicationService.linkBike(id, bikeId);
     if (activity.isEmpty()) {
       return Response.status(404).entity(notFoundProblem(id)).build();
     }
@@ -137,7 +134,7 @@ public class ActivitiesResource {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response setName(@PathParam("id") UUID id, String name) {
-    Optional<Activity> activity = activityService.updateName(id, name);
+    Optional<Activity> activity = activityApplicationService.updateName(id, name);
     if (activity.isEmpty()) {
       return Response.status(404).entity(notFoundProblem(id)).build();
     }
