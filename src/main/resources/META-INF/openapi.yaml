@@ -10,6 +10,7 @@ info:
 
 tags:
   - name: Activities
+  - name: Groups
   - name: Statistics
   - name: Upload
   - name: Bikes
@@ -19,23 +20,40 @@ paths:
     get:
       operationId: getActivities
       summary: 'Fetch all activities'
-      description: 'Returns a list of all activities, optionally filtered by year. Supports JSON and HTML.'
+      description: 'Returns a list of all activities.'
       tags:
         - Activities
-      parameters:
-        - name: year
-          in: query
-          description: 'Filter for a specific year'
-          schema:
-            type: integer
-            example: 2026
       responses:
         '200':
-          description: A list of activities.
+          description: 'A list of activities and groups order by date.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ActivityResponseList'
+                type: array
+                items:
+                  $ref: '#/components/schemas/FeedItem'
+            text/html:
+              schema:
+                type: string
+                format: html
+  /own/activities/feed:
+    get:
+      operationId: getFeed
+      summary: 'Fetch next fragment of activities.'
+      description: 'Returns a list of activities at cursor.'
+      tags:
+        - Activities
+      parameters:
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            description: 'Base64 encoded cursor pointing to next fragment.'
+            example: 'MjAyNi0wNS0wMyAyYjFjNDQ5YS01YjQwLTRlOGItOWNlNi01MmJhMzZlMjNkMWU='
+      responses:
+        '200':
+          description: 'A list of activities and groups order by date starting at cursor.'
+          content:
             text/html:
               schema:
                 type: string
@@ -330,6 +348,178 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFoundProblem'
 
+  /own/groups:
+    post:
+      operationId: createGroup
+      summary: 'Create a new activity group'
+      tags:
+        - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+      responses:
+        '201':
+          description: 'Group created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponse'
+        '400':
+          description: 'Request contains unknown Ids'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestProblem'
+      get:
+        operationId: fetchGroups
+        summary: 'Fetch all groups in an optional time range'
+        parameters:
+          - name: startDate
+            in: query
+            schema:
+              type: string
+              description: 'Optional start date to fetch groups from. Pattern: yyyy-mm-dd'
+              example: '2026-08-17'
+          - name: endDate
+            in: query
+            schema:
+              type: string
+              description: 'Optional end date to fetch groups from. Pattern: yyyy-mm-dd'
+              example: '2026-08-17'
+        tags:
+          - Groups
+        responses:
+          '200':
+            description: 'Ordered list of groups in given time range'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/GroupResponses'
+
+  /own/groups/id/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: getGroupById
+      summary: 'Fetch a group by ID'
+      tags:
+        - Groups
+      responses:
+        '200':
+          description: 'The requested group.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponse'
+        '404':
+          description: 'Group with requested ID does not exist'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundProblem'
+    put:
+      operationId: addActivityToGroup
+      summary: 'Add an activity to a group'
+      tags:
+        - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              format: uuid
+      responses:
+        '200':
+          description: 'Activity added to group'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponse'
+        '404':
+          description: 'Group or activity not found'
+    delete:
+      operationId: removeActivityFromGroup
+      summary: 'Remove an activity from a group'
+      tags:
+        - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              format: uuid
+      responses:
+        '204':
+          description: 'Activity removed from group'
+
+  /own/groups/id/{id}/name:
+    put:
+      operationId: updateGroupName
+      summary: 'Update group name'
+      tags:
+        - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              example: 'Hin- und Rückfahrt Lieblingscafe'
+      responses:
+        '200':
+          description: 'Updated group'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponse'
+        '404':
+          description: 'Group with requested ID does not exist'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundProblem'
+
+  /own/groups/id/{id}/rate:
+    put:
+      operationId: rateGroup
+      summary: 'Rate a group'
+      tags:
+        - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: integer
+              example: 3
+      responses:
+        '200':
+          description: 'Updated group'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponse'
+        '400':
+          description: 'Request body is invalid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestProblem'
+        '404':
+          description: 'Group with requested ID does not exist'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundProblem'
+
   /own/stats:
     get:
       operationId: getStatistics
@@ -409,49 +599,18 @@ components:
         $ref: '#/components/schemas/ActivityResponse'
 
     ActivityResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: '016e8bce-d617-40a6-8321-c8d58525042a'
-        displayName:
-          type: string
-          example: 'Ammerndorf über Tennenlohe Runde'
-        date:
-          type: string
-          format: date
-          example: '2022-06-25'
-        distance:
-          type: string
-          example: '67.46 km'
-        duration:
-          type: string
-          example: '3:19:04'
-        elapsedTime:
-          type: string
-          example: '3:36:22'
-        avgSpeed:
-          type: string
-          example: '20.33 km/h'
-        maxSpeed:
-          type: string
-          example: '51.95 km/h'
-        temperature:
-          type: string
-          example: '26 °C'
-        totalAscent:
-          type: string
-          example: '743 m'
-        rate:
-          type: integer
-          example: 4
-        bike:
-          $ref: '#/components/schemas/Bike'
-        positions:
-          type: array
-          items:
-            $ref: '#/components/schemas/Position'
+      allOf:
+        - $ref: '#/components/schemas/FeedItem'
+        - type: object
+          properties:
+            maxSpeed:
+              type: string
+              nullable: true
+              example: '51.95 km/h'
+            groupId:
+              type: string
+              description: 'Optional reference to group.'
+              format: uuid
 
     BadRequestProblem:
       type: object
@@ -465,6 +624,83 @@ components:
         detail:
           type: string
           example: "Request body contains invalid values"
+
+    FeedItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: '016e8bce-d617-40a6-8321-c8d58525042a'
+        type:
+          type: string
+          description: 'Acts as discriminator controlling additional properties.'
+          enum:
+            - GROUP
+            - ACTIVITY
+        displayName:
+          type: string
+          example: 'Ammerndorf über Tennenlohe Runde'
+        date:
+          type: string
+          description: 'Date or date range'
+          example: '2022-06-25'
+        distance:
+          type: string
+          example: '67.46 km'
+        duration:
+          type: string
+          example: '3:19:04'
+        elapsedTime:
+          type: string
+          example: '3:36:22'
+        avgSpeed:
+          type: string
+          example: '20.33 km/h'
+        temperature:
+          type: string
+          example: '26 °C'
+        totalAscent:
+          type: string
+          example: '743 m'
+        rate:
+          type: integer
+          example: 4
+        bike:
+          $ref: '#/components/schemas/Bike'
+        thumbnail:
+          type: string
+          description: 'SVG content showing the activity on a simple map.'
+        positions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Position'
+
+    Group:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        rate:
+          type: integer
+
+    GroupResponses:
+      type: array
+      items:
+        $ref: '#/components/schemas/GroupResponse'
+
+    GroupResponse:
+      allOf:
+        - $ref: '#/components/schemas/FeedItem'
+        - type: object
+          properties:
+            activities:
+              type: array
+              items:
+                $ref: '#/components/schemas/ActivityResponse'
 
     NotFoundProblem:
       type: object

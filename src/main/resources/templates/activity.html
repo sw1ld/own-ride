@@ -1,8 +1,17 @@
-{#include base showYearFilter=false}
+{#include base}
     <div class="container">
         <nav class="breadcrumb" aria-label="breadcrumbs">
             <ul>
-                <li><a href="/own/activities?year={data.date.year}">Activities</a></li>
+                <li><a href="/own/activities">Activities</a></li>
+                {#if data.type == 'GROUP'}
+                    <li><a href="/own/groups/id/{data.id}">{data.displayName}</a></li>
+                {/if}
+                {#if data.groupId}
+                    {! Fixme: Breadcrumb does not immediately update when group name changed !}
+                    <li id="group-breadcrumb" style="display: none;">
+                    <a id="group-link"></a>
+                </li>
+                {/if}
                 <li class="is-active"><a href="#" aria-current="page">{data.displayName}</a></li>
             </ul>
         </nav>
@@ -12,23 +21,32 @@
                 <div>
                     <h1 class="title editable-name" contenteditable="true" data-id="{data.id}">{data.displayName}</h1>
                     <h2 class="subtitle">{data.date}</h2>
-                    <div class="rating" data-id="{data.id}" data-rate="{data.rate}">
-                        <i class="fas fa-star {#if data.rate >= 5}active{/if}" data-value="5"></i>
-                        <i class="fas fa-star {#if data.rate >= 4}active{/if}" data-value="4"></i>
-                        <i class="fas fa-star {#if data.rate >= 3}active{/if}" data-value="3"></i>
-                        <i class="fas fa-star {#if data.rate >= 2}active{/if}" data-value="2"></i>
-                        <i class="fas fa-star {#if data.rate >= 1}active{/if}" data-value="1"></i>
+                    <div class="rating" data-id="{data.id}" data-type="activity" data-rate="{data.rate ?: 0}">
+                        <i class="fas fa-star {#if data.rate && data.rate >= 5}active{/if}" data-value="5"></i>
+                        <i class="fas fa-star {#if data.rate && data.rate >= 4}active{/if}" data-value="4"></i>
+                        <i class="fas fa-star {#if data.rate && data.rate >= 3}active{/if}" data-value="3"></i>
+                        <i class="fas fa-star {#if data.rate && data.rate >= 2}active{/if}" data-value="2"></i>
+                        <i class="fas fa-star {#if data.rate && data.rate >= 1}active{/if}" data-value="1"></i>
                     </div>
 
                 </div>
             </div>
             <div class="level-right">
-                <a href="/own/activities?year={data.date.year}" class="button is-link is-outlined">
+                {#if data.groupId}
+                <a href="/own/groups/id/{data.groupId}" class="button is-link is-outlined">
+                    <span class="icon">
+                        <i class="fas fa-arrow-left"></i>
+                    </span>
+                    <span>Back to Group</span>
+                </a>
+                {#else}
+                <a href="/own/activities" class="button is-link is-outlined">
                     <span class="icon">
                         <i class="fas fa-arrow-left"></i>
                     </span>
                     <span>Back to list</span>
                 </a>
+                {/if}
             </div>
         </div>
 
@@ -145,47 +163,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/own/altitude.js" defer></script>
     <script src="/own/map.js" defer></script>
+    <script src="/own/editable.js" defer></script>
     <script src="/own/modal.js" defer></script>
     <script src="/own/rating.js" defer></script>
-    <script>
-        document.querySelectorAll('.editable-name').forEach(element => {
-            element.addEventListener('blur', async (e) => {
-                const id = element.dataset.id;
-                const newName = element.innerText.trim();
-                
-                try {
-                    const response = await fetch('/own/activities/id/' + id + '/name', {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: newName
-                    });
-
-                    if (response.ok) {
-                        const updated = await response.json();
-                        // Update breadcrumb and other places if needed, but for KISS, reload or just let it be
-                        // window.location.reload(); 
-                        // Just update the element to the display name returned by the server
-                        element.innerText = updated.displayName;
-                        document.querySelector('.breadcrumb li.is-active a').innerText = updated.displayName;
-                    } else {
-                        alert("Fehler beim Speichern des Namens");
-                    }
-                } catch (err) {
-                    console.error(err);
-                    alert("Fehler beim Speichern des Namens");
-                }
-            });
-
-            element.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    element.blur();
-                }
-            });
-        });
-    </script>
     <script>
         const dropdown = document.getElementById('bikeDropdown');
         dropdown.querySelector('.dropdown-trigger button').addEventListener('click', (e) => {
@@ -217,28 +197,39 @@
                 });
             });
         });
-    </script>
-    <div id="confirmModal" class="modal">
-        <div class="modal-background"></div>
-        <div class="modal-card">
-            <header class="modal-card-head">
-                <p class="modal-card-title" id="confirmModalTitle">Confirm Action</p>
-                <button class="delete" aria-label="close" id="closeModal"></button>
-            </header>
-            <section class="modal-card-body">
-                <p id="confirmModalMessage">Are you sure?</p>
-            </section>
-            <footer class="modal-card-foot">
-                <button class="button is-success" id="confirmModalAction">Confirm</button>
-                <button class="button" id="cancelModal">Cancel</button>
-            </footer>
-        </div>
-    </div>
 
-    <script>
+        document.querySelectorAll('.recalculate-route').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = btn.dataset.id;
+                fetch(`/own/activities/id/` + id, { method: 'PUT' }).then(
+                    response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Error during recalculation');
+                    }
+                });
+            });
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof loadRoute === 'function') {
                 loadRoute('{data.id}');
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            const groupId = params.get('groupId');
+            const groupName = params.get('groupName');
+
+            if (groupName && groupId) {
+                const breadcrumb = document.getElementById('group-breadcrumb');
+                const link = document.getElementById('group-link');
+
+                link.href = `/own/groups/id/` + groupId;
+                link.textContent = groupName;
+
+                breadcrumb.style.display = '';
             }
         });
     </script>

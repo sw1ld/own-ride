@@ -20,6 +20,8 @@ public record Activity(
     LocalDateTime lastModified,
     Integer rate,
     Bike bike,
+    UUID groupId,
+    String thumbnail,
     List<Position> positions) {
 
   public Activity(ActivityData data) {
@@ -37,6 +39,8 @@ public record Activity(
         data.getLastModified(),
         data.getRate(),
         data.getBike() == null ? null : new Bike(data.getBike()),
+        data.getGroupId(),
+        data.getThumbnail(),
         data.getPositions());
   }
 }

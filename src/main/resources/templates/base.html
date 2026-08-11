@@ -259,10 +259,10 @@
 
             <div id="mainNavbar" class="navbar-menu">
                 <div class="navbar-start">
-                    <a class="navbar-item year-link" href="/own/upload">Upload</a>
+                    <a class="navbar-item" href="/own/upload">Upload</a>
                     <a class="navbar-item year-link" href="/own/stats">Dashboard</a>
-                    <a class="navbar-item year-link" href="/own/activities">Activities</a>
-                    <a class="navbar-item year-link" href="/own/bikes">Bikes</a>
+                    <a class="navbar-item" href="/own/activities">Activities</a>
+                    <a class="navbar-item" href="/own/bikes">Bikes</a>
                 </div>
             </div>
         </nav>
@@ -270,27 +270,11 @@
         <section class="section">
             <div class="container">
                 <div class="columns">
-                    {#if showYearFilter}
-                    <div class="column is-3-tablet is-12-mobile">
-                        <div class="field">
-                            <div class="control">
-                                <div class="select is-fullwidth">
-                                    <select id="yearFilter" style="border-radius: 8px;">
-                                        {#for y in availableYears}
-                                            <option value="{y}">{y}</option>
-                                        {/for}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {/if}
                 </div>
                 {#insert}Missing body! 😿{/}
             </div>
         </section>
 
-        <script src="/own/filters.js" defer></script>
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
@@ -306,5 +290,22 @@
                 }
             });
         </script>
+        <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+        <div id="confirmModal" class="modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title" id="confirmModalTitle">Confirm Action</p>
+                    <button class="delete" aria-label="close" id="closeModal"></button>
+                </header>
+                <section class="modal-card-body">
+                    <p id="confirmModalMessage">Are you sure?</p>
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button is-success" id="confirmModalAction">Confirm</button>
+                    <button class="button" id="cancelModal">Cancel</button>
+                </footer>
+            </div>
+        </div>
     </body>
 </html>

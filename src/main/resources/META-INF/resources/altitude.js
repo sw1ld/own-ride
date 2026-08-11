@@ -131,9 +131,9 @@ function updateAltitudeChart(route, distance) {
   }
 
   // Determine tick interval
-  let interval = 1;
-  if (totalDistance > 50) interval = 10;
-  else if (totalDistance > 10) interval = 5;
+  let interval = 5;
+  if (totalDistance > 100) interval = 25;
+  else if (totalDistance > 50) interval = 10;
 
   const options = getBaseOptions('distance', 'altitude', { beginAtZero: false });
   

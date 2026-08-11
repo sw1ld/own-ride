@@ -1,5 +1,6 @@
 package de.sw1ld;
 
+import jakarta.annotation.Nullable;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -8,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -30,14 +32,10 @@ public class ActivityDataRepositoryJpa implements ActivityDataRepository {
   }
 
   @Override
-  public List<ActivityData> findByYear(int year) {
-    LocalDate start = LocalDate.of(year, 1, 1);
-    LocalDate end = start.plusYears(1);
-
+  public List<ActivityData> findByIds(Set<UUID> ids) {
     return entityManager
-        .createNamedQuery(ActivityData.QUERY_FIND_BY_YEAR, ActivityData.class)
-        .setParameter("startOfYear", start)
-        .setParameter("startOfNextYear", end)
+        .createNamedQuery(ActivityData.QUERY_FIND_BY_IDS, ActivityData.class)
+        .setParameter("ids", ids)
         .getResultList();
   }
 
@@ -54,9 +52,22 @@ public class ActivityDataRepositoryJpa implements ActivityDataRepository {
   }
 
   @Override
-  public List<ActivityData> findAll() {
+  public List<ActivityData> fetchFeed(@Nullable Cursor cursor, int limit) {
+    LocalDate cursorDate;
+    UUID cursorId;
+    if (cursor == null) {
+      cursorDate = LocalDate.now();
+      cursorId = UUID.randomUUID(); // does not matter - acts only as a second condition after date!
+    } else {
+      cursorDate = cursor.date();
+      cursorId = cursor.id();
+    }
+
     return entityManager
-        .createNamedQuery(ActivityData.QUERY_FIND_ALL, ActivityData.class)
+        .createNamedQuery(ActivityData.QUERY_FETCH_FEED, ActivityData.class)
+        .setParameter("cursorDate", cursorDate)
+        .setParameter("cursorId", cursorId)
+        .setMaxResults(limit + 1) // +1 verify, if there is more to come
         .getResultList();
   }
 

@@ -3,7 +3,7 @@ function showConfirm(title, message, onConfirm) {
   const modalTitle = document.getElementById('confirmModalTitle');
   const modalMessage = document.getElementById('confirmModalMessage');
   const modalConfirmBtn = document.getElementById('confirmModalAction');
-  
+
   const closeModal = () => modal.classList.remove('is-active');
 
   modalTitle.textContent = title;
@@ -66,21 +66,37 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  document.querySelectorAll('.recalculate-route').forEach(btn => {
+  document.querySelectorAll('.remove-from-group').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const id = btn.dataset.id;
-      showConfirm("Confirm Recalculation", "Do you really want to recalculate this route?", async () => {
+      const activityId = btn.dataset.activityId;
+      const groupElement = document.querySelector('.editable-group-name');
+      const groupId = groupElement ? groupElement.dataset.id : null;
+
+      if (!groupId) {
+        console.error("Group ID not found");
+        return;
+      }
+
+      showConfirm('Remove from Group', 'Do you really want to remove this activity from the group?', async () => {
         try {
-          const response = await fetch(`/own/activities/id/${id}`, { method: 'PUT' });
+          const response = await fetch(`/own/groups/id/${groupId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(activityId)
+          });
           if (response.ok) {
-            window.location.reload();
+            if (response.headers.get('X-Group-Dissolved') === 'true') {
+              window.location.href = '/own/activities';
+            } else {
+              window.location.reload();
+            }
           } else {
-            alert("Error during recalculation");
+            alert('Failed to remove activity from group');
           }
         } catch (err) {
           console.error(err);
-          alert("Error during recalculation");
+          alert('Failed to remove activity from group');
         }
       });
     });

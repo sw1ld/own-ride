@@ -24,11 +24,13 @@ import org.hibernate.type.SqlTypes;
     name = ActivityData.QUERY_FIND_BY_ID,
     query = "SELECT ed FROM ActivityData ed WHERE id = :id")
 @NamedQuery(
-    name = ActivityData.QUERY_FIND_BY_YEAR,
+    name = ActivityData.QUERY_FIND_BY_IDS,
+    query = "SELECT ed FROM ActivityData ed WHERE id in :ids order by ed.date")
+@NamedQuery(
+    name = ActivityData.QUERY_FETCH_FEED,
     query =
-        "SELECT ed FROM ActivityData ed WHERE ed.date >= :startOfYear AND ed.date <"
-            + " :startOfNextYear")
-@NamedQuery(name = ActivityData.QUERY_FIND_ALL, query = "SELECT ed FROM ActivityData ed")
+        "SELECT ed FROM ActivityData ed WHERE ed.date < :cursorDate OR (ed.date = :cursorDate AND"
+            + " ed.id < :cursorId) ORDER BY ed.date DESC, ed.id DESC")
 @NamedQuery(
     name = ActivityData.QUERY_FIND_MIN_DATE,
     query = "SELECT MIN(ed.date) FROM ActivityData ed")
@@ -49,9 +51,9 @@ import org.hibernate.type.SqlTypes;
 public class ActivityData {
 
   public static final String QUERY_FIND_BY_ID = "ExtractedData.findById";
-  public static final String QUERY_FIND_BY_YEAR = "ExtractedData.findByYear";
+  public static final String QUERY_FIND_BY_IDS = "ExtractedData.findByIds";
   public static final String QUERY_PERFORMANCE_BY_YEAR = "ExtractedData.fetchPerformanceDataByYear";
-  public static final String QUERY_FIND_ALL = "ExtractedData.findAll";
+  public static final String QUERY_FETCH_FEED = "ExtractedData.fetchFeed";
   public static final String QUERY_FIND_MIN_DATE = "ExtractedData.findMinDate";
   public static final String QUERY_FIND_BY_TIME_CREATED = "ExtractedData.findByTimeCreated";
   public static final String QUERY_DELETE_BY_ID = "ExtractedData.deleteById";
@@ -104,6 +106,12 @@ public class ActivityData {
   @JdbcTypeCode(SqlTypes.JSON)
   @Convert(converter = PositionListJsonConverter.class)
   private List<Position> positions;
+
+  @Column(name = "group_id")
+  private UUID groupId;
+
+  @Column(columnDefinition = "TEXT")
+  private String thumbnail;
 
   public UUID getId() {
     return id;
@@ -231,5 +239,21 @@ public class ActivityData {
 
   public void setPositions(List<Position> positions) {
     this.positions = positions;
+  }
+
+  public UUID getGroupId() {
+    return groupId;
+  }
+
+  public void setGroupId(UUID groupId) {
+    this.groupId = groupId;
+  }
+
+  public String getThumbnail() {
+    return thumbnail;
+  }
+
+  public void setThumbnail(String thumbnail) {
+    this.thumbnail = thumbnail;
   }
 }

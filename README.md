@@ -35,8 +35,8 @@ With `OwnRide` I try to give a lightweight, community driven alternative to main
 - [ ] Add more graphs for e.g. "Speed & slope"
 - [ ] Optimize performance (caching)
 - [ ] Add notes to route (explain e.g. grading)
-- [ ] Allow grouping of routes (aggregate data for e.g. multiple days trip)
-
+- [ ] add search possibility for feeds
+  
 
 ## Local Setup
 

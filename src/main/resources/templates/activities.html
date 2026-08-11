@@ -1,58 +1,47 @@
-{#include base showYearFilter=true}
-    <h1 class="title">Activities</h1>
-    <section class="f-switch">
-        <div class="box">
-            <h2 class="title is-4">Details</h2>
+{#include base}
+    <h1 class="title">Recent Activities</h1>
+    <div id="activityFeed" class="activity-feed">
+            {#include feeds data=data nextCursor=nextCursor /}
+    </div>
 
-            <div id="activityResponses" class="table-container">
-                <table class="table is-striped is-hoverable is-fullwidth">
-                    <thead>
-                        <tr>
-                            <th class="sortable">Name <span class="arrow">↑↓</span></th>
-                            <th class="sortable has-text-centered">Date <span class="arrow">↑↓</span></th>
-                            <th class="sortable has-text-centered">Distance <span class="arrow">↑↓</span></th>
-                            <th class="sortable has-text-centered">Duration <span class="arrow">↑↓</span></th>
-                            <th class="sortable has-text-centered">Total ascent <span class="arrow">↑↓</span></th>
-                            <th class="sortable has-text-centered">Average Speed <span class="arrow">↑↓</span></th>
-                            {!<th class="sortable has-text-centered">Temperature <span class="arrow">↑↓</span></th>!}
-                            <th class="sortable has-text-centered">Rating <span class="arrow">↑↓</span></th>
-                        </tr>
-                    </thead>
+    <style>
+        .clickable-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background-color: #fafafa;
+        }
+        .clickable-card.drag-over {
+            border: 2px dashed #3273dc !important;
+            background-color: #f0f6ff !important;
+        }
+        .rating.is-small {
+            font-size: 0.75rem;
+        }
+        @media (prefers-color-scheme: dark) {
+            .clickable-card:hover {
+                background-color: #2c2c2c;
+                box-shadow: 0 2px 8px rgba(255,255,255,0.05);
+            }
+            .clickable-card.drag-over {
+                background-color: #1a2a4a !important;
+            }
+            .column.is-narrow div[style*="background-color: #f0f0f0"],
+            .column.is-narrow div[style*="background-color: #e8f1ff"] {
+                background-color: #333 !important;
+                border-color: #444 !important;
+            }
+            .has-text-dark {
+                color: #f5f5f5 !important;
+            }
+        }
+    </style>
 
-                    <tbody>
-                        {#for entry in data}
-                        <tr class="clickable-row" data-id="{entry.id}" onclick="window.location.href='/own/activities/id/{entry.id}'" style="cursor: pointer;">
-                            <td><a href="/own/activities/id/{entry.id}">{entry.displayName}</a></td>
-                            <td class="has-text-centered">{entry.date}</td>
-                            <td class="has-text-centered">{entry.distance}</td>
-                            <td class="has-text-centered">{entry.duration}</td>
-                            <td class="has-text-centered">{entry.totalAscent}</td>
-                            <td class="has-text-centered">{entry.avgSpeed}</td>
-                            {!<td class="has-text-centered">{entry.temperature}</td>!}
-                            <td class="has-text-centered">
-                                <div class="rating" data-id="{entry.id}" data-rate="{entry.rate}">
-                                    <i class="fas fa-star {#if entry.rate >= 5}active{/if}" data-value="5"></i>
-                                    <i class="fas fa-star {#if entry.rate >= 4}active{/if}" data-value="4"></i>
-                                    <i class="fas fa-star {#if entry.rate >= 3}active{/if}" data-value="3"></i>
-                                    <i class="fas fa-star {#if entry.rate >= 2}active{/if}" data-value="2"></i>
-                                    <i class="fas fa-star {#if entry.rate >= 1}active{/if}" data-value="1"></i>
-                                </div>
-                            </td>
-                        </tr>
-                        {/for}
-                    </tbody>
-                </table>
-            </div>
-            <script src="/own/arrow-toggler.js" defer></script>
-            <script src="/own/rating.js" defer></script>
-            <script>
-                document.querySelectorAll('.clickable-row').forEach(row => {
-                    row.addEventListener('click', (e) => {
-                        if (e.target.closest('button') || e.target.closest('a') || e.target.closest('.rating')) return;
-                        window.location.href = '/own/activities/id/' + row.dataset.id;
-                    });
-                });
-            </script>
-        </div>
-    </section>
+    <script>
+        document.body.addEventListener('htmx:configRequest', function (event) {
+            event.detail.headers['Accept'] = 'text/html';
+        });
+    </script>
+
+    <script src="/own/rating.js" defer></script>
+    <script src="/own/activities.js" defer></script>
 {/include}

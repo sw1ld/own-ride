@@ -28,17 +28,18 @@ class ActivityResourceTest {
   private static final String ACTIVITIES_PATH = "activities";
   private static final String ACTIVITY_ID_PATH = ACTIVITIES_PATH + "/id/%s";
 
-  private ActivityService activityService;
+  private ActivityApplicationService activityApplicationService;
 
   @BeforeEach
   void setup() {
-    activityService = mock(ActivityService.class);
-    QuarkusMock.installMockForType(activityService, ActivityService.class);
+    activityApplicationService = mock(ActivityApplicationService.class);
+    QuarkusMock.installMockForType(activityApplicationService, ActivityApplicationService.class);
   }
 
   @Test
   void fetchAllActivitiesDefaultingToJson() {
-    when(activityService.fetchActivities(any())).thenReturn(List.of(mockedActivity()));
+    when(activityApplicationService.fetchFragment(null))
+        .thenReturn(new ResponseFragment(List.of(new ActivityResponse(mockedActivity())), null));
 
     List<ActivityResponse> response =
         RestAssured.given()
@@ -68,7 +69,8 @@ class ActivityResourceTest {
 
   @Test
   void activitiesPageAsHtml() {
-    when(activityService.fetchActivities(any())).thenReturn(List.of(mockedActivity()));
+    when(activityApplicationService.fetchFragment(any()))
+        .thenReturn(new ResponseFragment(List.of(new ActivityResponse(mockedActivity())), null));
 
     RestAssured.given()
         .when()
@@ -78,15 +80,15 @@ class ActivityResourceTest {
         .statusCode(200)
         .contentType(ContentType.HTML)
         .body(
-            containsString("Activities"), // header
-            containsString("Details"), // sub header
-            containsString("Average Speed"), // some table header
-            containsString("25.00 km/h")); // some entry in table
+            containsString("Recent Activities"), // header
+            containsString("Distance"), // some header
+            containsString("25.00 km/h")); // some entry
   }
 
   @Test
   void activitiesByIdDefaultingToJson() {
-    when(activityService.fetchActivityBy(any())).thenReturn(Optional.of(mockedActivity()));
+    when(activityApplicationService.fetchActivityBy(any()))
+        .thenReturn(Optional.of(mockedActivity()));
 
     ActivityResponse response =
         given()
@@ -110,7 +112,8 @@ class ActivityResourceTest {
 
   @Test
   void activityPageAsHtml() {
-    when(activityService.fetchActivityBy(any())).thenReturn(Optional.of(mockedActivity()));
+    when(activityApplicationService.fetchActivityBy(any()))
+        .thenReturn(Optional.of(mockedActivity()));
 
     given()
         .accept(MediaType.TEXT_HTML)
@@ -127,7 +130,7 @@ class ActivityResourceTest {
 
   @Test
   void activityNotFoundAsHtml() {
-    when(activityService.fetchActivityBy(any())).thenReturn(Optional.empty());
+    when(activityApplicationService.fetchActivityBy(any())).thenReturn(Optional.empty());
 
     given()
         .accept(MediaType.TEXT_HTML)
@@ -142,7 +145,7 @@ class ActivityResourceTest {
 
   @Test
   void rateActivityWithInvalidRating_shouldFail() {
-    when(activityService.setUserRating(any(), any()))
+    when(activityApplicationService.setUserRating(any(), any()))
         .thenThrow(new IllegalRateException("Rate value must be between 0 and 5"));
 
     given()
@@ -169,6 +172,8 @@ class ActivityResourceTest {
         222,
         LocalDateTime.now(),
         3,
+        null,
+        null,
         null,
         List.of());
   }
