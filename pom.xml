@@ -20,8 +20,7 @@
     <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-    <quarkus.version>3.36.3</quarkus.version>
+    <quarkus.version>3.38.2</quarkus.version>
   </properties>
 
   <dependencyManagement>
@@ -53,12 +52,12 @@
     <dependency>
       <groupId>com.garmin</groupId>
       <artifactId>fit</artifactId>
-      <version>21.205.0</version>
+      <version>21.213.0</version>
     </dependency>
     <dependency>
       <groupId>io.quarkiverse.httpproblem</groupId>
       <artifactId>quarkus-http-problem</artifactId>
-      <version>3.33.1</version>
+      <version>3.38.2</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -160,7 +159,7 @@
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
-        <version>3.8.0</version>
+        <version>3.9.0</version>
         <configuration>
           <java>
             <googleJavaFormat>
