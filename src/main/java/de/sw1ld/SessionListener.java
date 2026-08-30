@@ -3,6 +3,8 @@ package de.sw1ld;
 import com.garmin.fit.SessionMesg;
 import com.garmin.fit.SessionMesgListener;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 public class SessionListener implements SessionMesgListener {
 
@@ -12,6 +14,7 @@ public class SessionListener implements SessionMesgListener {
   private Integer totalAscent;
   private double averageSpeed = 0.0;
   private Integer temperature;
+  private LocalDate date;
 
   @Override
   public void onMesg(SessionMesg mesg) {
@@ -40,6 +43,10 @@ public class SessionListener implements SessionMesgListener {
     if (mesg.getAvgTemperature() != null) {
       temperature = Integer.valueOf(mesg.getAvgTemperature().toString());
     }
+
+    if (mesg.getStartTime() != null) {
+      date = mesg.getStartTime().getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
   }
 
   double getDistance() {
@@ -64,5 +71,9 @@ public class SessionListener implements SessionMesgListener {
 
   Integer getTemperature() {
     return temperature;
+  }
+
+  LocalDate getDate() {
+    return date;
   }
 }

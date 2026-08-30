@@ -109,7 +109,7 @@ public class ActivityService {
       data.setActivity(activityRaw);
       data.setId(id);
       data.setName(fileName);
-      data.setDate(rec.getDate());
+      data.setDate(ses.getDate());
       data.setDistance(ses.getDistance());
       data.setDuration(ses.getTimeWithoutBreaks());
       data.setElapsedTime(ses.getElapsedTime());
@@ -212,7 +212,7 @@ public class ActivityService {
     try (InputStream is = new ByteArrayInputStream(content)) {
       decode.read(is, broadcaster);
 
-      data.setDate(rec.getDate());
+      data.setDate(ses.getDate());
       data.setDistance(ses.getDistance());
       data.setDuration(ses.getTimeWithoutBreaks());
       data.setElapsedTime(ses.getElapsedTime());

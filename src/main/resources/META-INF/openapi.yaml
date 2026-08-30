@@ -727,9 +727,6 @@ components:
         altitude:
           type: number
           example: 294.8
-        timestamp:
-          type: string
-          example: '2022-06-25'
 
     Bike:
       type: object
