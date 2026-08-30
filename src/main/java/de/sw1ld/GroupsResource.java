@@ -11,6 +11,8 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
@@ -26,6 +28,7 @@ import java.util.UUID;
 public class GroupsResource {
 
   private final GroupService groupService;
+  @Context private HttpHeaders headers;
 
   public GroupsResource(GroupService groupService) {
     this.groupService = groupService;
@@ -65,13 +68,19 @@ public class GroupsResource {
 
   @GET
   @Path("/id/{id}")
-  @Produces(MediaType.APPLICATION_JSON)
+  @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_HTML})
   public Response group(@PathParam("id") UUID id) {
     Optional<Group> group = groupService.fetchGroupBy(id);
 
-    return group.isEmpty()
-        ? Response.status(404).entity(notFoundProblem(id)).build()
-        : Response.ok().entity(new GroupResponse(group.get())).build();
+    if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
+      return group.isEmpty()
+          ? Response.status(404).entity(notFoundProblem(id)).build()
+          : Response.ok().entity(Templates.group(new GroupResponse(group.get()))).build();
+    } else {
+      return group.isEmpty()
+          ? Response.status(404).entity(notFoundProblem(id)).build()
+          : Response.ok().entity(new GroupResponse(group.get())).build();
+    }
   }
 
   @PUT
