@@ -49,7 +49,7 @@ function updateAltitudeChart(route, distance) {
   });
 
   const altitudes = rawAltitudes.map((val, i, arr) => {
-      const window = 5; // Erhöht auf 5 für glattere Höhen (11 Punkte)
+      const window = 10; // bigger number -> smoother altitude profile!
       let values = [];
       for (let j = i - window; j <= i + window; j++) {
           if (j >= 0 && j < arr.length && arr[j] !== 0) {
