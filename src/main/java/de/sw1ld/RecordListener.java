@@ -17,7 +17,11 @@ public class RecordListener implements RecordMesgListener {
     if (m.getPositionLat() != null && m.getPositionLong() != null) {
       positions.add(
           Position.fromSemicircles(
-              m.getPositionLat(), m.getPositionLong(), m.getEnhancedAltitude()));
+              m.getPositionLat(),
+              m.getPositionLong(),
+              m.getEnhancedAltitude() == null
+                  ? 0.0f // gets interpolated for smaller spikes
+                  : m.getEnhancedAltitude()));
     }
   }
 
