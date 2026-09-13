@@ -21,7 +21,7 @@
                 <div>
                     <h1 class="title editable-name" contenteditable="true" data-id="{data.id}">{data.displayName}</h1>
                     <h2 class="subtitle">{data.date}</h2>
-                    <div class="rating" data-id="{data.id}" data-type="activity" data-rate="{data.rate ?: 0}">
+                    <div class="rating" data-id="{data.id}" data-type="{data.type}" data-rate="{data.rate ?: 0}">
                         <i class="fas fa-star {#if data.rate && data.rate >= 5}active{/if}" data-value="5"></i>
                         <i class="fas fa-star {#if data.rate && data.rate >= 4}active{/if}" data-value="4"></i>
                         <i class="fas fa-star {#if data.rate && data.rate >= 3}active{/if}" data-value="3"></i>
