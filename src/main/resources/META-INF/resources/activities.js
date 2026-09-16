@@ -1,4 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Scroll- und Feed-Zustand wiederherstellen falls vorhanden
+    const savedHtml = sessionStorage.getItem('feed_restore_html');
+    const savedScroll = sessionStorage.getItem('feed_restore_scroll');
+
+    if (savedHtml && savedScroll) {
+        const feedContainer = document.getElementById('activityFeed');
+        if (feedContainer) {
+            feedContainer.innerHTML = savedHtml;
+            if (window.htmx) {
+                htmx.process(feedContainer);
+            }
+            window.scrollTo({
+                top: parseInt(savedScroll, 10),
+                behavior: 'instant'
+            });
+        }
+        sessionStorage.removeItem('feed_restore_html');
+        sessionStorage.removeItem('feed_restore_scroll');
+    }
+
     let draggedId = null;
     let draggedType = null;
     let currentDragOverCard = null;
@@ -10,6 +30,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const type = card.dataset.type;
         const id = card.dataset.id;
+
+        const feedContainer = document.getElementById('activityFeed');
+        if (feedContainer) {
+            sessionStorage.setItem('feed_restore_html', feedContainer.innerHTML);
+            sessionStorage.setItem('feed_restore_scroll', window.scrollY.toString());
+        }
+
         window.location.href = `/own/${type === 'GROUP' ? 'groups' : 'activities'}/id/${id}`;
     });
 
