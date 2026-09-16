@@ -27,7 +27,7 @@ import java.util.UUID;
 @NamedQuery(
     name = ActivityData.QUERY_FETCH_FEED,
     query =
-        "SELECT ed FROM ActivityData ed WHERE ed.date <= :cursorDate OR (ed.date = :cursorDate AND"
+        "SELECT ed FROM ActivityData ed WHERE ed.date < :cursorDate OR (ed.date = :cursorDate AND"
             + " ed.id < :cursorId) ORDER BY ed.date DESC, ed.id DESC")
 @NamedQuery(
     name = ActivityData.QUERY_FIND_MIN_DATE,
