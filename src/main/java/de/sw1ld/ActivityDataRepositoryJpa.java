@@ -56,7 +56,7 @@ public class ActivityDataRepositoryJpa implements ActivityDataRepository {
     LocalDate cursorDate;
     UUID cursorId;
     if (cursor == null) {
-      cursorDate = LocalDate.now();
+      cursorDate = LocalDate.now().plusDays(1); // date < cursorDate includes LD.now()!
       cursorId = UUID.randomUUID(); // does not matter - acts only as a second condition after date!
     } else {
       cursorDate = cursor.date();
