@@ -40,6 +40,14 @@
         document.body.addEventListener('htmx:configRequest', function (event) {
             event.detail.headers['Accept'] = 'text/html';
         });
+        document.body.addEventListener('htmx:afterRequest', function (event) {
+            if (event.detail.elt && event.detail.elt.hasAttribute('hx-get')) {
+                event.detail.elt.removeAttribute('hx-get');
+                event.detail.elt.removeAttribute('hx-trigger');
+                event.detail.elt.removeAttribute('hx-swap');
+                event.detail.elt.removeAttribute('hx-target');
+            }
+        });
     </script>
 
     <script src="/own/rating.js" defer></script>
