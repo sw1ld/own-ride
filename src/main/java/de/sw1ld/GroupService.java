@@ -34,6 +34,13 @@ public class GroupService {
     return groupRepository.findById(id).map(Group::new);
   }
 
+  public List<Group> fetchGroupsByIds(Set<UUID> ids) {
+    if (ids == null || ids.isEmpty()) {
+      return List.of();
+    }
+    return groupRepository.findByIds(ids).stream().map(Group::new).toList();
+  }
+
   List<Group> fetchGroups(LocalDate start, LocalDate end) {
     return groupRepository.findInRange(start, end).stream().map(Group::new).toList();
   }

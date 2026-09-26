@@ -2,10 +2,10 @@ package de.sw1ld;
 
 import jakarta.annotation.Nullable;
 import jakarta.enterprise.context.ApplicationScoped;
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -25,26 +25,34 @@ public class ActivityApplicationService {
 
   ResponseFragment fetchFragment(@Nullable String encodedCursor) {
     Fragment fragment = activityService.fetchActivities(encodedCursor);
-
     List<Activity> activities = fragment.activities();
 
-    List<Group> groups = List.of();
-    if (!activities.isEmpty()) {
-      groups = groupService.fetchGroups(activities.getLast().date(), activities.getFirst().date());
-      if (encodedCursor != null && !groups.isEmpty()) {
-        Group isCompleteGroup = groups.getFirst();
-        if (!new HashSet<>(activities).containsAll(isCompleteGroup.activities())) {
-          groups = new ArrayList<>(groups);
-          groups.remove(isCompleteGroup);
-
-          // make sure that groups (or activities in groups) get displayed twice
-          activities = new ArrayList<>(activities);
-          activities.removeAll(isCompleteGroup.activities());
-        }
-      }
+    if (activities.isEmpty()) {
+      return new ResponseFragment(List.of(), null);
     }
 
-    List<FeedItem> activityFeeds = alignActivitiesAndGroups(activities, groups);
+    Set<UUID> groupIds =
+        activities.stream()
+            .map(Activity::groupId)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+
+    List<Group> candidateGroups = groupService.fetchGroupsByIds(groupIds);
+
+    Set<UUID> currentActivityIds =
+        activities.stream().map(Activity::id).collect(Collectors.toSet());
+
+    List<Group> groupsToRender =
+        candidateGroups.stream()
+            .filter(
+                group -> {
+                  Activity latest = group.latestActivity();
+                  return latest != null && currentActivityIds.contains(latest.id());
+                })
+            .toList();
+
+    List<FeedItem> activityFeeds =
+        alignActivitiesAndGroups(activities, groupsToRender, candidateGroups);
 
     return new ResponseFragment(
         activityFeeds, fragment.nextCursor() != null ? fragment.nextCursor().encode() : null);
@@ -74,19 +82,37 @@ public class ActivityApplicationService {
     return activityService.updateName(id, name);
   }
 
-  private List<FeedItem> alignActivitiesAndGroups(List<Activity> activities, List<Group> groups) {
-    List<GroupResponse> groupedActivities = groups.stream().map(GroupResponse::new).toList();
+  private List<FeedItem> alignActivitiesAndGroups(
+      List<Activity> activities, List<Group> groupsToRender, List<Group> candidateGroups) {
+    List<GroupResponse> groupResponses = groupsToRender.stream().map(GroupResponse::new).toList();
 
-    Set<ActivityResponse> collect =
-        groupedActivities.stream()
-            .flatMap(a -> a.activities().stream())
+    Set<UUID> groupedActivityIds =
+        candidateGroups.stream()
+            .flatMap(g -> g.activities().stream())
+            .map(Activity::id)
             .collect(Collectors.toSet());
 
     List<ActivityResponse> standaloneActivities =
-        activities.stream().map(ActivityResponse::new).filter(a -> !collect.contains(a)).toList();
+        activities.stream()
+            .filter(a -> a.groupId() == null || !groupedActivityIds.contains(a.id()))
+            .map(ActivityResponse::new)
+            .toList();
 
-    return Stream.concat(groupedActivities.stream(), standaloneActivities.stream())
-        .sorted(Comparator.comparing(FeedItem::date).reversed())
+    return Stream.concat(groupResponses.stream(), standaloneActivities.stream())
+        .sorted(Comparator.comparing(this::sortDateOf).thenComparing(FeedItem::id).reversed())
         .collect(Collectors.toList());
+  }
+
+  private LocalDate sortDateOf(FeedItem item) {
+    if (item instanceof GroupResponse gr) {
+      return gr.activities().stream()
+          .map(a -> LocalDate.parse(a.date()))
+          .max(LocalDate::compareTo)
+          .orElse(LocalDate.MIN);
+    }
+    if (item instanceof ActivityResponse ar) {
+      return LocalDate.parse(ar.date());
+    }
+    return LocalDate.MIN;
   }
 }

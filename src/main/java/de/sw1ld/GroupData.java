@@ -20,6 +20,9 @@ import java.util.UUID;
       name = GroupData.QUERY_FIND_BY_ID,
       query = "SELECT g FROM GroupData g WHERE g.id = :id"),
   @NamedQuery(
+      name = GroupData.QUERY_FIND_BY_IDS,
+      query = "SELECT g FROM GroupData g WHERE g.id in :ids"),
+  @NamedQuery(
       name = GroupData.QUERY_FIND_IN_RANGE,
       query =
           "SELECT DISTINCT g FROM GroupData g JOIN g.activities a WHERE a.date >="
@@ -27,6 +30,7 @@ import java.util.UUID;
 })
 public class GroupData {
   public static final String QUERY_FIND_BY_ID = "GroupData.findById";
+  public static final String QUERY_FIND_BY_IDS = "GroupData.findByIds";
   public static final String QUERY_FIND_IN_RANGE = "GroupData.findInRange";
 
   @Id private UUID id;
