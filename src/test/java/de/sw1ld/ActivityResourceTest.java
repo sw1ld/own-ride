@@ -3,6 +3,7 @@ package de.sw1ld;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -83,6 +84,44 @@ class ActivityResourceTest {
             containsString("Recent Activities"), // header
             containsString("Distance"), // some header
             containsString("25.00 km/h")); // some entry
+  }
+
+  @Test
+  void feedPageAsHtmlWithNextCursor() {
+    when(activityApplicationService.fetchFragment("cursor123"))
+        .thenReturn(
+            new ResponseFragment(List.of(new ActivityResponse(mockedActivity())), "cursor456"));
+
+    RestAssured.given()
+        .when()
+        .queryParam("cursor", "cursor123")
+        .accept(ContentType.HTML)
+        .get(ACTIVITIES_PATH + "/feed")
+        .then()
+        .statusCode(200)
+        .contentType(ContentType.HTML)
+        .body(
+            containsString("hx-get=\"/own/activities/feed?cursor=cursor456\""),
+            containsString("hx-trigger=\"revealed\""),
+            containsString("hx-target=\"#feed-sentinel\""));
+  }
+
+  @Test
+  void feedPageAsHtmlWithoutNextCursor() {
+    when(activityApplicationService.fetchFragment("cursor123"))
+        .thenReturn(new ResponseFragment(List.of(new ActivityResponse(mockedActivity())), null));
+
+    RestAssured.given()
+        .when()
+        .queryParam("cursor", "cursor123")
+        .accept(ContentType.HTML)
+        .get(ACTIVITIES_PATH + "/feed")
+        .then()
+        .statusCode(200)
+        .contentType(ContentType.HTML)
+        .body(
+            not(containsString("hx-target=\"#feed-sentinel\"")),
+            not(containsString("hx-trigger=\"revealed\"")));
   }
 
   @Test
