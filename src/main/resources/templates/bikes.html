@@ -39,31 +39,22 @@
             </thead>
             <tbody>
                 {#for entry in bikes}
-                <tr>
+                <tr data-bike-id="{entry.bike.id}">
                     <td>
-                        <form id="edit-form-{entry.bike.id}" action="/own/bikes/{entry.bike.id}" method="POST" style="display: none;">
-                            <input class="input is-small" type="text" name="producer" value="{entry.bike.producer}" required>
-                        </form>
-                        <span id="view-producer-{entry.bike.id}">{entry.bike.producer}</span>
+                        <input class="input is-small bike-producer" type="text" name="producer" value="{entry.bike.producer}" placeholder="Producer" required>
                     </td>
                     <td>
-                        <input class="input is-small" type="text" name="name" value="{entry.bike.name}" required form="edit-form-{entry.bike.id}" style="display: none;" id="edit-form-name-{entry.bike.id}">
-                        <span id="view-name-{entry.bike.id}">{entry.bike.name}</span>
+                        <input class="input is-small bike-name" type="text" name="name" value="{entry.bike.name}" placeholder="Name" required>
                     </td>
                     <td class="has-text-centered">{entry.totalDistance}</td>
                     <td>
                         <div class="buttons are-small">
-                            <button class="button is-info is-outlined edit-button" data-id="{entry.bike.id}">
-                                <span class="icon">
-                                    <i class="fas fa-edit"></i>
-                                </span>
-                            </button>
-                            <button class="button is-success is-outlined save-button" data-id="{entry.bike.id}" style="display: none;" onclick="document.getElementById('edit-form-{entry.bike.id}').submit()">
+                            <button class="button is-success is-outlined save-bike" data-id="{entry.bike.id}" title="Save">
                                 <span class="icon">
                                     <i class="fas fa-save"></i>
                                 </span>
                             </button>
-                            <button class="button is-danger is-outlined delete-bike" data-id="{entry.bike.id}">
+                            <button class="button is-danger is-outlined delete-bike" data-id="{entry.bike.id}" title="Delete">
                                 <span class="icon">
                                     <i class="fas fa-trash"></i>
                                 </span>
@@ -77,19 +68,4 @@
     </div>
 
     <script src="/own/modal.js" defer></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.edit-button').forEach(button => {
-                button.addEventListener('click', () => {
-                    const id = button.dataset.id;
-                    document.getElementById('edit-form-' + id).style.display = 'block';
-                    document.getElementById('edit-form-name-' + id).style.display = 'block';
-                    document.getElementById('view-producer-' + id).style.display = 'none';
-                    document.getElementById('view-name-' + id).style.display = 'none';
-                    button.style.display = 'none';
-                    button.parentElement.querySelector('.save-button').style.display = 'inline-flex';
-                });
-            });
-        });
-    </script>
 {/include}
