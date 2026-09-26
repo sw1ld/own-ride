@@ -45,6 +45,52 @@ class GroupTest {
     assertThat(cut.avgSpeed()).isCloseTo(21.4, Offset.offset(0.1));
   }
 
+  @Test
+  void latestActivity_returnsChronologicallyLatestActivity() {
+    Activity a1 =
+        new Activity(
+            UUID.randomUUID(),
+            "Route 1",
+            LocalDate.of(2026, 5, 20),
+            50.0,
+            Duration.ofHours(2),
+            Duration.ofHours(2),
+            25.0,
+            40.0,
+            20,
+            100,
+            null,
+            4,
+            null,
+            null,
+            null,
+            List.of());
+    Activity a2 =
+        new Activity(
+            UUID.randomUUID(),
+            "Route 2",
+            LocalDate.of(2026, 5, 10),
+            30.0,
+            Duration.ofHours(1),
+            Duration.ofHours(1),
+            30.0,
+            45.0,
+            20,
+            50,
+            null,
+            4,
+            null,
+            null,
+            null,
+            List.of());
+
+    Group group = new Group(UUID.randomUUID(), "Multi-Day Tour", 4, null, List.of(a1, a2));
+
+    assertThat(group.activities().getFirst().id()).isEqualTo(a2.id());
+    assertThat(group.activities().getLast().id()).isEqualTo(a1.id());
+    assertThat(group.latestActivity().id()).isEqualTo(a1.id());
+  }
+
   private static ActivityData activity(LocalDate date, double distance, Duration duration) {
     ActivityData activity = new ActivityData();
     activity.setId(UUID.randomUUID());

@@ -10,16 +10,28 @@ import java.util.UUID;
 public record Group(
     UUID id, String name, Integer rate, String thumbnail, List<Activity> activities) {
 
+  public Group {
+    if (activities != null) {
+      activities =
+          activities.stream()
+              .sorted(Comparator.comparing(Activity::date).thenComparing(Activity::id))
+              .toList();
+    } else {
+      activities = List.of();
+    }
+  }
+
   public Group(GroupData data) {
     this(
         data.getId(),
         data.getName(),
         data.getRate(),
         data.getThumbnail(),
-        data.getActivities().stream()
-            .map(Activity::new)
-            .sorted(Comparator.comparing(Activity::date))
-            .toList());
+        data.getActivities().stream().map(Activity::new).toList());
+  }
+
+  public Activity latestActivity() {
+    return activities.isEmpty() ? null : activities.getLast();
   }
 
   public double totalDistance() {

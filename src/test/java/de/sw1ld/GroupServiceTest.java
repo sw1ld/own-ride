@@ -119,6 +119,29 @@ class GroupServiceTest {
     assertThat(result.get().totalDistance()).isEqualTo(30.0);
   }
 
+  @Test
+  void fetchGroupsByIds_returnsGroups() {
+    LocalDate day = LocalDate.of(2026, Month.AUGUST, 1);
+    UUID groupId = UUID.randomUUID();
+    ActivityData ride1 = activity(UUID.randomUUID(), day);
+    ActivityData ride2 = activity(UUID.randomUUID(), day);
+    GroupData groupData = group(groupId, List.of(ride1, ride2));
+
+    when(groupDataRepoMock.findByIds(Set.of(groupId))).thenReturn(List.of(groupData));
+
+    List<Group> result = cut.fetchGroupsByIds(Set.of(groupId));
+
+    assertThat(result).hasSize(1);
+    assertThat(result.getFirst().id()).isEqualTo(groupId);
+  }
+
+  @Test
+  void fetchGroupsByIds_emptySet_returnsEmptyList() {
+    List<Group> result = cut.fetchGroupsByIds(Set.of());
+
+    assertThat(result).isEmpty();
+  }
+
   private static GroupData group(UUID id, List<ActivityData> activities) {
     GroupData group = new GroupData();
     group.setId(id);

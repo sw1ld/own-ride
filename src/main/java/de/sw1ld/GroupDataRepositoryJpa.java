@@ -7,6 +7,7 @@ import jakarta.persistence.PersistenceContext;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -25,6 +26,17 @@ public class GroupDataRepositoryJpa implements GroupDataRepository {
     } catch (NoResultException e) {
       return Optional.empty();
     }
+  }
+
+  @Override
+  public List<GroupData> findByIds(Set<UUID> ids) {
+    if (ids == null || ids.isEmpty()) {
+      return List.of();
+    }
+    return entityManager
+        .createNamedQuery(GroupData.QUERY_FIND_BY_IDS, GroupData.class)
+        .setParameter("ids", ids)
+        .getResultList();
   }
 
   @Override
