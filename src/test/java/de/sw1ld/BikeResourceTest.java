@@ -115,4 +115,119 @@ class BikeResourceTest {
         .statusCode(404)
         .body(containsString("Not Found"), containsString("does not exist"));
   }
+
+  @Test
+  void addBikeAsJson() {
+    UUID id = UUID.randomUUID();
+    BikeData bikeData = mock(BikeData.class);
+    when(bikeData.getId()).thenReturn(id);
+    when(bikeData.getProducer()).thenReturn("Trek");
+    when(bikeData.getName()).thenReturn("Domane");
+
+    when(bikeService.addBike("Trek", "Domane")).thenReturn(bikeData);
+
+    Bike response =
+        RestAssured.given()
+            .when()
+            .contentType(ContentType.URLENC)
+            .formParam("producer", "Trek")
+            .formParam("name", "Domane")
+            .accept(MediaType.APPLICATION_JSON)
+            .post(BIKES_PATH)
+            .then()
+            .statusCode(201)
+            .contentType(ContentType.JSON)
+            .header("Location", containsString("/bikes/id/" + id))
+            .extract()
+            .body()
+            .as(Bike.class);
+
+    assertThat(response.producer()).isEqualTo("Trek");
+    assertThat(response.name()).isEqualTo("Domane");
+  }
+
+  @Test
+  void addBikeWithBlankValuesReturnsBadRequest() {
+    when(bikeService.addBike("   ", "Domane"))
+        .thenThrow(new IllegalArgumentException("Producer and bike name must not be empty"));
+
+    RestAssured.given()
+        .when()
+        .contentType(ContentType.URLENC)
+        .formParam("producer", "   ")
+        .formParam("name", "Domane")
+        .accept(MediaType.APPLICATION_JSON)
+        .post(BIKES_PATH)
+        .then()
+        .statusCode(400)
+        .body(
+            containsString("Bad Request"),
+            containsString("Producer and bike name must not be empty"));
+  }
+
+  @Test
+  void updateBikeAsJson() {
+    UUID id = UUID.randomUUID();
+    BikeData bikeData = mock(BikeData.class);
+    when(bikeData.getId()).thenReturn(id);
+    when(bikeData.getProducer()).thenReturn("Trek");
+    when(bikeData.getName()).thenReturn("Domane");
+
+    when(bikeService.updateBike(id, "Trek", "Domane")).thenReturn(Optional.of(bikeData));
+
+    Bike response =
+        RestAssured.given()
+            .when()
+            .contentType(ContentType.URLENC)
+            .formParam("producer", "Trek")
+            .formParam("name", "Domane")
+            .accept(MediaType.APPLICATION_JSON)
+            .put(BIKE_ID_PATH.formatted(id))
+            .then()
+            .statusCode(200)
+            .contentType(ContentType.JSON)
+            .extract()
+            .body()
+            .as(Bike.class);
+
+    assertThat(response.producer()).isEqualTo("Trek");
+    assertThat(response.name()).isEqualTo("Domane");
+  }
+
+  @Test
+  void updateBikeWithBlankValuesReturnsBadRequest() {
+    UUID id = UUID.randomUUID();
+    when(bikeService.updateBike(id, "Trek", ""))
+        .thenThrow(new IllegalArgumentException("Producer and bike name must not be empty"));
+
+    RestAssured.given()
+        .when()
+        .contentType(ContentType.URLENC)
+        .formParam("producer", "Trek")
+        .formParam("name", "")
+        .accept(MediaType.APPLICATION_JSON)
+        .put(BIKE_ID_PATH.formatted(id))
+        .then()
+        .statusCode(400)
+        .body(
+            containsString("Bad Request"),
+            containsString("Producer and bike name must not be empty"));
+  }
+
+  @Test
+  void updateBikeNotFoundReturns404() {
+    UUID id = UUID.randomUUID();
+    when(bikeService.updateBike(id, "Trek", "Domane")).thenReturn(Optional.empty());
+
+    RestAssured.given()
+        .when()
+        .contentType(ContentType.URLENC)
+        .formParam("producer", "Trek")
+        .formParam("name", "Domane")
+        .accept(MediaType.APPLICATION_JSON)
+        .put(BIKE_ID_PATH.formatted(id))
+        .then()
+        .statusCode(404)
+        .body(containsString("Not Found"), containsString("does not exist"));
+  }
 }

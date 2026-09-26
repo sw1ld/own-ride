@@ -36,23 +36,28 @@ public class BikeService {
 
   @Transactional
   public BikeData addBike(String producer, String name) {
+    validBikeInputOrThrow(producer, name);
+
     BikeData bike = new BikeData();
     bike.setId(UUID.randomUUID());
-    bike.setProducer(producer);
-    bike.setName(name);
+    bike.setProducer(producer.trim());
+    bike.setName(name.trim());
     bikeRepository.persist(bike);
     return bike;
   }
 
   @Transactional
-  public BikeData updateBike(UUID bikeId, String producer, String name) {
-    BikeData bike =
-        bikeRepository
-            .findById(bikeId)
-            .orElseThrow(() -> new IllegalArgumentException("Bike not found"));
-    bike.setProducer(producer);
-    bike.setName(name);
-    return bikeRepository.merge(bike);
+  public Optional<BikeData> updateBike(UUID bikeId, String producer, String name) {
+    validBikeInputOrThrow(producer, name);
+
+    Optional<BikeData> bikeInInventory = findBike(bikeId);
+    if (bikeInInventory.isEmpty()) {
+      return Optional.empty();
+    }
+    BikeData bike = bikeInInventory.get();
+    bike.setProducer(producer.trim());
+    bike.setName(name.trim());
+    return Optional.of(bikeRepository.merge(bike));
   }
 
   @Transactional
@@ -68,5 +73,11 @@ public class BikeService {
 
   public List<Bike> findAll() {
     return bikeRepository.findAll().stream().map(Bike::new).toList();
+  }
+
+  private static void validBikeInputOrThrow(String producer, String name) {
+    if (producer == null || producer.isBlank() || name == null || name.isBlank()) {
+      throw new IllegalArgumentException("Producer and bike name must not be empty");
+    }
   }
 }

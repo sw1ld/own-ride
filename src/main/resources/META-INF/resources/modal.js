@@ -3,31 +3,109 @@ function showConfirm(title, message, onConfirm) {
   const modalTitle = document.getElementById('confirmModalTitle');
   const modalMessage = document.getElementById('confirmModalMessage');
   const modalConfirmBtn = document.getElementById('confirmModalAction');
+  const modalCancelBtn = document.getElementById('cancelModal');
 
-  const closeModal = () => modal.classList.remove('is-active');
+  const closeModal = () => {
+    modal.classList.remove('is-active');
+  };
 
   modalTitle.textContent = title;
   modalMessage.textContent = message;
+  modalConfirmBtn.textContent = 'Confirm';
+  if (modalCancelBtn) modalCancelBtn.style.display = '';
   modal.classList.add('is-active');
 
   modalConfirmBtn.onclick = async () => {
-    await onConfirm();
+    if (onConfirm) await onConfirm();
     closeModal();
   };
 
   document.getElementById('closeModal').onclick = closeModal;
-  document.getElementById('cancelModal').onclick = closeModal;
+  if (modalCancelBtn) modalCancelBtn.onclick = closeModal;
+  document.querySelector('.modal-background').onclick = closeModal;
+}
+
+function showAlert(title, message) {
+  const modal = document.getElementById('confirmModal');
+  const modalTitle = document.getElementById('confirmModalTitle');
+  const modalMessage = document.getElementById('confirmModalMessage');
+  const modalConfirmBtn = document.getElementById('confirmModalAction');
+  const modalCancelBtn = document.getElementById('cancelModal');
+
+  const closeModal = () => {
+    modal.classList.remove('is-active');
+    if (modalCancelBtn) modalCancelBtn.style.display = '';
+    modalConfirmBtn.textContent = 'Confirm';
+  };
+
+  modalTitle.textContent = title;
+  modalMessage.textContent = message;
+  modalConfirmBtn.textContent = 'OK';
+  if (modalCancelBtn) modalCancelBtn.style.display = 'none';
+  modal.classList.add('is-active');
+
+  modalConfirmBtn.onclick = () => {
+    closeModal();
+  };
+
+  document.getElementById('closeModal').onclick = closeModal;
   document.querySelector('.modal-background').onclick = closeModal;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  const saveBike = async (row) => {
+    if (!row) return;
+    const id = row.dataset.bikeId;
+    const producer = row.querySelector('.bike-producer')?.value.trim() ?? '';
+    const name = row.querySelector('.bike-name')?.value.trim() ?? '';
+
+    if (!producer || !name) {
+      showAlert('Validation Error', 'Producer and bike name must not be empty.');
+      return;
+    }
+
+    try {
+      const params = new URLSearchParams({ producer, name });
+
+      const response = await fetch('/own/bikes/id/' + id, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: params.toString()
+      });
+
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        showAlert('Error', 'Failed to save bike.');
+      }
+    } catch (err) {
+      console.error(err);
+      showAlert('Error', 'Failed to save bike.');
+    }
+  };
+
+  document.querySelectorAll('.save-bike').forEach(btn => {
+    btn.addEventListener('click', () => saveBike(btn.closest('tr')));
+  });
+
+  document.querySelectorAll('.bike-producer, .bike-name').forEach(input => {
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        saveBike(input.closest('tr'));
+      }
+    });
+  });
+
   document.querySelectorAll('.delete-bike').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const id = btn.dataset.id;
       showConfirm("Confirm Deletion", "Do you really want to delete this bike and all its activity assignments?", async () => {
         try {
-          const response = await fetch(`/own/bikes/${id}`, { method: 'DELETE' });
+          const response = await fetch(`/own/bikes/id/${id}`, { method: 'DELETE' });
           if (response.ok) {
             window.location.reload();
           } else {
@@ -40,6 +118,18 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   });
+
+  const addForm = document.querySelector('form[action="/own/bikes"]');
+  if (addForm) {
+    addForm.addEventListener('submit', (e) => {
+      const producer = addForm.querySelector('input[name="producer"]')?.value.trim() ?? '';
+      const name = addForm.querySelector('input[name="name"]')?.value.trim() ?? '';
+      if (!producer || !name) {
+        e.preventDefault();
+        showAlert('Validation Error', 'Producer and bike name must not be empty.');
+      }
+    });
+  }
 
   document.querySelectorAll('.delete-route').forEach(btn => {
     btn.addEventListener('click', (e) => {

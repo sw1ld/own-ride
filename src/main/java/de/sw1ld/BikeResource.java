@@ -46,7 +46,12 @@ public class BikeResource {
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces(MediaType.APPLICATION_JSON)
   public Response addBike(@FormParam("producer") String producer, @FormParam("name") String name) {
-    BikeData bike = bikeService.addBike(producer, name);
+    BikeData bike;
+    try {
+      bike = bikeService.addBike(producer, name);
+    } catch (IllegalArgumentException e) {
+      return badRequestProblem(e.getMessage());
+    }
 
     if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
       // seeOther to avoid "double submit problem" caused by page reload
@@ -78,13 +83,16 @@ public class BikeResource {
       @PathParam("id") UUID id,
       @FormParam("producer") String producer,
       @FormParam("name") String name) {
-    BikeData bike = bikeService.updateBike(id, producer, name);
+    try {
+      Optional<BikeData> bike = bikeService.updateBike(id, producer, name);
 
-    if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
-      // seeOther to avoid "double submit problem" caused by page reload
-      return Response.seeOther(URI.create("/bikes")).build();
-    } else {
-      return Response.ok(bike).entity(new Bike(bike)).build();
+      if (bike.isEmpty()) {
+        return Response.status(Status.NOT_FOUND).entity(notFoundProblem(id)).build();
+      }
+
+      return Response.ok(new Bike(bike.get())).build();
+    } catch (IllegalArgumentException e) {
+      return badRequestProblem(e.getMessage());
     }
   }
 
@@ -97,5 +105,11 @@ public class BikeResource {
 
   private static HttpProblem notFoundProblem(UUID id) {
     return HttpProblem.valueOf(Status.NOT_FOUND, "Bike with id '%s' does not exist".formatted(id));
+  }
+
+  private static Response badRequestProblem(String detail) {
+    return Response.status(Status.BAD_REQUEST)
+        .entity(HttpProblem.valueOf(Status.BAD_REQUEST, detail))
+        .build();
   }
 }
