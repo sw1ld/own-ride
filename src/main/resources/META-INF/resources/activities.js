@@ -1,5 +1,44 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Scroll- und Feed-Zustand wiederherstellen falls vorhanden
+function applyPendingUpdates() {
+    try {
+        const pendingRatings = JSON.parse(sessionStorage.getItem('pending_rating_updates') || '{}');
+        Object.entries(pendingRatings).forEach(([key, rate]) => {
+            const [type, id] = key.split('_');
+            document.querySelectorAll(`.rating[data-id="${id}"][data-type="${type}"]`).forEach(el => {
+                el.dataset.rate = rate;
+                el.querySelectorAll('i').forEach(s => {
+                    const val = parseInt(s.dataset.value, 10);
+                    s.classList.toggle('active', val <= rate && rate > 0);
+                });
+            });
+        });
+    } catch (e) {
+        console.error('Error applying pending ratings', e);
+    }
+
+    try {
+        const pendingNames = JSON.parse(sessionStorage.getItem('pending_name_updates') || '{}');
+        Object.entries(pendingNames).forEach(([key, name]) => {
+            const [type, id] = key.split('_');
+            document.querySelectorAll(`.clickable-card[data-id="${id}"][data-type="${type}"] .title`).forEach(el => {
+                el.innerText = name;
+            });
+        });
+    } catch (e) {
+        console.error('Error applying pending names', e);
+    }
+}
+
+function restoreFeedAndScroll() {
+    if (sessionStorage.getItem('feed_needs_reload') === 'true') {
+        sessionStorage.removeItem('feed_needs_reload');
+        sessionStorage.removeItem('feed_restore_html');
+        sessionStorage.removeItem('feed_restore_scroll');
+        sessionStorage.removeItem('pending_rating_updates');
+        sessionStorage.removeItem('pending_name_updates');
+        window.location.reload();
+        return;
+    }
+
     const savedHtml = sessionStorage.getItem('feed_restore_html');
     const savedScroll = sessionStorage.getItem('feed_restore_scroll');
 
@@ -18,6 +57,18 @@ document.addEventListener('DOMContentLoaded', () => {
         sessionStorage.removeItem('feed_restore_html');
         sessionStorage.removeItem('feed_restore_scroll');
     }
+
+    applyPendingUpdates();
+    sessionStorage.removeItem('pending_rating_updates');
+    sessionStorage.removeItem('pending_name_updates');
+}
+
+window.addEventListener('pageshow', () => {
+    restoreFeedAndScroll();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    restoreFeedAndScroll();
 
     let draggedId = null;
     let draggedType = null;
