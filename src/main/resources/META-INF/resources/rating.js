@@ -31,6 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const updated = await response.json();
                 const newRate = updated.rate;
 
+                const pendingRatings = JSON.parse(sessionStorage.getItem('pending_rating_updates') || '{}');
+                pendingRatings[`${container.dataset.type}_${id}`] = newRate;
+                sessionStorage.setItem('pending_rating_updates', JSON.stringify(pendingRatings));
+
                 document.querySelectorAll(`.rating[data-id="${id}"][data-type="${container.dataset.type}"]`).forEach(el => {
                     el.dataset.rate = newRate;
                     el.querySelectorAll('i').forEach(s => {

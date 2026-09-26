@@ -18,6 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     const updated = await response.json();
                     const name = updated.name || updated.displayName;
                     element.innerText = name;
+
+                    const pendingNames = JSON.parse(sessionStorage.getItem('pending_name_updates') || '{}');
+                    const typeUpper = type === 'groups' ? 'GROUP' : 'ACTIVITY';
+                    pendingNames[`${typeUpper}_${id}`] = name;
+                    sessionStorage.setItem('pending_name_updates', JSON.stringify(pendingNames));
                     
                     // Update breadcrumb if present
                     const breadcrumbActive = document.querySelector('.breadcrumb li.is-active a');

@@ -49,6 +49,11 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
           const response = await fetch(`/own/activities/id/${id}`, { method: 'DELETE' });
           if (response.ok) {
+            sessionStorage.setItem('feed_needs_reload', 'true');
+            sessionStorage.removeItem('feed_restore_html');
+            sessionStorage.removeItem('feed_restore_scroll');
+            sessionStorage.removeItem('pending_rating_updates');
+            sessionStorage.removeItem('pending_name_updates');
             if (window.location.pathname.includes('/id/')) {
                // If we are on the detail page, go back to the list
                window.location.href = '/own/activities';
@@ -86,6 +91,11 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify(activityId)
           });
           if (response.ok) {
+            sessionStorage.setItem('feed_needs_reload', 'true');
+            sessionStorage.removeItem('feed_restore_html');
+            sessionStorage.removeItem('feed_restore_scroll');
+            sessionStorage.removeItem('pending_rating_updates');
+            sessionStorage.removeItem('pending_name_updates');
             if (response.headers.get('X-Group-Dissolved') === 'true') {
               window.location.href = '/own/activities';
             } else {
