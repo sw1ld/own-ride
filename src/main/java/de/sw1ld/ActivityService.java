@@ -100,7 +100,8 @@ public class ActivityService {
             activityDataRepository.findByTimeCreated(fileId.getTimeCreated());
 
         if (existingActivity.isPresent()) {
-          throw new IllegalArgumentException("Activity already uploaded");
+          throw new IllegalArgumentException(
+              "Activity already uploaded with id [%s]".formatted(existingActivity.get().getId()));
         }
       }
 
@@ -128,7 +129,7 @@ public class ActivityService {
 
       return id;
     } catch (Exception e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException(e.getMessage(), e);
     }
   }
 
