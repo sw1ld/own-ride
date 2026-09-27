@@ -2,15 +2,14 @@
     <div class="container">
         <nav class="breadcrumb" aria-label="breadcrumbs">
             <ul>
-                <li><a href="/own/activities">Activities</a></li>
+                <li id="activities-breadcrumb"><a href="/own/activities">Activities</a></li>
+                <li id="dashboard-breadcrumb" style="display: none;"><a href="/own/stats" id="back-dashboard-breadcrumb">Dashboard</a></li>
                 {#if data.type == 'GROUP'}
                     <li><a href="/own/groups/id/{data.id}">{data.displayName}</a></li>
                 {/if}
                 {#if data.groupId}
                     {! Fixme: Breadcrumb does not immediately update when group name changed !}
-                    <li id="group-breadcrumb" style="display: none;">
-                    <a id="group-link"></a>
-                </li>
+                    <li id="group-breadcrumb" style="display: none;"><a id="group-link"></a></li>
                 {/if}
                 <li class="is-active"><a href="#" aria-current="page">{data.displayName}</a></li>
             </ul>
@@ -33,18 +32,18 @@
             </div>
             <div class="level-right">
                 {#if data.groupId}
-                <a href="/own/groups/id/{data.groupId}" class="button is-link is-outlined">
+                <a href="/own/groups/id/{data.groupId}" id="back-link-group" onclick="if (history.length > 1) { history.back(); return false; }" class="button is-link is-outlined">
                     <span class="icon">
                         <i class="fas fa-arrow-left"></i>
                     </span>
-                    <span>Back to Group</span>
+                    <span id="back-link-group-label">Back to Group</span>
                 </a>
                 {#else}
-                <a href="/own/activities" onclick="if (history.length > 1) { history.back(); return false; }" class="button is-link is-outlined">
+                <a href="/own/activities" id="back-link-list" onclick="if (history.length > 1) { history.back(); return false; }" class="button is-link is-outlined">
                     <span class="icon">
                         <i class="fas fa-arrow-left"></i>
                     </span>
-                    <span>Back to list</span>
+                    <span id="back-link-list-label">Back to list</span>
                 </a>
                 {/if}
             </div>
@@ -116,11 +115,17 @@
                     <tr>
                         <td class="has-text-centered p-4">
                             <p class="title is-5 mb-1">{data.distance}</p>
-                            <p class="heading">Distance</p>
+                            <div class="heading">
+                                <div class="fas fa-route"></div>
+                                Distance
+                            </div>
                         </td>
                         <td class="has-text-centered p-4">
                             <p class="title is-5 mb-1">{data.duration}</p>
-                            <div class="heading">Duration</div>
+                            <div class="heading">
+                                <div class="fas fa-stopwatch"></div>
+                                Duration
+                            </div>
                         </td>
                         <td class="has-text-centered p-4">
                             <p class="title is-5 mb-1">{data.avgSpeed}</p>
@@ -130,15 +135,24 @@
                     <tr>
                         <td class="has-text-centered p-4">
                             <p class="title is-5 mb-1">{data.totalAscent}</p>
-                            <div class="heading">Total Ascent</div>
+                            <div class="heading">
+                                <div class="fas fa-mountain"></div>
+                                Ascent
+                            </div>
                         </td>
                         <td class="has-text-centered p-4">
                             <p class="title is-5 mb-1">{data.elapsedTime}</p>
-                            <div class="heading">Elapsed Time</div>
+                            <div class="heading">
+                                <i class="fa-solid fa-hourglass-half"></i>
+                                Elapsed Time
+                            </div>
                         </td>
                         <td class="has-text-centered p-4">
                             <p class="title is-5 mb-1">{data.maxSpeed}</p>
-                            <div class="heading">Max Speed</div>
+                            <div class="heading">
+                                <div class="fas fa-gauge-high"></div>
+                                Max Speed
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -219,17 +233,39 @@
             }
 
             const params = new URLSearchParams(window.location.search);
-            const groupId = params.get('groupId');
-            const groupName = params.get('groupName');
 
-            if (groupName && groupId) {
-                const breadcrumb = document.getElementById('group-breadcrumb');
-                const link = document.getElementById('group-link');
+            if (params.get('from') === 'dashboard') {
+                document.getElementById('activities-breadcrumb').style.display = 'none';
+                document.getElementById('dashboard-breadcrumb').style.display = '';
 
-                link.href = `/own/groups/id/` + groupId;
-                link.textContent = groupName;
+                const filterUnit = params.get('filterUnit');
+                const offset = params.get('offset');
+                const dashboardParams = new URLSearchParams();
 
-                breadcrumb.style.display = '';
+                if (filterUnit !== null) {
+                    dashboardParams.set('filterUnit', filterUnit);
+                }
+                if (offset !== null) {
+                    dashboardParams.set('offset', offset);
+                }
+
+                const backLink = document.getElementById('back-link-list');
+                const backLinkGroup = document.getElementById('back-link-group');
+                const backDashboardBreadcrumb = document.getElementById('back-dashboard-breadcrumb');
+                if (backLink) {
+                    backLink.href = '/own/stats?' + dashboardParams.toString();
+                    backLink.removeAttribute('onclick');
+                    document.getElementById('back-link-list-label').textContent = 'Back to Dashboard';
+                }
+                if (backLinkGroup) {
+                    backLinkGroup.href = '/own/stats?' + dashboardParams.toString();
+                    backLinkGroup.removeAttribute('onclick');
+                    document.getElementById('back-link-group-label').textContent = 'Back to Dashboard';
+                }
+                if (backDashboardBreadcrumb) {
+                    backDashboardBreadcrumb.href = '/own/stats?' + dashboardParams.toString();
+                    backDashboardBreadcrumb.removeAttribute('onclick');
+                }
             }
         });
     </script>

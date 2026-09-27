@@ -1,6 +1,7 @@
 package de.sw1ld;
 
 import jakarta.annotation.Nullable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -12,11 +13,11 @@ public interface ActivityDataRepository {
 
   List<ActivityData> findByIds(Set<UUID> ids);
 
-  List<PerformanceData> fetchPerformanceDataByYear(int year);
+  List<PerformanceData> fetchPerformanceData(LocalDate start, LocalDate end);
 
   List<ActivityData> fetchFeed(@Nullable Cursor cursor, int limit);
 
-  Optional<Integer> findMinYear();
+  Optional<LocalDate> findEarliestActivityDate();
 
   Optional<ActivityData> findByTimeCreated(LocalDateTime timeCreated);
 

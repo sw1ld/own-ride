@@ -102,12 +102,15 @@
                 background-color: var(--primary-light);
             }
 
-            .button.is-info.is-outlined {
+            .button.is-info.is-outlined,
+            .button.is-link.is-outlined {
                 color: var(--primary-color);
                 border-color: var(--primary-color);
             }
-            .button.is-info.is-outlined:hover {
+            .button.is-info.is-outlined:hover,
+            .button.is-link.is-outlined:hover {
                 background-color: var(--primary-color);
+                border-color: var(--primary-color);
                 color: white;
             }
             
@@ -199,14 +202,6 @@
             .modal {
                 z-index: 1000;
             }
-            th.sortable {
-                cursor: pointer;
-                user-select: none;
-            }
-            .arrow {
-                font-size: 0.8em;
-                margin-left: 4px;
-            }
             .charts {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -216,10 +211,6 @@
             .chart {
                 padding: 1rem;
                 border-radius: 8px;
-            }
-            .canvas {
-                width: 100%;
-                height: 100%;
             }
             .rating {
                 display: inline-flex;
@@ -239,6 +230,74 @@
             }
             .navbar-brand .navbar-item img {
                 max-height: 2.5rem;
+            }
+
+            .tabs.is-toggle a {
+                font-weight: 500;
+                border-color: var(--border-color);
+                color: var(--text-color);
+            }
+            .tabs.is-toggle li.is-active a {
+                background-color: var(--primary-color);
+                border-color: var(--primary-color);
+                color: white;
+            }
+            .tabs.is-toggle a:hover {
+                background-color: rgba(11, 69, 135, 0.08);
+                border-color: var(--primary-color);
+                color: var(--primary-color);
+            }
+            .tabs.is-toggle li.is-active a:hover {
+                background-color: var(--primary-light);
+                color: white;
+            }
+
+            .summary-stat {
+                text-align: center;
+                padding: 1rem;
+                height: 100%;
+                border-radius: 8px;
+            }
+
+            .clickable-card-element:hover {
+                transform: translateX(4px);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                background-color: #fafafa;
+            }
+
+            .pagination-previous,
+            .pagination-next {
+                flex-grow: 0;
+                flex-shrink: 0;
+                flex-basis: auto;
+                width: 2.5em;
+                padding: 0;
+            }
+            .pagination-previous {
+                margin-right: auto;
+            }
+            .pagination-next {
+                margin-left: auto;
+            }
+            .pagination-previous[disabled],
+            .pagination-next[disabled] {
+                color: var(--border-color) !important;
+                border-color: var(--border-color) !important;
+                background-color: transparent !important;
+                pointer-events: none;
+            }
+            #periodLabel {
+                font-weight: 600;
+                color: var(--title-color);
+            }
+            #dashboard-breadcrumb::before {
+                /*suppress leading slash in "/ Dashboard / $ACTIVITY_NAME" */
+                content: none !important;
+            }
+            #dashboard-breadcrumb a {
+                /*suppress leading whitespace in " Dashboard / $ACTIVITY_NAME" */
+                margin-left: 0 !important;
+                padding-left: 0 !important;
             }
         </style>
     </head>
@@ -260,7 +319,7 @@
             <div id="mainNavbar" class="navbar-menu">
                 <div class="navbar-start">
                     <a class="navbar-item" href="/own/upload">Upload</a>
-                    <a class="navbar-item year-link" href="/own/stats">Dashboard</a>
+                    <a class="navbar-item filter-unit" href="/own/stats">Dashboard</a>
                     <a class="navbar-item" href="/own/activities">Activities</a>
                     <a class="navbar-item" href="/own/bikes">Bikes</a>
                 </div>

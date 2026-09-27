@@ -15,6 +15,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import jakarta.ws.rs.core.MediaType;
 import java.io.File;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -29,13 +30,15 @@ import org.junit.jupiter.api.TestMethodOrder;
 class ApiTest {
 
   private static final int YEAR = 2021;
+  private static final int OFFSET = LocalDate.now().getYear() - YEAR;
 
   @Test
   @Order(1)
   void initialApplication_hasNoContent() {
     given()
         .accept(MediaType.APPLICATION_JSON)
-        .queryParam("year", YEAR)
+        .queryParam("filterUnit", "YEAR")
+        .queryParam("offset", OFFSET)
         .when()
         .get("/stats")
         .then()
@@ -95,7 +98,8 @@ class ApiTest {
 
     given()
         .accept(MediaType.APPLICATION_JSON)
-        .queryParam("year", YEAR)
+        .queryParam("filterUnit", "YEAR")
+        .queryParam("offset", OFFSET)
         .when()
         .get("/stats")
         .then()
@@ -109,7 +113,7 @@ class ApiTest {
     assertThat(activity.displayName()).isEqualTo("Route1");
     assertThat(activity.date()).isEqualTo("2021-04-27");
     assertThat(activity.distance()).isEqualTo("34.68 km");
-    assertThat(activity.duration()).isEqualTo("1:34:54");
+    assertThat(activity.duration()).isEqualTo("01:34:54 h");
     assertThat(activity.avgSpeed()).isEqualTo("21.93 km/h");
     assertThat(activity.temperature()).isEqualTo("/");
     assertThat(activity.totalAscent()).isEqualTo("/");
@@ -135,7 +139,8 @@ class ApiTest {
 
     given()
         .accept(MediaType.APPLICATION_JSON)
-        .queryParam("year", YEAR)
+        .queryParam("filterUnit", "YEAR")
+        .queryParam("offset", OFFSET)
         .when()
         .get("/stats")
         .then()

@@ -1,46 +1,175 @@
 {#include base}
-    <div class="columns">
-        <div class="column is-3-tablet is-12-mobile">
-            <div class="field">
-                <div class="control">
-                    <div class="select is-fullwidth">
-                        <select id="yearFilter" style="border-radius: 8px;">
-                            {#for y in availableYears}
-                                <option value="{y}">{y}</option>
-                            {/for}
-                        </select>
-                    </div>
+    <h1 class="title">Dashboard</h1>
+
+    <div class="tabs is-toggle is-centered">
+        <ul>
+            <li>
+                <a><span id="weekFilter">Week</span></a>
+            </li>
+            <li>
+                <a><span id="monthFilter">Month</span></a>
+            </li>
+            <li class="is-active">
+                <a><span id="yearFilter">Year</span></a>
+            </li>
+            <li>
+                <a><span id="noFilter">All</span></a>
+            </li>
+        </ul>
+    </div>
+    <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+        <a href="#" class="pagination-previous button is-link is-outlined">
+            <span class="icon">
+                <i class="fas fa-arrow-left"></i>
+            </span>
+        </a>
+        <span id="periodLabel" class="pagination-list has-text-centered"></span>
+        <a href="#" class="pagination-next button is-link is-outlined">
+            <span class="icon">
+                <i class="fas fa-arrow-right"></i>
+            </span>
+        </a>
+    </nav>
+
+    <div class="box">
+        <h2 class="title is-5 mb-5">Summary</h2>
+
+        <div class="columns is-mobile is-multiline">
+            <div class="column is-6-mobile is-3-desktop">
+                <div class="summary-stat">
+                    <span class="icon is-medium has-text-info">
+                        <i class="fas fa-list"></i>
+                    </span>
+                    <p class="title is-5 mb-1">{stats.rides}</p>
+                    <p class="heading">Activities</p>
+                </div>
+            </div>
+
+            <div class="column is-6-mobile is-3-desktop">
+                <div class="summary-stat">
+                    <span class="icon is-medium has-text-info">
+                        <i class="fa-solid fa-route"></i>
+                    </span>
+                    <p class="title is-5 mb-1">{stats.distance}</p>
+                    <p class="heading">Total Distance</p>
+                </div>
+            </div>
+
+            <div class="column is-6-mobile is-3-desktop">
+                <div class="summary-stat">
+                <span class="icon is-medium has-text-info">
+                    <i class="fas fa-stopwatch"></i>
+                </span>
+                    <p class="title is-5 mb-1">{stats.duration}</p>
+                    <p class="heading">Total Duration</p>
+                </div>
+            </div>
+
+            <div class="column is-6-mobile is-3-desktop">
+                <div class="summary-stat">
+                <span class="icon is-medium has-text-info">
+                    <i class="fas fa-mountain"></i>
+                </span>
+                    <p class="title is-5 mb-1">{stats.ascent}</p>
+                    <p class="heading">Total Ascent</p>
                 </div>
             </div>
         </div>
     </div>
-    <h1 class="title">Dashboard</h1>
+
+
     <div class="box">
-        <h2 class="title is-4">Summary</h2>
-
-        <div id="summary" class="table-container">
-            <table class="table is-fullwidth">
-                <thead>
-                    <tr>
-                        <th class="has-text-centered">Activities</th>
-                        <th class="has-text-centered">Total distance</th>
-                        <th class="has-text-centered">Total ascent</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr>
-                        <td id="ridesCount" class="has-text-centered">{stats.rides}</td>
-                        <td id="totalDistance" class="has-text-centered">{stats.distance}</td>
-                        <td id="totalDistance" class="has-text-centered">{stats.ascent}</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="level mb-5">
+            <div class="level-left">
+                <div>
+                    <h2 class="title is-5 mb-1">Highlights</h2>
+                </div>
+            </div>
         </div>
+
+        <div class="card mb-2 clickable-card-element" data-highlight-id="{stats.longestDistanceActivityId}">
+            <div class="card-content p-3">
+                <div class="columns is-mobile is-vcentered">
+                    <div class="column is-flex is-align-items-center">
+                        <span class="icon has-text-info mr-3">
+                            <i class="fas fa-route"></i>
+                        </span>
+                        <div>
+                            <p class="has-text-weight-semibold mb-1">Longest Ride</p>
+                            <p class="is-size-7 has-text-grey">Endurance Challenge</p>
+                        </div>
+                    </div>
+
+                    <div class="column is-narrow has-text-right">
+                        <p class="title is-6 mb-1">{stats.longestDistance}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-2 clickable-card-element" data-highlight-id="{stats.fastestRideActivityId}">
+            <div class="card-content p-3">
+                <div class="columns is-mobile is-vcentered">
+                    <div class="column is-flex is-align-items-center">
+                        <span class="icon has-text-info mr-3">
+                            <i class="fas fa-gauge-simple-high"></i>
+                        </span>
+                        <div>
+                            <p class="has-text-weight-semibold mb-1">Fastest Ride</p>
+                            <p class="is-size-7 has-text-grey">Pace Setter</p>
+                        </div>
+                    </div>
+
+                    <div class="column is-narrow has-text-right">
+                        <p class="title is-6 mb-1">{stats.fastestRide}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-2 clickable-card-element" data-highlight-id="{stats.topSpeedActivityId}">
+            <div class="card-content p-3">
+                <div class="columns is-mobile is-vcentered">
+                    <div class="column is-flex is-align-items-center">
+                        <span class="icon has-text-info mr-3">
+                            <i class="fas fa-gauge-high"></i>
+                        </span>
+                        <div>
+                            <p class="has-text-weight-semibold mb-1">Top Speed</p>
+                            <p class="is-size-7 has-text-grey">Speed Demon</p>
+                        </div>
+                    </div>
+
+                    <div class="column is-narrow has-text-right">
+                        <p class="title is-6 mb-1">{stats.topSpeed}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-2 clickable-card-element" data-highlight-id="{stats.biggestClimbActivityId}">
+                <div class="card-content p-3">
+                    <div class="columns is-mobile is-vcentered">
+                        <div class="column is-flex is-align-items-center">
+                            <span class="icon has-text-info mr-3">
+                                <i class="fas fa-mountain-sun"></i>
+                            </span>
+                            <div>
+                                <p class="has-text-weight-semibold mb-1">Biggest Climb</p>
+                                <p class="is-size-7 has-text-grey">Mountain Challenge</p>
+                            </div>
+                        </div>
+
+                        <div class="column is-narrow has-text-right">
+                            <p class="title is-6 mb-1">{stats.biggestClimb}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
     </div>
 
     <div class="box">
-        <h2 class="title is-4">Analysis</h2>
+        <h2 class="title is-5">Analysis</h2>
         <div class="charts">
             <div class="chart">
                 <div id="routesInYear" style="position: relative; height:40vh; width:100%">
@@ -59,6 +188,20 @@
     <script src="/own/stats.js" defer></script>
     <script src="/own/filters.js" defer></script>
     <script>
+        document.querySelectorAll('.clickable-card-element').forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('a') || e.target.closest('button')) return;
+
+                const dataHighlightId = card.dataset.highlightId;
+                console.log("ID: " + dataHighlightId);
+
+                if (dataHighlightId) {
+                    window.location.href = '/own/activities/id/' + dataHighlightId
+                        + '?from=dashboard&' + window.location.search.substring(1);
+                }
+            });
+        });
+
         document.addEventListener("DOMContentLoaded", () => {
             if (typeof loadStatistics === 'function') {
                 loadStatistics();

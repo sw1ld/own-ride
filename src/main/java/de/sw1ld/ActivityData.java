@@ -42,15 +42,16 @@ import java.util.UUID;
     name = ActivityData.QUERY_REMOVE_BIKE_ASSIGNMENTS,
     query = "UPDATE ActivityData ed SET ed.bike = null WHERE ed.bike.id = :bikeId")
 @NamedQuery(
-    name = ActivityData.QUERY_PERFORMANCE_BY_YEAR,
+    name = ActivityData.QUERY_PERFORMANCE,
     query =
-        "SELECT new de.sw1ld.PerformanceData(ed.date, ed.distance, ed.totalAscent) "
-            + "FROM ActivityData ed WHERE ed.date >= :startOfYear AND ed.date < :startOfNextYear")
+        "SELECT new de.sw1ld.PerformanceData(ed.id, ed.date, ed.distance, ed.totalAscent,"
+            + " ed.duration, ed.avgSpeed, ed.maxSpeed) FROM ActivityData ed WHERE ed.date >="
+            + " :start AND ed.date <= :end")
 public class ActivityData {
 
   public static final String QUERY_FIND_BY_ID = "ExtractedData.findById";
   public static final String QUERY_FIND_BY_IDS = "ExtractedData.findByIds";
-  public static final String QUERY_PERFORMANCE_BY_YEAR = "ExtractedData.fetchPerformanceDataByYear";
+  public static final String QUERY_PERFORMANCE = "ExtractedData.fetchPerformanceData";
   public static final String QUERY_FETCH_FEED = "ExtractedData.fetchFeed";
   public static final String QUERY_FIND_MIN_DATE = "ExtractedData.findMinDate";
   public static final String QUERY_FIND_BY_TIME_CREATED = "ExtractedData.findByTimeCreated";

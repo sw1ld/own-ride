@@ -17,7 +17,7 @@ With `OwnRide` I try to give a lightweight, community driven alternative to main
 ## Key Features
 
 - **File Upload:** Import single or multiple FIT files via a web frontend
-- **Dashboard:** Get a visual overview of your activities summarized per year
+- **Dashboard:** Get an overview of your achievements
 - **Details View:** See a list of your activities, including route and altitude profiles
 - **Persistence:** Add additional information to each activity
 
@@ -33,7 +33,6 @@ With `OwnRide` I try to give a lightweight, community driven alternative to main
 - [ ] Insert "events" such as "repair/service meeting"
 - [ ] Export all files (including meta data)?
 - [ ] Add more graphs for e.g. "Speed & slope"
-- [ ] Optimize performance (caching)
 - [ ] Add notes to route (explain e.g. grading)
 - [ ] add search possibility for feeds
   

@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.IntStream;
 import org.jspecify.annotations.NonNull;
 
 @ApplicationScoped
@@ -52,16 +51,12 @@ public class ActivityService {
     return new Fragment(items, nextCursor);
   }
 
-  List<PerformanceData> fetchPerformanceData(@NonNull Integer year) {
-    return activityDataRepository.fetchPerformanceDataByYear(year);
+  List<PerformanceData> fetchPerformanceData(@NonNull LocalDate start, @NonNull LocalDate end) {
+    return activityDataRepository.fetchPerformanceData(start, end);
   }
 
-  List<Integer> getAvailableYears() {
-    int currentYear = LocalDate.now().getYear();
-    int minYear = activityDataRepository.findMinYear().orElse(currentYear);
-
-    // We want a descending list (most recent year first)
-    return IntStream.rangeClosed(minYear, currentYear).boxed().sorted((a, b) -> b - a).toList();
+  LocalDate getEarliestActivityDate() {
+    return activityDataRepository.findEarliestActivityDate().orElse(LocalDate.now());
   }
 
   @Transactional

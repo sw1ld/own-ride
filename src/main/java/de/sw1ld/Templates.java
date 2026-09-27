@@ -9,8 +9,7 @@ public class Templates {
 
   private Templates() {}
 
-  public static native TemplateInstance statistics(
-      StatisticResponse stats, List<Integer> availableYears);
+  public static native TemplateInstance statistics(StatisticResponse stats);
 
   public static native TemplateInstance activities(List<FeedItem> data, String nextCursor);
 
