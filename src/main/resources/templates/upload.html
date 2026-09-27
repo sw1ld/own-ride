@@ -47,14 +47,11 @@
                             <form id="uploadForm" action="/own/upload" method="post" enctype="multipart/form-data">
 
                                 <div class="field">
-                                    <label class="label">Upload files or folders</label>
+                                    <label class="label">Upload files</label>
                                     <div class="control">
                                         <div class="buttons">
                                             <button type="button" class="button is-info is-outlined" id="selectFilesBtn">
                                                 <span>📄 Select files</span>
-                                            </button>
-                                            <button type="button" class="button is-info is-outlined" id="selectFolderBtn">
-                                                <span>📁 Select folder</span>
                                             </button>
                                         </div>
                                         
@@ -66,15 +63,7 @@
                                             accept=".fit"
                                             multiple
                                         >
-                                        <input
-                                            id="folderInput"
-                                            class="is-hidden"
-                                            type="file"
-                                            name="file"
-                                            accept=".fit"
-                                            webkitdirectory
-                                        >
-                                        
+
                                         <div class="file has-name is-fullwidth is-boxed mt-2">
                                             <label class="file-label">
                                                 <span id="fileName" class="file-name has-text-centered">
