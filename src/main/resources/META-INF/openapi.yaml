@@ -543,15 +543,25 @@ paths:
   /own/stats:
     get:
       operationId: getStatistics
-      summary: 'Fetch aggregated statistics for the current year.'
+      summary: 'Fetch aggregated statistics for a given filter unit and offset.'
       tags:
         - Statistics
       parameters:
-        - name: year
+        - name: filterUnit
+          in: query
+          schema:
+            type: string
+            enum: [WEEK, MONTH, YEAR, ALL]
+            example: 'MONTH'
+            description: 'Granularity of filtering time'
+        - name: offset
           in: query
           schema:
             type: integer
-            example: 2026
+            example: '1'
+            description: 'Number of filterUnits in the past used for pagination. 
+            Zero means current YEAR/MONTH/WEEK. 
+            It does not apply for ALL, since all data gets aggregated already.'
       responses:
         '200':
           description: 'Overall statistics for the year.'
@@ -780,6 +790,37 @@ components:
         distance:
           type: string
           example: '821.84 km'
+        ascent:
+          type: string
+          example: '1234 m'
+        longestDistance:
+          type: string
+          example: '123.45 km'
+        longestDistanceActivityId:
+          type: string
+          format: uuid
+          example: '6e87e7a4-6326-4e40-933c-750e78f23439'
+        topSpeed:
+          type: string
+          example: '51.95 km/h'
+        topSpeedActivityId:
+          type: string
+          format: uuid
+          example: '6e87e7a4-6326-4e40-933c-750e78f23439'
+        fastestRide:
+          type: string
+          example: '32.10 km/h'
+        fastestRideActivityId:
+          type: string
+          format: uuid
+          example: '6e87e7a4-6326-4e40-933c-750e78f23439'
+        biggestClimb:
+          type: string
+          example: '567 m'
+        biggestClimbActivityId:
+          type: string
+          format: uuid
+          example: '6e87e7a4-6326-4e40-933c-750e78f23439'
         tourDates:
           type: object
           description: 'Map of dates to distance'
@@ -791,6 +832,24 @@ components:
             '2026-07-04': 0.0
             '2026-07-05': 0.0
             '2026-07-06': 39.5099296875
+        start:
+          type: string
+          format: date
+          description: 'First day of the selected period.'
+          example: '2026-07-01'
+        end:
+          type: string
+          format: date
+          description: 'Last day of the selected period.'
+          example: '2026-07-31'
+        hasPrevious:
+          type: boolean
+          description: 'Whether an earlier period is available.'
+          example: true
+        hasNext:
+          type: boolean
+          description: 'Whether a later period is available (false for the current period).'
+          example: false
 
     UploadResponseList:
         type: array

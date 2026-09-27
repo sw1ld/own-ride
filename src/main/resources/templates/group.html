@@ -77,7 +77,7 @@
             <h2 class="title is-5">Distinct Activities</h2>
             <div class="activity-feed">
                 {#for entry in data.activities}
-                    <div class="card mb-2 clickable-activity" data-id="{entry.id}" style="cursor: pointer; border-radius: 6px; transition: transform 0.1s, box-shadow 0.1s;">
+                    <div class="card mb-2 clickable-card-element" data-id="{entry.id}" style="cursor: pointer; border-radius: 6px; transition: transform 0.1s, box-shadow 0.1s;">
                         <div class="card-content p-3">
                             <div class="columns is-mobile is-vcentered">
                                 <div class="column is-narrow">
@@ -138,7 +138,7 @@
     <script src="/own/modal.js" defer></script>
     <script src="/own/rating.js" defer></script>
     <script>
-        document.querySelectorAll('.clickable-activity').forEach(card => {
+        document.querySelectorAll('.clickable-card-element').forEach(card => {
             card.addEventListener('click', (e) => {
                 if (e.target.closest('a') || e.target.closest('button')) return;
                 window.location.href = '/own/activities/id/' + card.dataset.id + '?groupName={data.displayName}&groupId={data.id}';
@@ -151,12 +151,4 @@
             }
         });
     </script>
-
-    <style>
-        .clickable-activity:hover {
-            transform: translateX(4px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            background-color: #fafafa;
-        }
-    </style>
 {/include}

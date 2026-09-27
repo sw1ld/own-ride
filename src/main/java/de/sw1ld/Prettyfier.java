@@ -6,6 +6,13 @@ public class Prettyfier {
 
   private Prettyfier() {}
 
+  static String distanceCompactWithUnit(double distance) {
+    if (distance >= 1000.0) {
+      return "%.2fK km".formatted(distance / 1000);
+    }
+    return distanceWithUnit(distance);
+  }
+
   static String distanceWithUnit(double distance) {
     return "%.2f km".formatted(distance);
   }
@@ -22,17 +29,25 @@ public class Prettyfier {
     }
   }
 
-  public static String duration(Duration duration) {
-    if (duration == null) {
+  public static String duration(Duration d) {
+    if (d == null) {
       return "not defined";
     }
-    return "%d:%02d:%02d"
-        .formatted(duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
+
+    if (d.toDays() >= 1) {
+      double totalHours = d.toSeconds() / 3_600.0;
+      return "%.2f h".formatted(totalHours);
+    }
+
+    return "%02d:%02d:%02d h".formatted(d.toHoursPart(), d.toMinutesPart(), d.toSecondsPart());
   }
 
   public static String withMeter(Integer value) {
     if (value == null) {
       return "/";
+    }
+    if (value >= 10000) {
+      return "%3dK m".formatted(value / 1000);
     } else {
       return "%d m".formatted(value);
     }

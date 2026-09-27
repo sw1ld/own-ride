@@ -40,14 +40,12 @@ public class ActivityDataRepositoryJpa implements ActivityDataRepository {
   }
 
   @Override
-  public List<PerformanceData> fetchPerformanceDataByYear(int year) {
-    LocalDate start = LocalDate.of(year, 1, 1);
-    LocalDate end = start.plusYears(1);
+  public List<PerformanceData> fetchPerformanceData(LocalDate start, LocalDate end) {
 
     return entityManager
-        .createNamedQuery(ActivityData.QUERY_PERFORMANCE_BY_YEAR, PerformanceData.class)
-        .setParameter("startOfYear", start)
-        .setParameter("startOfNextYear", end)
+        .createNamedQuery(ActivityData.QUERY_PERFORMANCE, PerformanceData.class)
+        .setParameter("start", start)
+        .setParameter("end", end)
         .getResultList();
   }
 
@@ -72,12 +70,12 @@ public class ActivityDataRepositoryJpa implements ActivityDataRepository {
   }
 
   @Override
-  public Optional<Integer> findMinYear() {
+  public Optional<LocalDate> findEarliestActivityDate() {
     LocalDate minDate =
         entityManager
             .createNamedQuery(ActivityData.QUERY_FIND_MIN_DATE, LocalDate.class)
             .getSingleResult();
-    return Optional.ofNullable(minDate).map(LocalDate::getYear);
+    return Optional.ofNullable(minDate);
   }
 
   @Override

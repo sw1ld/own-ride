@@ -25,16 +25,17 @@ public class StatisticResource {
 
   @GET
   @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_HTML})
-  public Response statistics(@QueryParam("year") Integer year) {
-    if (year == null) {
-      year = LocalDate.now().getYear();
-    }
-    List<PerformanceData> performanceData = activityService.fetchPerformanceData(year);
-    var stats = StatisticService.getStats(performanceData, year);
+  public Response statistics(
+      @QueryParam("filterUnit") String filterUnit, @QueryParam("offset") Integer offset) {
+    LocalDate earliestActivityDate = activityService.getEarliestActivityDate();
+    DateCalculator dateCalculator = new DateCalculator(filterUnit, offset, earliestActivityDate);
+
+    List<PerformanceData> performanceData =
+        activityService.fetchPerformanceData(dateCalculator.start(), dateCalculator.end());
+    var stats = StatisticService.getStats(performanceData, dateCalculator);
 
     if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
-      var years = activityService.getAvailableYears();
-      return Response.ok(Templates.statistics(stats, years)).build();
+      return Response.ok(Templates.statistics(stats)).build();
     } else {
       return Response.ok(stats).build();
     }
