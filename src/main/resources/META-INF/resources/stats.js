@@ -122,37 +122,4 @@ function initStatistics(dailyDates, dailyDistance, filterUnit) {
         '',
         'kilometers'
     );
-
-    const distances = dailyDistance.filter(v => v > 0);
-    const binCount = 10;
-    const min = 0;
-    const max = 100;
-    const binSize = (max - min) / binCount;
-
-    const bins = new Array(binCount).fill(0).map((_, i) => ({
-        start: min + i * binSize,
-        end: min + (i + 1) * binSize,
-        count: 0
-    }));
-
-    distances.forEach(value => {
-        const index = Math.min(
-            Math.floor((value - min) / binSize),
-            binCount - 1
-        );
-        if (index >= 0) {
-            bins[index].count++;
-        }
-    });
-
-    const labelPerBin = bins.map(b => Math.round(b.end).toString());
-    const dataPerBin = bins.map(b => b.count);
-
-    createBarChart(
-        "routeLengthChart",
-        labelPerBin,
-        dataPerBin,
-        'kilometers',
-        'active days'
-    );
 }
