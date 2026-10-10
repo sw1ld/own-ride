@@ -75,15 +75,9 @@ QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://localhost:5432/ownridedb
 
 #### 3. Build and Run
 
-Generate diagrams (optional, required for full documentation):
-```shell
-mkdir -p src/main/resources/diagrams/generated && \
-plantuml src/main/resources/diagrams/*.puml -tsvg -o generated
-```
-
 Build the project using Maven:
 ```shell
-mvn clean verify -Pdocs
+mvn spotless:check sortpom:verify clean verify
 ```
 
 Start the application in development mode:
