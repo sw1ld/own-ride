@@ -201,43 +201,4 @@
     </plugins>
   </build>
 
-  <profiles>
-    <profile>
-      <id>docs</id>
-      <build>
-        <plugins>
-          <!--
-            copy diagrams to resources, so they are available at /diagrams
-          -->
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-resources-plugin</artifactId>
-            <version>3.5.0</version>
-            <executions>
-              <execution>
-                <id>copy-diagrams</id>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <phase>generate-resources</phase>
-                <configuration>
-                  <outputDirectory>${project.build.outputDirectory}/META-INF/resources/diagrams</outputDirectory>
-                  <resources>
-                    <resource>
-                      <directory>${project.basedir}/src/main/resources/diagrams/generated</directory>
-                      <filtering>false</filtering>
-                      <excludes>
-                        <exclude>*.puml</exclude>
-                      </excludes>
-                    </resource>
-                  </resources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-
 </project>
