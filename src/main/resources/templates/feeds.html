@@ -1,5 +1,5 @@
 {#for entry in data}
-    <div class="card mb-2 clickable-card" draggable="true" data-id="{entry.id}" data-type="{entry.type}" style="cursor: pointer; border-radius: 6px; transition: transform 0.1s, box-shadow 0.1s; {#if entry.type.name == 'GROUP'}border-left: 3px solid #0B4587;{/if}"
+    <div class="card mb-2 clickable-card" draggable="true" data-id="{entry.id}" data-type="{entry.type}" data-date="{entry.date}" style="cursor: pointer; border-radius: 6px; transition: transform 0.1s, box-shadow 0.1s; {#if entry.type.name == 'GROUP'}border-left: 3px solid #0B4587;{/if}"
          {#if nextCursor && (entry_index == 8 || (data.size <= 8 && entry_isFirst))}
              hx-get="/own/activities/feed?cursor={nextCursor}"
              hx-trigger="revealed"
