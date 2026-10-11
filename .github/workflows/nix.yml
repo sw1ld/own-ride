@@ -1,0 +1,31 @@
+name: Nix CI
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ "**" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v7
+
+    - uses: cachix/install-nix-action@v31
+      with:
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Check flake
+      run: nix flake check --all-systems --no-update-lock-file
+
+    - name: Build with Maven (including Tests)
+      run: nix develop --no-update-lock-file -c mvn -B verify
+
+    - name: Build package
+      run: nix build --no-update-lock-file

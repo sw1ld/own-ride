@@ -88,6 +88,38 @@ mvn quarkus:dev
 The application will be accessible at [http://localhost:8080/own/stats](http://localhost:8080/own/stats).
 For technical details there is also an OpenApiSpecification published via [Swagger-UI](http://localhost:8080/own/q/swagger-ui).
 
+#### Build with Nix
+
+Enter a development shell with Java 21 and Maven:
+
+```shell
+nix develop
+```
+
+Build the Quarkus application with the pinned Java 21 and Maven toolchain:
+
+```shell
+nix build
+```
+
+Run the packaged application after configuring PostgreSQL as described above:
+
+```shell
+./result/bin/ownride
+```
+
+You can also build and run it directly:
+
+```shell
+nix run
+```
+
+The package includes the Quarkus fast JAR and its dependencies in `result/share/ownride`.
+Nix builds skip tests because the Quarkus integration tests require Docker to start PostgreSQL.
+Run the Maven verification command above to execute the test suite.
+After changing Maven dependencies or updating the flake lock, set `mvnHash` in `flake.nix` to `pkgs.lib.fakeHash` and run `nix build`.
+Replace it with the `got: sha256-...` value reported by Nix and build again.
+
 ## Contribution
 
 Looks like you managed to run the application locally. 

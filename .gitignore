@@ -23,4 +23,6 @@ pom.xml.releaseBackup
 pom.xml.tag
 pom.xml.versionsBackup
 release.properties
+result
+result-*
 target/
